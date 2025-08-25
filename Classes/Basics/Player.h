@@ -12,6 +12,7 @@ class Player : public BaseBeing
 public:
 
 	static Player* create();
+
 	
 };
 

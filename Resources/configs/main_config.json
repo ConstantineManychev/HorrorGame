@@ -12,7 +12,14 @@
 		},
 		"keys" : {
 			"left" : "A",
-			"right" : "D"
+			"right" : "D",
+			"up" : "W",
+			"down" : "S",
+			"use": "E",
+			"jump": "SPACE",
+			"run": "SHIFT",
+			"always_run": "CAPS LOCK",
+			"console": "`"
 		}
 	},
 	"global_values" : 

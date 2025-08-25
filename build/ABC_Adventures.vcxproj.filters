@@ -7,19 +7,40 @@
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\BValue.cpp">
       <Filter>Source Files\Classes\Basics</Filter>
     </ClCompile>
+    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\BaseAction.cpp">
+      <Filter>Source Files\Classes\Basics</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\BaseBeing.cpp">
+      <Filter>Source Files\Classes\Basics</Filter>
+    </ClCompile>
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\BaseLocation.cpp">
+      <Filter>Source Files\Classes\Basics</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\BaseObject.cpp">
       <Filter>Source Files\Classes\Basics</Filter>
     </ClCompile>
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\BaseScene.cpp">
       <Filter>Source Files\Classes\Basics</Filter>
     </ClCompile>
+    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\Enemy.cpp">
+      <Filter>Source Files\Classes\Basics</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\Item.cpp">
+      <Filter>Source Files\Classes\Basics</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\Parallax.cpp">
+      <Filter>Source Files\Classes\Basics</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\Player.cpp">
+      <Filter>Source Files\Classes\Basics</Filter>
+    </ClCompile>
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\HelloWorldScene.cpp">
       <Filter>Source Files\Classes</Filter>
     </ClCompile>
-    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Helpers\DataHelper.cpp">
+    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Helpers\JsonHelper.cpp">
       <Filter>Source Files\Classes\Helpers</Filter>
     </ClCompile>
-    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Helpers\JsonHelper.cpp">
+    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Helpers\NodeHelper.cpp">
       <Filter>Source Files\Classes\Helpers</Filter>
     </ClCompile>
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Logics\LocationLogic.cpp">
@@ -34,10 +55,16 @@
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Managers\ScenesManager.cpp">
       <Filter>Source Files\Classes\Managers</Filter>
     </ClCompile>
+    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Managers\ViewManager.cpp">
+      <Filter>Source Files\Classes\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Scenes\EditorScene.cpp">
+      <Filter>Source Files\Classes\Scenes</Filter>
+    </ClCompile>
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Scenes\GreetingsScene.cpp">
       <Filter>Source Files\Classes\Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Scenes\MainMenuScene.cpp">
+    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Scenes\MainGameScene.cpp">
       <Filter>Source Files\Classes\Scenes</Filter>
     </ClCompile>
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\proj.win32\main.cpp">
@@ -54,10 +81,31 @@
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\BValue.h">
       <Filter>Source Files\Classes\Basics</Filter>
     </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\BaseAction.h">
+      <Filter>Source Files\Classes\Basics</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\BaseBeing.h">
+      <Filter>Source Files\Classes\Basics</Filter>
+    </ClInclude>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\BaseLocation.h">
       <Filter>Source Files\Classes\Basics</Filter>
     </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\BaseObject.h">
+      <Filter>Source Files\Classes\Basics</Filter>
+    </ClInclude>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\BaseScene.h">
+      <Filter>Source Files\Classes\Basics</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\Enemy.h">
+      <Filter>Source Files\Classes\Basics</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\Item.h">
+      <Filter>Source Files\Classes\Basics</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\Parallax.h">
+      <Filter>Source Files\Classes\Basics</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\Player.h">
       <Filter>Source Files\Classes\Basics</Filter>
     </ClInclude>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\CommonDefines.h">
@@ -66,10 +114,10 @@
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\HelloWorldScene.h">
       <Filter>Source Files\Classes</Filter>
     </ClInclude>
-    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Helpers\DataHelper.h">
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Helpers\JsonHelper.h">
       <Filter>Source Files\Classes\Helpers</Filter>
     </ClInclude>
-    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Helpers\JsonHelper.h">
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Helpers\NodeHelper.h">
       <Filter>Source Files\Classes\Helpers</Filter>
     </ClInclude>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Logics\LocationLogic.h">
@@ -84,10 +132,16 @@
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Managers\ScenesManager.h">
       <Filter>Source Files\Classes\Managers</Filter>
     </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Managers\ViewManager.h">
+      <Filter>Source Files\Classes\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Scenes\EditorScene.h">
+      <Filter>Source Files\Classes\Scenes</Filter>
+    </ClInclude>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Scenes\GreetingsScene.h">
       <Filter>Source Files\Classes\Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Scenes\MainMenuScene.h">
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Scenes\MainGameScene.h">
       <Filter>Source Files\Classes\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Types\BasicDataTypes.h">
@@ -111,6 +165,18 @@
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Resources\configs\main_config.json">
       <Filter>Resources\configs</Filter>
     </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Resources\configs\views\main_menu_view.json">
+      <Filter>Resources\configs\views</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Resources\configs\views\stage_A_view.json">
+      <Filter>Resources\configs\views</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Resources\configs\views\title_view.json">
+      <Filter>Resources\configs\views</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Resources\configs\views\views_list.json">
+      <Filter>Resources\configs\views</Filter>
+    </ClInclude>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Resources\fonts\Marker Felt.ttf">
       <Filter>Resources\fonts</Filter>
     </ClInclude>
@@ -118,6 +184,36 @@
       <Filter>Resources\fonts</Filter>
     </ClInclude>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Resources\res\.gitkeep">
+      <Filter>Resources\res</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Resources\res\A_Letter.png">
+      <Filter>Resources\res</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Resources\res\KaoBXlpX1PeB.png">
+      <Filter>Resources\res</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Resources\res\Title.png">
+      <Filter>Resources\res</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Resources\res\fire.png">
+      <Filter>Resources\res</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Resources\res\main_menu\MM_A_Letter.png">
+      <Filter>Resources\res\main_menu</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Resources\res\main_menu\MM_B_Letter.png">
+      <Filter>Resources\res\main_menu</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Resources\res\main_menu\MM_Background.png">
+      <Filter>Resources\res\main_menu</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Resources\res\main_menu\MM_C_Letter.png">
+      <Filter>Resources\res\main_menu</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Resources\res\main_menu\MM_ground.png">
+      <Filter>Resources\res\main_menu</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Resources\res\tale_paticle.plist">
       <Filter>Resources\res</Filter>
     </ClInclude>
   </ItemGroup>
@@ -136,11 +232,17 @@
     <Filter Include="Resources\configs">
       <UniqueIdentifier>{4A120A9F-65D2-3088-B78F-99E4EDC3C1FB}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources\configs\views">
+      <UniqueIdentifier>{D76DAEE0-0793-3650-AF1B-C24172179CFA}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Resources\fonts">
       <UniqueIdentifier>{E60C09A0-7273-3FA9-A68B-2400095C6199}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resources\res">
       <UniqueIdentifier>{EE39D558-7B5B-3E2F-8FF4-25A0612BD9BF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\res\main_menu">
+      <UniqueIdentifier>{BA0ABF3C-85BD-3C62-B427-3E71CE01D6B5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
       <UniqueIdentifier>{726D1C23-6039-3DEF-8E3F-3C75972632E1}</UniqueIdentifier>

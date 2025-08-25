@@ -52,14 +52,23 @@
     <ClCompile Include="..\Classes\Basics\BaseAction.cpp">
       <Filter>Source Files\Classes\basics</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Basics\BaseBeing.cpp">
-      <Filter>Source Files\Classes\basics</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\Basics\Enemy.cpp">
       <Filter>Source Files\Classes\basics</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\Basics\Player.cpp">
       <Filter>Source Files\Classes\basics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Basics\Parallax.cpp">
+      <Filter>Source Files\Classes\basics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Basics\BaseObject.cpp">
+      <Filter>Source Files\Classes\basics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Basics\BaseBeing.cpp">
+      <Filter>Source Files\Classes\basics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Scenes\EditorScene.cpp">
+      <Filter>Source Files\Classes\scenes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -138,14 +147,23 @@
     <ClInclude Include="..\Classes\Basics\BaseAction.h">
       <Filter>Source Files\Classes\basics</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Basics\BaseBeing.h">
-      <Filter>Source Files\Classes\basics</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\Basics\Enemy.h">
       <Filter>Source Files\Classes\basics</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\Basics\Player.h">
       <Filter>Source Files\Classes\basics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Basics\Parallax.h">
+      <Filter>Source Files\Classes\basics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Basics\BaseObject.h">
+      <Filter>Source Files\Classes\basics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Basics\BaseBeing.h">
+      <Filter>Source Files\Classes\basics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Scenes\EditorScene.h">
+      <Filter>Source Files\Classes\scenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

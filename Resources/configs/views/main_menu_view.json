@@ -93,6 +93,16 @@
 						"runAction" : "change_view",
 						"id" : "stage_A"
 					}
+				],
+				"onBtnClickMove" : 
+				[
+					{
+						"runAction" : "forget_button",
+						"conditions" : 
+						{
+							"is_Highlighted" : false
+						}
+					}
 				]
 			},
 			"params" :

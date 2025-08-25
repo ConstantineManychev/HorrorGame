@@ -25,9 +25,10 @@ void GameDirector::startGame()
 {
 	DM->parseViewConfigs();
 
-	SM->registerScene( "main", MainGameScene::create());
+	auto mainGameScene = MainGameScene::create();
+	SM->registerScene("main", mainGameScene);
 
-	SM->openScene("main");
+	//SM->openScene("main");
 }
 
 void GameDirector::setLocation(BaseLocation* aLocation)

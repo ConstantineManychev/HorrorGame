@@ -751,7 +751,7 @@ float BValue::getFloat() const
 
     if (_type == Type::STRING)
     {
-        return utils::atof(_field.strVal->c_str());
+        return static_cast<float>(utils::atof(_field.strVal->c_str()));
     }
     if (_type == Type::LONG_DOUBLE)
     {
@@ -940,7 +940,7 @@ std::string BValue::getString() const
             ret << std::fixed << std::setprecision( 7 ) << _field.sizeVal->width << "," << _field.sizeVal->height;
             break;
         case Type::COLOR3B:
-            ret << std::fixed << std::setprecision( 0 ) << (int)_field.color3BVal->r << "," << (int)_field.color3BVal->g << "," << (int)_field.color3BVal->b;
+            ret << std::fixed << std::setprecision( 0 ) << static_cast<int>(_field.color3BVal->r) << "," << static_cast<int>(_field.color3BVal->g) << "," << static_cast<int>(_field.color3BVal->b);
             break;
         case Type::COLOR4F:
             ret << std::fixed << std::setprecision( 7 ) << _field.color4FVal->r << "," << _field.color4FVal->g << "," << _field.color4FVal->b << "," << _field.color4FVal->a;
@@ -972,20 +972,20 @@ const long double& BValue::getLongDouble() const
     {
         case Type::BYTE:
         {
-            g_longDouble = _field.byteVal;
+            g_longDouble = static_cast<long double>(_field.byteVal);
             return g_longDouble;
         }
             break;
         case Type::INTEGER:
         {
-            g_longDouble = _field.intVal;
+            g_longDouble = static_cast<long double>(_field.intVal);
             
             return g_longDouble;
         }
             break;
         case Type::FLOAT:
         {
-            g_longDouble = _field.floatVal;
+            g_longDouble = static_cast<long double>(_field.floatVal);
             
             return g_longDouble;
         }
@@ -1020,28 +1020,28 @@ const long double& BValue::getLongDouble() const
             break;
         case Type::VEC2:
         {
-            g_longDouble = _field.vec2Val->x;
+            g_longDouble = static_cast<long double>(_field.vec2Val->x);
             
             return g_longDouble;
         }
             break;
         case Type::SIZE:
         {
-            g_longDouble = _field.sizeVal->width;
+            g_longDouble = static_cast<long double>(_field.sizeVal->width);
             
             return g_longDouble;
         }
             break;
         case Type::COLOR3B:
         {
-            g_longDouble = _field.color3BVal->r;
+            g_longDouble = static_cast<long double>(_field.color3BVal->r);
             
             return g_longDouble;
         }
             break;
         case Type::COLOR4F:
         {
-            g_longDouble = _field.color4FVal->r;
+            g_longDouble = static_cast<long double>(_field.color4FVal->r);
             
             return g_longDouble;
         }
@@ -1065,7 +1065,7 @@ const Vec2& BValue::getVec2() const
     {
         case Type::BYTE:
         {
-            g_printVec2.x = _field.byteVal;
+            g_printVec2.x = static_cast<float>(_field.byteVal);
             g_printVec2.y = 0.0f;
             
             return g_printVec2;
@@ -1073,7 +1073,7 @@ const Vec2& BValue::getVec2() const
             break;
         case Type::INTEGER:
         {
-            g_printVec2.x = _field.intVal;
+            g_printVec2.x = static_cast<float>(_field.intVal);
             g_printVec2.y = 0.0f;
             
             return g_printVec2;
@@ -1094,8 +1094,8 @@ const Vec2& BValue::getVec2() const
             auto pos = _field.strVal->find( ',' );
             if ( pos != std::string::npos )
             {
-                g_printVec2.x = utils::atof(_field.strVal->substr( 0, pos ).c_str());
-                g_printVec2.y = utils::atof(_field.strVal->substr( pos + 1, _field.strVal->size() - pos - 1 ).c_str());
+                g_printVec2.x = static_cast<float>(utils::atof(_field.strVal->substr( 0, pos ).c_str()));
+                g_printVec2.y = static_cast<float>(utils::atof(_field.strVal->substr( pos + 1, _field.strVal->size() - pos - 1 ).c_str()));
             }
             
             return g_printVec2;
@@ -1103,7 +1103,7 @@ const Vec2& BValue::getVec2() const
             break;
         case Type::LONG_DOUBLE:
         {
-            g_printVec2.x = *_field.longDoubleVal;
+            g_printVec2.x = static_cast<float>(*_field.longDoubleVal);
             g_printVec2.y = 0.0f;
             
             return g_printVec2;
@@ -1111,7 +1111,7 @@ const Vec2& BValue::getVec2() const
             break;
         case Type::DOUBLE:
         {
-            g_printVec2.x = _field.doubleVal;
+            g_printVec2.x = static_cast<float>(_field.doubleVal);
             g_printVec2.y = 0.0f;
             
             return g_printVec2;
@@ -1133,24 +1133,24 @@ const Vec2& BValue::getVec2() const
             break;
         case Type::SIZE:
         {
-            g_printVec2.x = _field.sizeVal->width;
-            g_printVec2.y = _field.sizeVal->height;
+            g_printVec2.x = static_cast<float>(_field.sizeVal->width);
+            g_printVec2.y = static_cast<float>(_field.sizeVal->height);
             
             return g_printVec2;
         }
             break;
         case Type::COLOR3B:
         {
-            g_printVec2.x = _field.color3BVal->r;
-            g_printVec2.y = _field.color3BVal->g;
+            g_printVec2.x = static_cast<float>(_field.color3BVal->r);
+            g_printVec2.y = static_cast<float>(_field.color3BVal->g);
             
             return g_printVec2;
         }
             break;
         case Type::COLOR4F:
         {
-            g_printVec2.x = _field.color4FVal->r;
-            g_printVec2.y = _field.color4FVal->g;;
+            g_printVec2.x = static_cast<float>(_field.color4FVal->r);
+            g_printVec2.y = static_cast<float>(_field.color4FVal->g);
             
             return g_printVec2;
         }
@@ -1174,7 +1174,7 @@ const Size& BValue::getSize() const
     {
         case Type::BYTE:
         {
-            g_printSize.width = _field.byteVal;
+            g_printSize.width = static_cast<float>(_field.byteVal);
             g_printSize.height = 0.0f;
             
             return g_printSize;
@@ -1182,7 +1182,7 @@ const Size& BValue::getSize() const
             break;
         case Type::INTEGER:
         {
-            g_printSize.width = _field.intVal;
+            g_printSize.width = static_cast<float>(_field.intVal);
             g_printSize.height = 0.0f;
             
             return g_printSize;
@@ -1203,8 +1203,8 @@ const Size& BValue::getSize() const
             auto pos = _field.strVal->find( ',' );
             if ( pos != std::string::npos )
             {
-                g_printSize.width = utils::atof(_field.strVal->substr( 0, pos ).c_str());
-                g_printSize.height = utils::atof(_field.strVal->substr( pos + 1, _field.strVal->size() - pos - 1 ).c_str());
+                g_printSize.width = static_cast<float>(utils::atof(_field.strVal->substr( 0, pos ).c_str()));
+                g_printSize.height = static_cast<float>(utils::atof(_field.strVal->substr( pos + 1, _field.strVal->size() - pos - 1 ).c_str()));
             }
             
             return g_printSize;
@@ -1212,7 +1212,7 @@ const Size& BValue::getSize() const
             break;
         case Type::LONG_DOUBLE:
         {
-            g_printSize.width = *_field.longDoubleVal;
+            g_printSize.width = static_cast<float>(*_field.longDoubleVal);
             g_printSize.height = 0.0f;
             
             return g_printSize;
@@ -1220,7 +1220,7 @@ const Size& BValue::getSize() const
             break;
         case Type::DOUBLE:
         {
-            g_printSize.width = _field.doubleVal;
+            g_printSize.width = static_cast<float>(_field.doubleVal);
             g_printSize.height = 0.0f;
             
             return g_printSize;
@@ -1242,24 +1242,24 @@ const Size& BValue::getSize() const
             break;
         case Type::VEC2:
         {
-            g_printSize.width = _field.vec2Val->x;
-            g_printSize.height = _field.vec2Val->y;
+            g_printSize.width = static_cast<float>(_field.vec2Val->x);
+            g_printSize.height = static_cast<float>(_field.vec2Val->y);
             
             return g_printSize;
         }
             break;
         case Type::COLOR3B:
         {
-            g_printSize.width = _field.color3BVal->r;
-            g_printSize.height = _field.color3BVal->g;
+            g_printSize.width = static_cast<float>(_field.color3BVal->r);
+            g_printSize.height = static_cast<float>(_field.color3BVal->g);
             
             return g_printSize;
         }
             break;
         case Type::COLOR4F:
         {
-            g_printSize.width = _field.color4FVal->r;
-            g_printSize.height = _field.color4FVal->g;;
+            g_printSize.width = static_cast<float>(_field.color4FVal->r);
+            g_printSize.height = static_cast<float>(_field.color4FVal->g);
             
             return g_printSize;
         }
@@ -1283,7 +1283,7 @@ const Color3B& BValue::getColor3B() const
     {
         case Type::BYTE:
         {
-            g_printColor3B.r = _field.byteVal;
+            g_printColor3B.r = static_cast<uint8_t>(_field.byteVal);
             g_printColor3B.g = 0;
             g_printColor3B.b = 0;
             
@@ -1292,7 +1292,7 @@ const Color3B& BValue::getColor3B() const
             break;
         case Type::INTEGER:
         {
-            g_printColor3B.r = _field.intVal;
+            g_printColor3B.r = static_cast<uint8_t>(_field.intVal);
             g_printColor3B.g = 0;
             g_printColor3B.b = 0;
             
@@ -1301,7 +1301,7 @@ const Color3B& BValue::getColor3B() const
             break;
         case Type::FLOAT:
         {
-            g_printColor3B.r = _field.floatVal;
+            g_printColor3B.r = static_cast<uint8_t>(_field.floatVal);
             g_printColor3B.g = 0;
             g_printColor3B.b = 0;
             
@@ -1326,17 +1326,17 @@ const Color3B& BValue::getColor3B() const
                 switch ( i ) {
                     case 0:
                     {
-                        g_printColor3B.r = colSeg;
+                        g_printColor3B.r = static_cast<uint8_t>(colSeg);
                     }
                         break;
                     case 1:
                     {
-                        g_printColor3B.g = colSeg;
+                        g_printColor3B.g = static_cast<uint8_t>(colSeg);
                     }
                         break;
                     case 2:
                     {
-                        g_printColor3B.b = colSeg;
+                        g_printColor3B.b = static_cast<uint8_t>(colSeg);
                     }
                         break;
                     default:
@@ -1357,7 +1357,7 @@ const Color3B& BValue::getColor3B() const
             break;
         case Type::LONG_DOUBLE:
         {
-            g_printColor3B.r = *_field.longDoubleVal;
+            g_printColor3B.r = static_cast<uint8_t>(*_field.longDoubleVal);
             g_printColor3B.g = 0;
             g_printColor3B.b = 0;
             
@@ -1366,7 +1366,7 @@ const Color3B& BValue::getColor3B() const
             break;
         case Type::DOUBLE:
         {
-            g_printColor3B.r = _field.doubleVal;
+            g_printColor3B.r = static_cast<uint8_t>(_field.doubleVal);
             g_printColor3B.g = 0;
             g_printColor3B.b = 0;
             
@@ -1388,8 +1388,8 @@ const Color3B& BValue::getColor3B() const
             break;
         case Type::VEC2:
         {
-            g_printColor3B.r = _field.vec2Val->x;
-            g_printColor3B.g = _field.vec2Val->y;
+            g_printColor3B.r = static_cast<uint8_t>(_field.vec2Val->x);
+            g_printColor3B.g = static_cast<uint8_t>(_field.vec2Val->y);
             g_printColor3B.b = 0;
             
             return g_printColor3B;
@@ -1397,8 +1397,8 @@ const Color3B& BValue::getColor3B() const
             break;
         case Type::SIZE:
         {
-            g_printColor3B.r = _field.sizeVal->width;
-            g_printColor3B.g = _field.sizeVal->height;
+            g_printColor3B.r = static_cast<uint8_t>(_field.sizeVal->width);
+            g_printColor3B.g = static_cast<uint8_t>(_field.sizeVal->height);
             g_printColor3B.b = 0;
             
             return g_printColor3B;
@@ -1430,7 +1430,7 @@ const Color4F& BValue::getColor4F() const
     {
         case Type::BYTE:
         {
-            g_printColor4F.r = _field.byteVal;
+            g_printColor4F.r = static_cast<float>(_field.byteVal);
             g_printColor4F.g = 0.0f;
             g_printColor4F.b = 0.0f;
             g_printColor4F.a = 0.0f;
@@ -1440,7 +1440,7 @@ const Color4F& BValue::getColor4F() const
             break;
         case Type::INTEGER:
         {
-            g_printColor4F.r = _field.intVal;
+            g_printColor4F.r = static_cast<float>(_field.intVal);
             g_printColor4F.g = 0.0f;
             g_printColor4F.b = 0.0f;
             g_printColor4F.a = 0.0f;
@@ -1469,7 +1469,7 @@ const Color4F& BValue::getColor4F() const
             int i = 0;
             while ( ( !rawStr.empty() ) && ( i < 4 ) )
             {
-                const float colSeg = utils::atof( rawStr.substr( 0, pos ).c_str() );
+                const float colSeg = static_cast<float>(utils::atof( rawStr.substr( 0, pos ).c_str() ));
                 rawStr = rawStr.substr( pos + 1, rawStr.size() - pos - 1 );
                 
                 switch ( i ) {
@@ -1511,7 +1511,7 @@ const Color4F& BValue::getColor4F() const
             break;
         case Type::LONG_DOUBLE:
         {
-            g_printColor4F.r = *_field.longDoubleVal;
+            g_printColor4F.r = static_cast<float>(*_field.longDoubleVal);
             g_printColor4F.g = 0.0f;
             g_printColor4F.b = 0.0f;
             g_printColor4F.a = 0.0f;
@@ -1521,7 +1521,7 @@ const Color4F& BValue::getColor4F() const
             break;
         case Type::DOUBLE:
         {
-            g_printColor4F.r = _field.doubleVal;
+            g_printColor4F.r = static_cast<float>(_field.doubleVal);
             g_printColor4F.g = 0.0f;
             g_printColor4F.b = 0.0f;
             g_printColor4F.a = 0.0f;
@@ -1544,8 +1544,8 @@ const Color4F& BValue::getColor4F() const
             break;
         case Type::VEC2:
         {
-            g_printColor4F.r = _field.vec2Val->x;
-            g_printColor4F.g = _field.vec2Val->y;
+            g_printColor4F.r = static_cast<float>(_field.vec2Val->x);
+            g_printColor4F.g = static_cast<float>(_field.vec2Val->y);
             g_printColor4F.b = 0.0f;
             g_printColor4F.a = 0.0f;
             
@@ -1554,8 +1554,8 @@ const Color4F& BValue::getColor4F() const
             break;
         case Type::SIZE:
         {
-            g_printColor4F.r = _field.sizeVal->width;
-            g_printColor4F.g = _field.sizeVal->height;
+            g_printColor4F.r = static_cast<float>(_field.sizeVal->width);
+            g_printColor4F.g = static_cast<float>(_field.sizeVal->height);
             g_printColor4F.b = 0.0f;
             g_printColor4F.a = 0.0f;
             
@@ -1590,13 +1590,13 @@ std::string BValue::getStringForVisit() const
     {
         case Type::BYTE:
         {
-            float fRet = _field.byteVal;
+            float fRet = static_cast<float>(_field.byteVal);
             ret << std::fixed << std::setprecision( 7 ) << fRet;
         }
             break;
         case Type::INTEGER:
         {
-            float fRet = _field.intVal;
+            float fRet = static_cast<float>(_field.intVal);
             ret << std::fixed << std::setprecision( 7 ) << fRet;
         }
             break;
@@ -1608,7 +1608,7 @@ std::string BValue::getStringForVisit() const
             break;
         case Type::DOUBLE:
         {
-            float fRet = _field.doubleVal;
+            float fRet = static_cast<float>(_field.doubleVal);
             ret << std::fixed << std::setprecision( 7 ) << fRet;
         }
             break;
@@ -1629,7 +1629,7 @@ std::string BValue::getStringForVisit() const
 			break;
 		case Type::COLOR3B:
 		{
-			ret << std::fixed << std::setprecision(0) << (int)_field.color3BVal->r << "," << (int)_field.color3BVal->g << "," << (int)_field.color3BVal->b;
+			ret << std::fixed << std::setprecision(0) << static_cast<int>(_field.color3BVal->r) << "," << static_cast<int>(_field.color3BVal->g) << "," << static_cast<int>(_field.color3BVal->b);
 		}
 			break;
 		case Type::COLOR4F:
@@ -1644,7 +1644,6 @@ std::string BValue::getStringForVisit() const
             break;
     }
     return ret.str();
-
 }
 BValueVector& BValue::getValueVector()
 {

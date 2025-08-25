@@ -61,6 +61,13 @@ private:
 
 	void changeView(const std::string& aViewID);
 
+	bool isAllConditionsMeetRequirements(const BValueMap& aMap, Node* aNode);
+
+	const BValueMap& getParamMap(const BValueMap& aMap, const std::string& aParam);
+	std::string getParamString(const BValueMap& aMap, const std::string& aParam);
+	float getParamFloat(const BValueMap& aMap, const std::string& aParam);
+	bool getParamBool(const BValueMap& aMap, const std::string& aParam);
+
 public:
 
 	static ViewManager* getInstance();

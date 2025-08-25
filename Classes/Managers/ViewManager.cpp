@@ -14,6 +14,7 @@
 
 _USEC
 
+static const BValueMap MapNull;
 ViewManager::ViewManager()
 {
 
@@ -326,29 +327,6 @@ FiniteTimeAction* ViewManager::createActionFromBValue(const BValue& aBValue, Nod
 {
 	FiniteTimeAction* result = nullptr;
 
-	auto getParamString = [](const BValueMap& aMap, const std::string& aParam)
-	{
-		std::string result;
-		auto it = aMap.find(aParam);
-		if (it != aMap.end() && it->second.isString())
-		{
-			result = it->second.getString();
-		}
-		return result;
-	}; 
-	auto getParamFloat = [](const BValueMap& aMap, const std::string& aParam)
-	{
-		float result = 0.f;
-		auto it = aMap.find(aParam);
-		if (it != aMap.end() 
-			&& it->second.isFloat() || it->second.isDouble())
-		{
-			result = it->second.getFloat();
-		}
-		return result;
-
-	};
-
 	if (aBValue.isMap())
 	{
 		std::string actionVecName;
@@ -369,33 +347,55 @@ FiniteTimeAction* ViewManager::createActionFromBValue(const BValue& aBValue, Nod
 					{
 						const auto& actionMap = action.getValueMap();
 
+						
 						auto it = actionMap.find("runAction");
 						if (it != actionMap.end() && it->second.isString())
 						{
 							actionName = it->second.getString();
 							if (actionName == "fade_in")
 							{
-								result = FadeIn::create( getParamFloat(actionMap, "duration") );
+								result = FadeIn::create(getParamFloat(actionMap, "duration"));
 							}
 							else if (actionName == "fade_out")
 							{
-								result = FadeOut::create( getParamFloat(actionMap, "duration") );
+								result = FadeOut::create(getParamFloat(actionMap, "duration"));
 							}
 							else if (actionName == "delay_time")
 							{
-								result = DelayTime::create( getParamFloat(actionMap, "duration") );
+								result = DelayTime::create(getParamFloat(actionMap, "duration"));
 							}
 							else if (actionName == "change_view")
 							{
-								std::string viewID = getParamString(actionMap, "id");
-								result = CallFunc::create([viewID]() 
+								auto viewID = getParamString(actionMap, "id");
+								result = CallFunc::create([viewID]()
 								{
 									VM->changeView(viewID);
 								});
 							}
+							else if (actionName == "forget_button")
+							{
+								auto btn = dynamic_cast<ui::Button*>(aNode);
+								if (btn)
+								{
+									result = CallFunc::create([actionMap, btn]()
+									{
+										auto conditions = VM->getParamMap(actionMap, "conditions");
+										bool isAllConditions = VM->isAllConditionsMeetRequirements(conditions, btn);
+
+										if (isAllConditions)
+										{
+											btn->setTouchEnabled(false);
+											btn->setTouchEnabled(true);
+										}
+									});
+								}
+							}
 						}
 
-						mViewsActions[aNode][actionVecName].pushBack(result);
+						if (aNode && !actionVecName.empty() && result)
+						{
+							mViewsActions[aNode][actionVecName].pushBack(result);
+						}
 					}
 				}
 			}
@@ -411,11 +411,20 @@ void ViewManager::changeView(const std::string& aViewID)
 
 	if (currentScene)
 	{
+		Vector<Node*> nodesToRemove;
 		for (auto child : currentScene->getChildren())
 		{
-			removeViewByID(child->getName());
+			if (child->getTag() != 9999) // Do not remove editor UI elements
+			{
+				removeViewByID(child->getName());
+				nodesToRemove.pushBack(child);
+			}
 		}
-		currentScene->removeAllChildren();
+		for (auto node : nodesToRemove)
+		{
+			currentScene->removeChild(node, true);
+		}
+		//currentScene->removeAllChildren(); // Removed as we selectively remove children now
 
 		auto view = getViewByID(aViewID);
 
@@ -462,16 +471,88 @@ Node* ViewManager::getViewByID(const std::string& aID)
 
 void ViewManager::runActionForNode(Node* aNode, const std::string& aID)
 {
-	auto actionsListIt = mViewsActions.find(aNode);
-	if (actionsListIt != mViewsActions.end())
+	if (aNode)
 	{
-		auto& actionsList = actionsListIt->second;
-		auto actionIt = actionsList.find(aID);
-		if (actionIt != actionsList.end())
+		auto actionsListIt = mViewsActions.find(aNode);
+		if (actionsListIt != mViewsActions.end())
 		{
-			auto sequence = Sequence::create(actionIt->second);
+			auto& actionsList = actionsListIt->second;
+			auto actionIt = actionsList.find(aID);
+			if (actionIt != actionsList.end())
+			{
+				auto sequence = Sequence::create(actionIt->second);
 
-			aNode->runAction(sequence);
+				aNode->runAction(sequence);
+			}
 		}
 	}
 }
+
+
+bool ViewManager::isAllConditionsMeetRequirements(const BValueMap& aMap, Node* aNode)
+{
+	bool result = true;
+
+	for (auto it = aMap.begin(); it != aMap.end(); ++it)
+	{
+		std::string conditionName = it->first;
+		if (it->second.isBoolean())
+		{
+			bool value = it->second.getBool();
+
+			if (conditionName == "is_Highlighted")
+			{
+				auto btn = dynamic_cast<ui::Button*>(aNode);
+				if (btn)
+				{
+					result = btn->isHighlighted() == value;
+				}
+			}
+		}
+	}
+
+	return result;
+};
+
+const BValueMap& ViewManager::getParamMap (const BValueMap& aMap, const std::string& aParam)
+{
+	auto it = aMap.find(aParam);
+	if (it != aMap.end() && it->second.isMap())
+	{
+		return it->second.getValueMap();
+	}
+	return MapNull;
+};
+
+std::string ViewManager::getParamString (const BValueMap& aMap, const std::string& aParam)
+{
+	std::string result;
+	auto it = aMap.find(aParam);
+	if (it != aMap.end() && it->second.isString())
+	{
+		result = it->second.getString();
+	}
+	return result;
+};
+float ViewManager::getParamFloat (const BValueMap& aMap, const std::string& aParam)
+{
+	float result = 0.f;
+	auto it = aMap.find(aParam);
+	if (it != aMap.end()
+		&& it->second.isFloat() || it->second.isDouble())
+	{
+		result = it->second.getFloat();
+	}
+	return result;
+
+};
+bool ViewManager::getParamBool (const BValueMap& aMap, const std::string& aParam)
+{
+	bool result;
+	auto it = aMap.find(aParam);
+	if (it != aMap.end() && it->second.isBoolean())
+	{
+		result = it->second.getBool();
+	}
+	return result;
+};

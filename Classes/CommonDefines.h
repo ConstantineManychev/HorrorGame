@@ -7,4 +7,6 @@
 #define _CEND }
 
 
+#define DEVELOP_MODE 1 // Set to 1 for development, 0 for production
+
 #endif

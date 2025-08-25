@@ -822,10 +822,12 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   <ItemGroup>
     <ClInclude Include="..\Classes\Basics\BaseAction.h" />
     <ClInclude Include="..\Classes\Basics\BaseBeing.h" />
+    <ClInclude Include="..\Classes\Basics\BaseObject.h" />
     <ClInclude Include="..\Classes\Basics\BaseLocation.h" />
     <ClInclude Include="..\Classes\Basics\BaseScene.h" />
     <ClInclude Include="..\Classes\Basics\BValue.h" />
     <ClInclude Include="..\Classes\Basics\Enemy.h" />
+    <ClInclude Include="..\Classes\Basics\Parallax.h" />
     <ClInclude Include="..\Classes\Basics\Player.h" />
     <ClInclude Include="..\Classes\CommonDefines.h" />
     <ClInclude Include="..\Classes\Helpers\NodeHelper.h" />
@@ -835,6 +837,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="..\Classes\Managers\GameDirector.h" />
     <ClInclude Include="..\Classes\Managers\ScenesManager.h" />
     <ClInclude Include="..\Classes\Managers\ViewManager.h" />
+    <ClInclude Include="..\Classes\Scenes\EditorScene.h" />
     <ClInclude Include="..\Classes\Scenes\GreetingsScene.h" />
     <ClInclude Include="..\Classes\Scenes\MainGameScene.h" />
     <ClInclude Include="..\Classes\Types\BasicDataTypes.h" />
@@ -844,10 +847,12 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\proj.win32\resource.h" />
     <ClCompile Include="..\Classes\Basics\BaseAction.cpp" />
     <ClCompile Include="..\Classes\Basics\BaseBeing.cpp" />
+    <ClCompile Include="..\Classes\Basics\BaseObject.cpp" />
     <ClCompile Include="..\Classes\Basics\BaseLocation.cpp" />
     <ClCompile Include="..\Classes\Basics\BaseScene.cpp" />
     <ClCompile Include="..\Classes\Basics\BValue.cpp" />
     <ClCompile Include="..\Classes\Basics\Enemy.cpp" />
+    <ClCompile Include="..\Classes\Basics\Parallax.cpp" />
     <ClCompile Include="..\Classes\Basics\Player.cpp" />
     <ClCompile Include="..\Classes\Helpers\NodeHelper.cpp" />
     <ClCompile Include="..\Classes\Helpers\JsonHelper.cpp" />
@@ -856,6 +861,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="..\Classes\Managers\GameDirector.cpp" />
     <ClCompile Include="..\Classes\Managers\ScenesManager.cpp" />
     <ClCompile Include="..\Classes\Managers\ViewManager.cpp" />
+    <ClCompile Include="..\Classes\Scenes\EditorScene.cpp" />
     <ClCompile Include="..\Classes\Scenes\GreetingsScene.cpp" />
     <ClCompile Include="..\Classes\Scenes\MainGameScene.cpp" />
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\AppDelegate.cpp" />
