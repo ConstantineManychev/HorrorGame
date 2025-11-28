@@ -1,22 +1,28 @@
 #ifndef __EDITOR_SCENE_H__
 #define __EDITOR_SCENE_H__
 
-#include "cocos2d.h"
+#include "ui/UIButton.h"
+#include "ui/UILayout.h"
+
+#include "Basics/BaseScene.h"
 #include "CommonDefines.h"
 #include "Types/BasicDataTypes.h"
 
 _CSTART
 
-class EditorScene : public cocos2d::Scene
+class EditorScene : public BaseScene
 {
 public:
-	static cocos2d::Scene* createScene(const std::string& viewID);
+	static BaseScene* createScene(const std::string& viewID);
 
 	virtual bool init() override;
+	virtual void useDefaultView() override;
 
 private:
-	std::string mCurrentViewID; // ID of the view being edited
-	std::vector<std::pair<std::string, std::string>> mAvailableViews; // List of available views (name, view ID)
+	std::string mCurrentViewID;
+	std::vector<std::pair<std::string, std::string>> mAvailableViews;
+	Node* mSelectedFolder;
+	ui::Layout* mNodesListLayout;
 
 	void loadViewObjects(const std::string& viewID);
 	void saveViewObjects(const std::string& viewID);
@@ -25,7 +31,12 @@ private:
 	void setupEditorUI();
 	void addNodeToScene(const std::string& type, const std::string& texture = "");
 
-	cocos2d::Node* mSelectedNode; // Currently selected node for editing
+	void updateCurrentNodeList(Node* aNode);
+	ui::Button* createButtonForChangeFolder(const std::string& aName, Node* aNode, float aCurrentY);
+
+	cocos2d::Node* mSelectedNode;
+
+	CREATE_FUNC(EditorScene);
 };
 
 _CEND

@@ -40,6 +40,25 @@ struct sWindowInfo
 	{}
 };
 
+struct sSceneObjectInfo
+{
+	std::string name;
+	std::string type;
+	Vec2 position;
+	float scaleX;
+	float scaleY;
+	int zOrder;
+	std::string textureFileName;
+	BValue customData; // For any additional, specific data
+
+	sSceneObjectInfo()
+		: scaleX(1.0f)
+		, scaleY(1.0f)
+		, zOrder(0)
+	{}
+};
+
+
 _CEND
 
 #endif // __BASIC_DATA_TYPES_H__

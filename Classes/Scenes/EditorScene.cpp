@@ -1,21 +1,21 @@
 #include "EditorScene.h"
 #include "Managers/DataManager.h"
 #include "Helpers/NodeHelper.h"
-#include "ui/UIButton.h"
-#include "ui/UILayout.h"
+
 #include "ui/UIScrollView.h"
-#include "Managers/ScenesManager.h" // Required for SM macro
+#include "Managers/ScenesManager.h"
+#include "Managers/ViewManager.h"
 
 _USEC
 
-Scene* EditorScene::createScene(const std::string& viewID)
+BaseScene* EditorScene::createScene(const std::string& viewID)
 {
-    EditorScene* scene = static_cast<EditorScene*>(EditorScene::create());
+	EditorScene* scene = static_cast<EditorScene*>(EditorScene::create());
     if (scene)
     {
-		scene->mCurrentViewID = viewID; // Set the current view ID
-		scene->setupEditorUI(); // Setup UI after view ID is set
-		scene->loadViewObjects(scene->mCurrentViewID.empty() ? "main" : scene->mCurrentViewID); // Load view after UI is setup
+		scene->setCurrentViewID(viewID);
+		scene->setupEditorUI(); 
+		//scene->loadViewObjects(scene->mCurrentViewID.empty() ? "main" : scene->mCurrentViewID);
 		
         return scene;
     }
@@ -30,58 +30,19 @@ bool EditorScene::init()
         return false;
     }
 
-	// UI setup and scene loading will be handled in createScene to ensure correct order
-	//setupEditorUI(); // Removed from init
-
     return true;
+}
+
+void EditorScene::useDefaultView()
+{
+	VM->changeView("title");
 }
 
 void EditorScene::loadViewObjects(const std::string& viewID)
 {
 	CCLOG("EditorScene: Loading view from: %s", viewID.c_str());
 
-	// Remove all existing game nodes (keep UI elements)
-	Vector<Node*> nodesToRemove;
-	for (Node* child : this->getChildren())
-	{
-		if (child->getTag() != 9999) // Assuming editor UI elements have a specific tag
-		{
-			nodesToRemove.pushBack(child);
-		}
-	}
-	for (Node* node : nodesToRemove)
-	{
-		this->removeChild(node, true);
-	}
-
-	// Get view info from DataManager
-	const BValue& viewInfo = DM->getViewInfoByID(viewID);
-
-	if (viewInfo.isMap() && viewInfo.getValueMap().count("children"))
-	{
-		const BValue& childrenValue = viewInfo.getValueMap().at("children");
-
-		if (childrenValue.isVector())
-		{
-			const auto& objects = childrenValue.getValueVector();
-			CCLOG("EditorScene: Loaded %zu objects for view: %s", objects.size(), viewID.c_str());
-
-			for (const auto& objBValue : objects)
-			{
-				sSceneObjectInfo objInfo;
-				DM->parseSceneObject(objBValue.getValueMap(), objInfo); // Assuming parseSceneObject takes BValueMap
-				Node* node = NodeHelper::createNodeFromSceneObjectInfo(objInfo);
-				if (node)
-				{
-					this->addChild(node, node->getLocalZOrder(), node->getName());
-				}
-			}
-		}
-	}
-	else
-	{
-		CCLOG("EditorScene: Failed to load view info for %s or no children found.", viewID.c_str());
-	}
+	VM->changeView(viewID);
 }
 
 void EditorScene::saveViewObjects(const std::string& viewID)
@@ -90,76 +51,8 @@ void EditorScene::saveViewObjects(const std::string& viewID)
 
 	std::vector<sSceneObjectInfo> sceneObjects;
 
-	// Iterate through all children to collect their info
 	for (Node* child : this->getChildren())
 	{
-		// Skip editor UI elements
-		if (child->getTag() == 9999) // Assuming editor UI elements have a specific tag
-		{
-			continue;
-		}
-
-		sSceneObjectInfo objInfo;
-		objInfo.name = child->getName().empty() ? "unnamed_node" : child->getName();
-
-		if (dynamic_cast<Sprite*>(child))
-		{
-			objInfo.type = "Sprite";
-			Sprite* sprite = static_cast<Sprite*>(child);
-			if (sprite->getTexture())
-			{
-				objInfo.textureFileName = sprite->getTexture()->getPath();
-			}
-		}
-		else if (dynamic_cast<ui::Button*>(child))
-		{
-			objInfo.type = "Button";
-			ui::Button* button = static_cast<ui::Button*>(child);
-			if (objInfo.customData.isMap())
-			{
-				auto it = objInfo.customData.getValueMap().find("textureFileName");
-				if (it != objInfo.customData.getValueMap().end() && it->second.isString())
-				{
-					objInfo.textureFileName = it->second.getString();
-				}
-			}
-			else
-			{
-				objInfo.textureFileName = "HelloWorld.png"; 
-			}
-
-		}
-		else
-		{
-			objInfo.type = "Node";
-		}
-
-		objInfo.position = child->getPosition();
-		objInfo.scaleX = child->getScaleX();
-		objInfo.scaleY = child->getScaleY();
-		objInfo.zOrder = child->getLocalZOrder(); 
-
-		if (child->getUserObject())
-		{
-			if (objInfo.type == "Button")
-			{
-				
-				if (objInfo.customData.isMap())
-				{
-					auto it = objInfo.customData.getValueMap().find("textureFileName");
-					if (it != objInfo.customData.getValueMap().end() && it->second.isString())
-					{
-						objInfo.textureFileName = it->second.getString();
-					}
-				}
-				else
-				{
-					objInfo.textureFileName = "HelloWorld.png"; 
-				}
-			}
-		}
-
-		sceneObjects.push_back(objInfo);
 	}
 
 	// Save to the original view config file, not a separate scene file
@@ -168,14 +61,11 @@ void EditorScene::saveViewObjects(const std::string& viewID)
 
 void EditorScene::setupEditorUI()
 {
-	// Clear previous view list to avoid duplicates
 	mAvailableViews.clear();
 
 	auto visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-	// --- View Selection UI ---
-	// Load available view IDs from DataManager
 	std::vector<std::string> viewIDs = DM->getViewsIDs();
 
 	for (const auto& viewID : viewIDs)
@@ -183,7 +73,6 @@ void EditorScene::setupEditorUI()
 		mAvailableViews.push_back({viewID, viewID}); // Store view ID as both name and ID
 	}
 
-	// Create a scroll view for view selection
 	auto viewScrollView = ui::ScrollView::create();
 	viewScrollView->setContentSize(Size(200, visibleSize.height - 100));
 	viewScrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
@@ -191,18 +80,17 @@ void EditorScene::setupEditorUI()
 	viewScrollView->setAnchorPoint(Vec2(0, 1));
 	viewScrollView->setPosition(Vec2(10, visibleSize.height - 10));
 	this->addChild(viewScrollView, 9999);
-	viewScrollView->setTag(9999); // Ensure scroll view is also tagged
+	viewScrollView->setTag(9999);
 
-	// Create a layout to hold view selection buttons
 	auto viewListLayout = ui::Layout::create();
 	viewListLayout->setLayoutType(ui::Layout::Type::VERTICAL);
-	viewListLayout->setContentSize(Size(200, mAvailableViews.size() * 30)); // Adjust height based on number of views
+	viewListLayout->setContentSize(Size(200, mAvailableViews.size() * 30));
 	viewListLayout->setBackGroundColorType(ui::Layout::BackGroundColorType::SOLID);
 	viewListLayout->setBackGroundColor(Color3B::GRAY);
 	viewScrollView->addChild(viewListLayout);
-	viewListLayout->setTag(9999); // Ensure layout is also tagged
+	viewListLayout->setTag(9999);
 
-	float currentY = viewListLayout->getContentSize().height - 30; // Start from top
+	float currentY = viewListLayout->getContentSize().height - 30;
 	for (const auto& viewPair : mAvailableViews)
 	{
 		auto viewButton = ui::Button::create();
@@ -222,6 +110,27 @@ void EditorScene::setupEditorUI()
 		viewButton->setTag(9999); // Ensure button is also tagged
 		currentY -= 30;
 	}
+
+	auto nodesScrollView = ui::ScrollView::create();
+	nodesScrollView->setContentSize(Size(200, visibleSize.height - 100));
+	nodesScrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
+	nodesScrollView->setBounceEnabled(true);
+	nodesScrollView->setAnchorPoint(Vec2(0, 1));
+	nodesScrollView->setPosition(Vec2(10, visibleSize.height - 10));
+	this->addChild(viewScrollView, 9999);
+	nodesScrollView->setTag(9999);
+
+	auto mNodesListLayout = ui::Layout::create();
+	mNodesListLayout->setLayoutType(ui::Layout::Type::VERTICAL);
+	mNodesListLayout->setContentSize(Size(200, 10 * 30));
+	mNodesListLayout->setBackGroundColorType(ui::Layout::BackGroundColorType::SOLID);
+	mNodesListLayout->setBackGroundColor(Color3B::GRAY);
+	mNodesListLayout->setName("node_list");
+	nodesScrollView->addChild(mNodesListLayout);
+	mNodesListLayout->setTag(9999);
+
+	updateCurrentNodeList(this);
+	
 
 	// Add Node button
 	auto addNodeButton = ui::Button::create();
@@ -304,7 +213,7 @@ void EditorScene::addNodeToScene(const std::string& type, const std::string& tex
 {
 	sSceneObjectInfo objInfo;
 	objInfo.type = type;
-	objInfo.name = type + std::to_string(this->getChildrenCount()); // Simple unique name
+	objInfo.name = type + std::to_string(this->getChildrenCount());
 	objInfo.position = Director::getInstance()->getVisibleSize() / 2;
 	objInfo.textureFileName = textureFileName;
 
@@ -322,4 +231,55 @@ void EditorScene::addNodeToScene(const std::string& type, const std::string& tex
 		this->addChild(newNode);
 		mSelectedNode = newNode;
 	}
+}
+
+void EditorScene::updateCurrentNodeList(Node* aNode)
+{
+	if (mNodesListLayout && aNode)
+	{
+		mNodesListLayout->removeAllChildrenWithCleanup(true);
+		auto currentY = mNodesListLayout->getContentSize().height - 30;
+		if (aNode != this && mSelectedFolder)
+		{
+			auto viewButton = createButtonForChangeFolder("...", mSelectedFolder, currentY);
+
+			currentY -= 30;
+		}
+		mSelectedFolder = aNode;
+
+		auto viewButton = createButtonForChangeFolder(mSelectedFolder->getName(), mSelectedFolder, currentY);
+		currentY -= 30;
+
+		for (Node* child : mSelectedFolder->getChildren())
+		{
+			auto viewButton = createButtonForChangeFolder(child->getName(), mSelectedFolder, currentY);
+			
+			currentY -= 30;
+		}
+	}
+}
+
+ui::Button* EditorScene::createButtonForChangeFolder(const std::string& aName, Node* aNode, float aCurrentY)
+{
+	auto result = ui::Button::create();
+	if (aNode && mNodesListLayout)
+	{
+		const std::string& name = aNode->getName();
+		result->setTitleText(name);
+		result->setTitleFontSize(18);
+		result->setContentSize(Size(180, 25));
+		result->setPosition(Vec2(mNodesListLayout->getContentSize().width / 2, aCurrentY));
+		result->addTouchEventListener([&, name](Ref* sender, ui::Widget::TouchEventType type)
+		{
+			if (type == ui::Widget::TouchEventType::ENDED)
+			{
+				updateCurrentNodeList(aNode);
+			}
+		});
+
+		mNodesListLayout->addChild(result);
+		result->setTag(9999);
+	}
+
+	return result;
 }

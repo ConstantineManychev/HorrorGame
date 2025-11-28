@@ -29,6 +29,7 @@ private:
 	void parseStartupInfo(const rapidjson::Value& aValue, sMainInfo& aMainInfo);
 
 	std::string mResourcePath;
+	std::string mMainInfoConfigPath; // New member to store the path of main config file
 
  	sMainInfo mMainInfo;
 	BValueMap mGlobalValues;
@@ -37,11 +38,15 @@ private:
 	std::map< std::string, sWindowInfo > mWindowsInfos;
 	std::map< std::string, BValue > mViewsInfos;
 
+	std::vector<sSceneObjectInfo> mLoadedSceneObjects;
+
 	void parseViewConfig(const std::string& aConfigPath);
 
 	EventKeyboard::KeyCode convertStringToKeyCode(const std::string& aID);
 
 public:
+
+	void parseSceneObject(const BValueMap& aValue, sSceneObjectInfo& aSceneObjectInfo);
 
 	static DataManager* getInstance();
 
@@ -49,8 +54,15 @@ public:
 
 	void loadMainInfo(const std::string& configPath);
 	void loadWindows(const std::string& folderPath);
+	void loadScene(const std::string& sceneFilePath);
+
+	void saveScene(const std::string& sceneFilePath, const std::vector<sSceneObjectInfo>& sceneObjects);
+	void saveView(const std::string& viewID, const std::vector<sSceneObjectInfo>& sceneObjects);
+
+	const std::vector<sSceneObjectInfo>& getLoadedSceneObjects() const;
 
 	void parseViewConfigs();
+	std::vector<std::string> getViewsIDs() const; // New method to get all loaded view IDs
 
 	const sMainInfo& getMainInfo() const;
 	const sWindowInfo* getWindowInfo(const std::string& aWndID) const;

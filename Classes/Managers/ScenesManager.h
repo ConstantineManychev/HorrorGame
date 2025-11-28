@@ -15,6 +15,7 @@ private:
 
 	std::map<std::string, BaseScene*> mScenes;
 
+	std::string mCurrentSceneID;
 	BaseScene* mCurrentScene;
 
 public:
@@ -24,7 +25,11 @@ public:
 	void registerScene(const std::string& aSceneID, BaseScene* aScene);
 	void openScene(const std::string& aSceneID);
 
+	void runEditorScene();
+	void runGameScene();
+
 	BaseScene* getCurrentScene();
+	std::string& getCurrentSceneID();
 
 };
 

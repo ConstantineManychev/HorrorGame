@@ -136,6 +136,8 @@ void DataManager::parseStartupInfo(const rapidjson::Value& aValue, sMainInfo& aM
 
 				setupKey("left");
 				setupKey("right");
+				setupKey("up");
+				setupKey("down");
 				
 			}
 		}
@@ -176,6 +178,211 @@ void DataManager::parseViewConfig(const std::string& aConfigPath)
 	}
 
 }
+
+void DataManager::parseSceneObject(const BValueMap& aValue, sSceneObjectInfo& aSceneObjectInfo)
+{
+	auto getFloatMember = [&](const std::string& name, float defaultValue) -> float {
+		auto it = aValue.find(name);
+		if (it != aValue.end() && (it->second.isFloat() || it->second.isDouble() || it->second.isInteger()))
+		{
+			return it->second.getFloat();
+		}
+		return defaultValue;
+	};
+
+	auto getIntMember = [&](const std::string& name, int defaultValue) -> int {
+		auto it = aValue.find(name);
+		if (it != aValue.end() && it->second.isInteger())
+		{
+			return it->second.getInt();
+		}
+		return defaultValue;
+	};
+
+	auto getStringMember = [&](const std::string& name, const std::string& defaultValue) -> std::string {
+		auto it = aValue.find(name);
+		if (it != aValue.end() && it->second.isString())
+		{
+			return it->second.getString();
+		}
+		return defaultValue;
+	};
+
+	auto itName = aValue.find("name");
+	if (itName != aValue.end() && itName->second.isString())
+	{
+		aSceneObjectInfo.name = itName->second.getString();
+	}
+
+	auto itType = aValue.find("type");
+	if (itType != aValue.end() && itType->second.isString())
+	{
+		aSceneObjectInfo.type = itType->second.getString();
+	}
+
+	auto itPosition = aValue.find("position");
+	if (itPosition != aValue.end() && itPosition->second.isMap())
+	{
+		const auto& posObject = itPosition->second.getValueMap();
+		aSceneObjectInfo.position.x = getFloatMember("x", 0.0f);
+		aSceneObjectInfo.position.y = getFloatMember("y", 0.0f);
+	}
+
+	aSceneObjectInfo.scaleX = getFloatMember("scaleX", 1.0f);
+	aSceneObjectInfo.scaleY = getFloatMember("scaleY", 1.0f);
+	aSceneObjectInfo.zOrder = getIntMember("zOrder", 0);
+	aSceneObjectInfo.textureFileName = getStringMember("textureFileName", "");
+
+	auto itCustomData = aValue.find("customData");
+	if (itCustomData != aValue.end())
+	{
+		aSceneObjectInfo.customData = itCustomData->second;
+	}
+}
+
+void DataManager::loadScene(const std::string& sceneFilePath)
+{
+	mLoadedSceneObjects.clear();
+	std::string content = FileUtils::getInstance()->getStringFromFile(sceneFilePath);
+
+	if (content.empty())
+	{
+		CCLOG("DataManager: Failed to load scene file %s", sceneFilePath.c_str());
+		return;
+	}
+
+	rapidjson::Document document;
+	document.Parse<0>(content.c_str());
+
+	if (document.HasParseError() || !document.IsArray())
+	{
+		CCLOG("DataManager: Failed to parse scene file %s or it's not an array.", sceneFilePath.c_str());
+		return;
+	}
+
+	for (rapidjson::SizeType i = 0; i < document.Size(); ++i)
+	{
+		sSceneObjectInfo objectInfo;
+		// Convert rapidjson::Value to BValueMap for parseSceneObject
+		BValue objBValue;
+		JsonHelper::parseBValueFromJsonValue(document[i], objBValue);
+		if (objBValue.isMap())
+		{
+			parseSceneObject(objBValue.getValueMap(), objectInfo);
+			mLoadedSceneObjects.push_back(objectInfo);
+		}
+	}
+	CCLOG("DataManager: Scene %s loaded successfully with %zd objects.", sceneFilePath.c_str(), mLoadedSceneObjects.size());
+}
+
+void DataManager::saveScene(const std::string& sceneFilePath, const std::vector<sSceneObjectInfo>& sceneObjects)
+{
+	rapidjson::Document document;
+	document.SetArray();
+	rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
+
+	for (const auto& objInfo : sceneObjects)
+	{
+		rapidjson::Value obj(rapidjson::kObjectType);
+
+		obj.AddMember("name", rapidjson::Value(objInfo.name.c_str(), allocator).Move(), allocator);
+		obj.AddMember("type", rapidjson::Value(objInfo.type.c_str(), allocator).Move(), allocator);
+
+		rapidjson::Value position(rapidjson::kObjectType);
+		position.AddMember("x", objInfo.position.x, allocator);
+		position.AddMember("y", objInfo.position.y, allocator);
+		obj.AddMember("position", position, allocator);
+
+		obj.AddMember("scaleX", objInfo.scaleX, allocator);
+		obj.AddMember("scaleY", objInfo.scaleY, allocator);
+		obj.AddMember("zOrder", objInfo.zOrder, allocator);
+		obj.AddMember("textureFileName", rapidjson::Value(objInfo.textureFileName.c_str(), allocator).Move(), allocator);
+
+		if (!objInfo.customData.isNull())
+		{
+			rapidjson::Value customDataValue;
+			//JsonHelper::writeBValueToJsonValue(allocator, objInfo.customData, customDataValue);
+			obj.AddMember("customData", customDataValue, allocator);
+		}
+
+		document.PushBack(obj, allocator);
+	}
+
+	rapidjson::StringBuffer buffer;
+	rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+	document.Accept(writer);
+
+	std::string content = buffer.GetString();
+	FileUtils::getInstance()->writeStringToFile(content, sceneFilePath);
+	CCLOG("DataManager: Scene saved successfully to %s.", sceneFilePath.c_str());
+}
+
+void DataManager::saveView(const std::string& viewID, const std::vector<sSceneObjectInfo>& sceneObjects)
+{
+	CCLOG("DataManager: Saving view %s.", viewID.c_str());
+
+	BValue viewBValue;
+	viewBValue.clearWithType(BValue::Type::MAP);
+
+	// Add view ID
+	viewBValue.getValueMap()["id"] = BValue(viewID);
+
+	// Create a BValue vector for children
+	BValue childrenBValue;
+	childrenBValue.clearWithType(BValue::Type::VECTOR);
+
+	for (const auto& objInfo : sceneObjects)
+	{
+		BValue objMap;
+		objMap.clearWithType(BValue::Type::MAP);
+
+		objMap.getValueMap()["name"] = BValue(objInfo.name);
+		objMap.getValueMap()["type"] = BValue(objInfo.type);
+
+		BValue positionMap;
+		positionMap.clearWithType(BValue::Type::MAP);
+		positionMap.getValueMap()["x"] = BValue(objInfo.position.x);
+		positionMap.getValueMap()["y"] = BValue(objInfo.position.y);
+		objMap.getValueMap()["position"] = positionMap;
+
+		objMap.getValueMap()["scaleX"] = BValue(objInfo.scaleX);
+		objMap.getValueMap()["scaleY"] = BValue(objInfo.scaleY);
+		objMap.getValueMap()["zOrder"] = BValue(objInfo.zOrder);
+		objMap.getValueMap()["textureFileName"] = BValue(objInfo.textureFileName);
+
+		if (!objInfo.customData.isNull())
+		{
+			objMap.getValueMap()["customData"] = objInfo.customData;
+		}
+
+		childrenBValue.getValueVector().push_back(objMap);
+	}
+
+	viewBValue.getValueMap()["children"] = childrenBValue;
+
+	// Update mViewsInfos
+	mViewsInfos[viewID] = viewBValue;
+
+	// Get the actual file path for the view
+	std::string viewFilePath = "configs/views/" + viewID + ".json"; // Assuming this convention
+	// Alternatively, you might want to look up the original file path from parseViewConfig
+
+	//JsonHelper::writeBValueToJsonConfig(viewFilePath, viewBValue);
+
+	CCLOG("DataManager: View %s saved successfully to %s.", viewID.c_str(), viewFilePath.c_str());
+}
+
+const std::vector<sSceneObjectInfo>& DataManager::getLoadedSceneObjects() const
+{
+	return mLoadedSceneObjects;
+}
+
+void DataManager::saveMainInfo()
+{
+	// No implementation provided in the original file, so leaving it as is.
+	CCLOG("DataManager::saveMainInfo() not implemented.");
+}
+
 
 const sMainInfo& DataManager::getMainInfo() const
 {
@@ -221,6 +428,16 @@ const BValue& DataManager::getViewInfoByID(const std::string& aID) const
 	return BValue::Null;
 }
 
+std::vector<std::string> DataManager::getViewsIDs() const
+{
+	std::vector<std::string> viewIDs;
+	for (const auto& pair : mViewsInfos)
+	{
+		viewIDs.push_back(pair.first);
+	}
+	return viewIDs;
+}
+
 const BValue& DataManager::getGlobalValue(const std::string& aID)
 {
 	auto it = mGlobalValues.find(aID);
@@ -255,6 +472,58 @@ EventKeyboard::KeyCode DataManager::convertStringToKeyCode(const std::string& aI
 	else if (aID == "D")
 	{
 		result = EventKeyboard::KeyCode::KEY_D;
+	}
+	else if (aID == "S")
+	{
+		result = EventKeyboard::KeyCode::KEY_S;
+	}
+	else if (aID == "W")
+	{
+		result = EventKeyboard::KeyCode::KEY_W;
+	}
+	else if (aID == "E")
+	{
+		result = EventKeyboard::KeyCode::KEY_E;
+	}
+	else if (aID == "Q")
+	{
+		result = EventKeyboard::KeyCode::KEY_Q;
+	}
+	else if (aID == "I")
+	{
+		result = EventKeyboard::KeyCode::KEY_I;
+	}
+	else if (aID == "SPACE")
+	{
+		result = EventKeyboard::KeyCode::KEY_SPACE;
+	}
+	else if (aID == "SHIFT")
+	{
+		result = EventKeyboard::KeyCode::KEY_SHIFT;
+	}
+	else if (aID == "CTRL")
+	{
+		result = EventKeyboard::KeyCode::KEY_CTRL;
+	}
+	else if (aID == "ALT")
+	{
+		result = EventKeyboard::KeyCode::KEY_ALT;
+	}
+	else if (aID == "TAB")
+	{
+		result = EventKeyboard::KeyCode::KEY_TAB;
+	}
+	else if (aID == "ESC")
+	{
+		result = EventKeyboard::KeyCode::KEY_ESCAPE;
+	}
+	else if (aID == "`")
+	{
+		result = EventKeyboard::KeyCode::KEY_TILDE;
+	}
+	else if (aID == "CAPS LOCK")
+	{
+		result = EventKeyboard::KeyCode::KEY_CAPS_LOCK;
 	}
 
 	return result;

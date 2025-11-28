@@ -34,6 +34,12 @@
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Basics\Player.cpp">
       <Filter>Source Files\Classes\Basics</Filter>
     </ClCompile>
+    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Components\InputComponent.cpp">
+      <Filter>Source Files\Classes\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Components\MovementComponent.cpp">
+      <Filter>Source Files\Classes\Components</Filter>
+    </ClCompile>
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\HelloWorldScene.cpp">
       <Filter>Source Files\Classes</Filter>
     </ClCompile>
@@ -43,6 +49,9 @@
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Helpers\NodeHelper.cpp">
       <Filter>Source Files\Classes\Helpers</Filter>
     </ClCompile>
+    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Helpers\ViewFactory.cpp">
+      <Filter>Source Files\Classes\Helpers</Filter>
+    </ClCompile>
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Logics\LocationLogic.cpp">
       <Filter>Source Files\Classes\Logics</Filter>
     </ClCompile>
@@ -50,6 +59,12 @@
       <Filter>Source Files\Classes\Managers</Filter>
     </ClCompile>
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Managers\GameDirector.cpp">
+      <Filter>Source Files\Classes\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Managers\GameSession.cpp">
+      <Filter>Source Files\Classes\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Managers\InputManager.cpp">
       <Filter>Source Files\Classes\Managers</Filter>
     </ClCompile>
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Managers\ScenesManager.cpp">
@@ -111,6 +126,15 @@
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\CommonDefines.h">
       <Filter>Source Files\Classes</Filter>
     </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Components\GameComponent.h">
+      <Filter>Source Files\Classes\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Components\InputComponent.h">
+      <Filter>Source Files\Classes\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Components\MovementComponent.h">
+      <Filter>Source Files\Classes\Components</Filter>
+    </ClInclude>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\HelloWorldScene.h">
       <Filter>Source Files\Classes</Filter>
     </ClInclude>
@@ -120,6 +144,9 @@
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Helpers\NodeHelper.h">
       <Filter>Source Files\Classes\Helpers</Filter>
     </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Helpers\ViewFactory.h">
+      <Filter>Source Files\Classes\Helpers</Filter>
+    </ClInclude>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Logics\LocationLogic.h">
       <Filter>Source Files\Classes\Logics</Filter>
     </ClInclude>
@@ -127,6 +154,12 @@
       <Filter>Source Files\Classes\Managers</Filter>
     </ClInclude>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Managers\GameDirector.h">
+      <Filter>Source Files\Classes\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Managers\GameSession.h">
+      <Filter>Source Files\Classes\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Managers\InputManager.h">
       <Filter>Source Files\Classes\Managers</Filter>
     </ClInclude>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Managers\ScenesManager.h">
@@ -145,6 +178,9 @@
       <Filter>Source Files\Classes\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Types\BasicDataTypes.h">
+      <Filter>Source Files\Classes\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\Types\InputTypes.h">
       <Filter>Source Files\Classes\Types</Filter>
     </ClInclude>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\proj.win32\main.h">
@@ -252,6 +288,9 @@
     </Filter>
     <Filter Include="Source Files\Classes\Basics">
       <UniqueIdentifier>{0C0753FA-A0D1-30CB-BAD1-9E7979068DC3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Classes\Components">
+      <UniqueIdentifier>{75FEB7E0-B429-356E-9E9A-B7CF77078C09}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Classes\Helpers">
       <UniqueIdentifier>{DDFDE707-E026-3A22-95B9-3E2278D815A5}</UniqueIdentifier>

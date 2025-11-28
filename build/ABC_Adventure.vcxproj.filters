@@ -70,6 +70,15 @@
     <ClCompile Include="..\Classes\Scenes\EditorScene.cpp">
       <Filter>Source Files\Classes\scenes</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\Helpers\ViewFactory.cpp">
+      <Filter>Source Files\Classes\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Components\InputComponent.cpp">
+      <Filter>Source Files\Classes\components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Components\MovementComponent.cpp">
+      <Filter>Source Files\Classes\components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\AppDelegate.h">
@@ -165,6 +174,18 @@
     <ClInclude Include="..\Classes\Scenes\EditorScene.h">
       <Filter>Source Files\Classes\scenes</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\Helpers\ViewFactory.h">
+      <Filter>Source Files\Classes\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Components\GameComponent.h">
+      <Filter>Source Files\Classes\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Components\InputComponent.h">
+      <Filter>Source Files\Classes\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Components\MovementComponent.h">
+      <Filter>Source Files\Classes\components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="E:\My Cocos2dx projects\ABC_Adventure\CMakeLists.txt" />
@@ -213,6 +234,9 @@
     </Filter>
     <Filter Include="Source Files\Classes\locations">
       <UniqueIdentifier>{65cf88d6-c6ad-4745-becc-eba540f4c4b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Classes\components">
+      <UniqueIdentifier>{9a38a190-e0a6-4126-8139-33da68ce4557}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

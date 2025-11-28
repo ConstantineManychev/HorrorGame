@@ -6,10 +6,5 @@ _USEC
 
 void MainGameScene::useDefaultView()
 {
-	auto view = VM->getViewByID("title");
-
-	if (view)
-	{
-		this->addChild(view);
-	}
+	VM->changeView("title");
 }

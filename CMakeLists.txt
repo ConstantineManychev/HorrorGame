@@ -62,6 +62,12 @@ file(GLOB_RECURSE GAME_SOURCE
         "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Types/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Scenes/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Helpers/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Scenes/EditorScene.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Helpers/ViewFactory.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Managers/GameSession.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Managers/InputManager.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Components/InputComponent.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Components/MovementComponent.cpp"
      )
 file(GLOB_RECURSE GAME_HEADER
         "${CMAKE_CURRENT_SOURCE_DIR}/Classes/*.h"
