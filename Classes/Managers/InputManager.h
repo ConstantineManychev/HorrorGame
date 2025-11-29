@@ -4,9 +4,12 @@
 #include "cocos2d.h"
 #include "CommonDefines.h"
 #include "Types/InputTypes.h"
+#include "Basics/ServiceLocator.h" // Include ServiceLocator
 #include <functional>
 #include <unordered_map>
 #include <vector>
+#include <string>
+#include <map>
 
 _CSTART
 
@@ -15,11 +18,20 @@ using AxisCallback = std::function<void(GameAction aAction, float aValue)>;
 
 class InputManager
 {
+    friend class ServiceLocator;
+    friend class AppDelegate;
+
 public:
-    static InputManager* getInstance();
+    static InputManager* getInstance(); // Keep for now or remove
 
-    void init(Node* aInputNode);
+    void init(cocos2d::Node* aInputNode);
 
+    // Context Management
+    void createContext(const std::string& contextName);
+    void switchContext(const std::string& contextName);
+    void bindKeyToContext(const std::string& contextName, cocos2d::EventKeyboard::KeyCode aKeyCode, GameAction aAction);
+
+    // Legacy Listener Methods
     void addActionListener(GameAction aAction, const std::string& aListenerID, ActionCallback aCallback);
     void addAxisListener(GameAction aAction, const std::string& aListenerID, AxisCallback aCallback);
     void removeListener(const std::string& aListenerID);
@@ -27,25 +39,20 @@ public:
     bool isActionPressed(GameAction aAction) const;
     float getActionStrength(GameAction aAction) const;
 
-    // Mapping configuration
-    void bindKey(EventKeyboard::KeyCode aKeyCode, GameAction aAction);
-    
 private:
     InputManager();
     ~InputManager();
 
-    void setupKeyboardListeners(Node* aNode);
-    void setupMouseListeners(Node* aNode);
-    // Controller support can be added later if needed to keep it simple first
-    // void setupControllerListeners(Node* aNode);
+    void setupKeyboardListeners(cocos2d::Node* aNode);
+    void setupMouseListeners(cocos2d::Node* aNode);
 
-    void onKeyPressed(EventKeyboard::KeyCode aKeyCode, Event* aEvent);
-    void onKeyReleased(EventKeyboard::KeyCode aKeyCode, Event* aEvent);
+    void onKeyPressed(cocos2d::EventKeyboard::KeyCode aKeyCode, cocos2d::Event* aEvent);
+    void onKeyReleased(cocos2d::EventKeyboard::KeyCode aKeyCode, cocos2d::Event* aEvent);
     
     void triggerAction(GameAction aAction, bool aIsPressed);
     void triggerAxis(GameAction aAction, float aValue);
 
-    GameAction mapKeyToAction(EventKeyboard::KeyCode aKeyCode);
+    GameAction mapKeyToAction(cocos2d::EventKeyboard::KeyCode aKeyCode);
     
     std::unordered_map<GameAction, bool> mActionStates;
     std::unordered_map<GameAction, float> mAxisStates;
@@ -62,10 +69,17 @@ private:
     std::unordered_map<std::string, std::vector<ActionListenerInfo>> mActionListeners;
     std::unordered_map<std::string, std::vector<AxisListenerInfo>> mAxisListeners;
 
-    std::unordered_map<EventKeyboard::KeyCode, GameAction> mKeyBindings;
+    struct InputContext {
+        std::string name;
+        std::map<cocos2d::EventKeyboard::KeyCode, GameAction> keyBindings;
+    };
+
+    std::unordered_map<std::string, InputContext> mContexts;
+    InputContext* mActiveContext = nullptr;
 };
 
-#define IM InputManager::getInstance()
+// Redirect IM macro to ServiceLocator
+#define IM SL->getService<InputManager>()
 
 _CEND
 

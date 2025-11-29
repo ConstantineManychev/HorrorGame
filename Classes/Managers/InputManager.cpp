@@ -1,6 +1,8 @@
 #include "InputManager.h"
+#include "EventBus.h"
 
-_USEC
+USING_NS_CC;
+_CSTART
 
 InputManager* InputManager::getInstance()
 {
@@ -10,17 +12,28 @@ InputManager* InputManager::getInstance()
 
 InputManager::InputManager()
 {
-    // Default bindings
-    mKeyBindings[EventKeyboard::KeyCode::KEY_A] = GameAction::MoveLeft;
-    mKeyBindings[EventKeyboard::KeyCode::KEY_LEFT_ARROW] = GameAction::MoveLeft;
-    mKeyBindings[EventKeyboard::KeyCode::KEY_D] = GameAction::MoveRight;
-    mKeyBindings[EventKeyboard::KeyCode::KEY_RIGHT_ARROW] = GameAction::MoveRight;
-    mKeyBindings[EventKeyboard::KeyCode::KEY_W] = GameAction::MoveUp;
-    mKeyBindings[EventKeyboard::KeyCode::KEY_UP_ARROW] = GameAction::MoveUp;
-    mKeyBindings[EventKeyboard::KeyCode::KEY_S] = GameAction::MoveDown;
-    mKeyBindings[EventKeyboard::KeyCode::KEY_DOWN_ARROW] = GameAction::MoveDown;
-    mKeyBindings[EventKeyboard::KeyCode::KEY_SPACE] = GameAction::Jump;
-    mKeyBindings[EventKeyboard::KeyCode::KEY_E] = GameAction::Use;
+    // Create default contexts
+    createContext("Game");
+    createContext("Editor");
+
+    // Setup Game Context Bindings
+    bindKeyToContext("Game", EventKeyboard::KeyCode::KEY_A, GameAction::MoveLeft);
+    bindKeyToContext("Game", EventKeyboard::KeyCode::KEY_LEFT_ARROW, GameAction::MoveLeft);
+    bindKeyToContext("Game", EventKeyboard::KeyCode::KEY_D, GameAction::MoveRight);
+    bindKeyToContext("Game", EventKeyboard::KeyCode::KEY_RIGHT_ARROW, GameAction::MoveRight);
+    bindKeyToContext("Game", EventKeyboard::KeyCode::KEY_W, GameAction::MoveUp);
+    bindKeyToContext("Game", EventKeyboard::KeyCode::KEY_UP_ARROW, GameAction::MoveUp);
+    bindKeyToContext("Game", EventKeyboard::KeyCode::KEY_S, GameAction::MoveDown);
+    bindKeyToContext("Game", EventKeyboard::KeyCode::KEY_DOWN_ARROW, GameAction::MoveDown);
+    bindKeyToContext("Game", EventKeyboard::KeyCode::KEY_SPACE, GameAction::Jump);
+    bindKeyToContext("Game", EventKeyboard::KeyCode::KEY_E, GameAction::Use);
+
+    // Setup Editor Context Bindings (Initially empty or specific editor actions)
+    // For example, WASD could move the camera in Editor, but NOT trigger "MoveUp" (Player movement)
+    // bindKeyToContext("Editor", EventKeyboard::KeyCode::KEY_W, GameAction::EditorCameraUp); // Example
+    
+    // Set default context
+    switchContext("Game");
 }
 
 InputManager::~InputManager()
@@ -34,6 +47,42 @@ void InputManager::init(Node* aInputNode)
     setupKeyboardListeners(aInputNode);
     setupMouseListeners(aInputNode);
 }
+
+void InputManager::createContext(const std::string& contextName)
+{
+    if (mContexts.find(contextName) == mContexts.end())
+    {
+        InputContext context;
+        context.name = contextName;
+        mContexts[contextName] = context;
+    }
+}
+
+void InputManager::switchContext(const std::string& contextName)
+{
+    auto it = mContexts.find(contextName);
+    if (it != mContexts.end())
+    {
+        // Reset current states if needed to prevent "stuck" keys
+        // For simple implementation, we just switch pointer
+        mActiveContext = &it->second;
+        CCLOG("InputManager: Switched to context '%s'", contextName.c_str());
+    }
+    else
+    {
+        CCLOG("InputManager: Failed to switch to context '%s'. Not found.", contextName.c_str());
+    }
+}
+
+void InputManager::bindKeyToContext(const std::string& contextName, EventKeyboard::KeyCode aKeyCode, GameAction aAction)
+{
+    auto it = mContexts.find(contextName);
+    if (it != mContexts.end())
+    {
+        it->second.keyBindings[aKeyCode] = aAction;
+    }
+}
+
 
 void InputManager::setupKeyboardListeners(Node* aNode)
 {
@@ -71,10 +120,13 @@ void InputManager::onKeyReleased(EventKeyboard::KeyCode aKeyCode, Event* aEvent)
 
 GameAction InputManager::mapKeyToAction(EventKeyboard::KeyCode aKeyCode)
 {
-    auto it = mKeyBindings.find(aKeyCode);
-    if (it != mKeyBindings.end())
+    if (mActiveContext)
     {
-        return it->second;
+        auto it = mActiveContext->keyBindings.find(aKeyCode);
+        if (it != mActiveContext->keyBindings.end())
+        {
+            return it->second;
+        }
     }
     return GameAction::None;
 }
@@ -83,6 +135,12 @@ void InputManager::triggerAction(GameAction aAction, bool aIsPressed)
 {
     mActionStates[aAction] = aIsPressed;
 
+    InputActionData data;
+    data.action = (int)aAction;
+    data.isPressed = aIsPressed;
+    EB->publish(EventType::INPUT_ACTION_TRIGGERED, &data);
+
+    // Legacy Listeners
     for (auto& pair : mActionListeners)
     {
         for (auto& info : pair.second)
@@ -99,6 +157,12 @@ void InputManager::triggerAxis(GameAction aAction, float aValue)
 {
     mAxisStates[aAction] = aValue;
 
+    InputAxisData data;
+    data.action = (int)aAction;
+    data.value = aValue;
+    EB->publish(EventType::INPUT_AXIS_TRIGGERED, &data);
+
+    // Legacy Listeners
     for (auto& pair : mAxisListeners)
     {
         for (auto& info : pair.second)
@@ -153,7 +217,4 @@ float InputManager::getActionStrength(GameAction aAction) const
     return 0.0f;
 }
 
-void InputManager::bindKey(EventKeyboard::KeyCode aKeyCode, GameAction aAction)
-{
-    mKeyBindings[aKeyCode] = aAction;
-}
+_CEND

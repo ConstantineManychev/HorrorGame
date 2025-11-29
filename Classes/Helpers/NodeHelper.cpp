@@ -11,7 +11,8 @@
 #include "Managers/DataManager.h"
 
 
-_USEC
+USING_NS_CC;
+_CSTART
 
 Node* NodeHelper::createNodeForType(const std::string& aType)
 {
@@ -96,3 +97,5 @@ void NodeHelper::stopAllActionsRecursive(Node* aNode)
 		}
 	}
 }
+
+_CEND

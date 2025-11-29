@@ -3,56 +3,46 @@
 
 #include "cocos2d.h"
 #include "CommonDefines.h"
-#include "Basics/BValue.h"
 
-_CSTART
+namespace GameSpace {
 
-class GameSession
-{
-public:
-	static GameSession* getInstance();
+	class GameSession
+	{
+	public:
+		static GameSession* getInstance();
 
-	void startNewSession();
-	void saveSession(const std::string& filePath);
-	void loadSession(const std::string& filePath);
+		void startNewSession();
+		void saveSession(const std::string& aFilePath);
+		void loadSession(const std::string& aFilePath);
 
-	// Player Data
-	void setPlayerPosition(const Vec2& pos);
-	Vec2 getPlayerPosition() const;
-	
-	// You can extend this with more player stats like Health, Score, etc.
-	// void setPlayerHealth(int health);
-	// int getPlayerHealth() const;
+		void setPlayerPosition(const cocos2d::Vec2& aPos);
+		cocos2d::Vec2 getPlayerPosition() const;
 
-	// Location Data
-	void setCurrentLocationID(const std::string& locationID);
-	std::string getCurrentLocationID() const;
+		void setCurrentLocationID(const std::string& aLocationID);
+		std::string getCurrentLocationID() const;
 
-	// Game Time
-	void setGameTime(float time);
-	float getGameTime() const;
-	void addGameTime(float delta);
+		void setGameTime(float aTime);
+		float getGameTime() const;
+		void addGameTime(float aDelta);
 
-	// Generic Data
-	void setSessionValue(const std::string& key, const BValue& value);
-	BValue getSessionValue(const std::string& key) const;
+		void setSessionValue(const std::string& aKey, const cocos2d::Value& aValue);
+		cocos2d::Value getSessionValue(const std::string& aKey) const;
 
-private:
-	GameSession();
-	~GameSession();
+	private:
+		GameSession();
+		~GameSession();
 
-	void loadDefaultConfig();
+		void loadDefaultConfig();
 
-	Vec2 mPlayerPosition;
-	std::string mCurrentLocationID;
-	float mGameTime;
-	
-	BValueMap mSessionData;
-};
+		cocos2d::Vec2 mPlayerPosition;
+		std::string mCurrentLocationID;
+		float mGameTime;
 
-#define GS GameSession::getInstance()
+		cocos2d::ValueMap mSessionData;
+	};
 
-_CEND
+#define GS GameSpace::GameSession::getInstance()
 
-#endif // __GAME_SESSION_H__
+}
 
+#endif

@@ -1,64 +1,53 @@
 #ifndef __BASIC_DATA_TYPES_H__
 #define __BASIC_DATA_TYPES_H__
 
-#include "CommonDefines.h"
-#include "Basics/BValue.h"
+#include "cocos2d.h"
 
-_CSTART
+namespace GameSpace {
 
-struct sMainInfo
-{
-	bool isFullScreen;
+	struct sMainInfo
+	{
+		bool isFullScreen;
+		float screenHeight;
+		float screenWidth;
+		float spritesHeight;
+		float spritesWidth;
+		float scaleY;
+		float scaleX;
 
-	float screenHeight;
-	float screenWidth;
-	
-	float spritesHeight;
-	float spritesWidth;
+		sMainInfo()
+			: isFullScreen(false)
+			, screenHeight(600.f)
+			, screenWidth(800.f)
+			, spritesHeight(600.f)
+			, spritesWidth(800.f)
+			, scaleY(1.f)
+			, scaleX(1.f)
+		{}
+	};
 
-	float scaleY;
-	float scaleX;
+	struct sSceneObjectInfo
+	{
+		std::string name;
+		std::string type;
+		cocos2d::Vec2 position;
+		float scaleX;
+		float scaleY;
+		float rotation;
+		int zOrder;
+		std::string textureFileName;
 
-	sMainInfo()
-		: isFullScreen(false)
-		, screenHeight(600.f)
-		, screenWidth(800.f)
-		, spritesHeight(600.f)
-		, spritesWidth(800.f)
-		, scaleY(1.f)
-		, scaleX(1.f)
-	{}
-};
+		cocos2d::Value customData;
 
-struct sWindowInfo
-{
-	std::string windowID;
+		sSceneObjectInfo()
+			: scaleX(1.0f)
+			, scaleY(1.0f)
+			, zOrder(0)
+			, rotation(0.0f)
+			, customData(cocos2d::Value::Null)
+		{}
+	};
 
-	Value params;
-
-	sWindowInfo()
-	{}
-};
-
-struct sSceneObjectInfo
-{
-	std::string name;
-	std::string type;
-	Vec2 position;
-	float scaleX;
-	float scaleY;
-	int zOrder;
-	std::string textureFileName;
-	BValue customData; // For any additional, specific data
-
-	sSceneObjectInfo()
-		: scaleX(1.0f)
-		, scaleY(1.0f)
-		, zOrder(0)
-	{}
-};
-
-
-_CEND
+} // namespace GameSpace
 
 #endif // __BASIC_DATA_TYPES_H__

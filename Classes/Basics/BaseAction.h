@@ -7,7 +7,7 @@
 
 _CSTART
 
-class BaseAction : FiniteTimeAction
+class BaseAction : cocos2d::FiniteTimeAction
 {
 public:
 };

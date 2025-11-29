@@ -6,9 +6,9 @@
 
 _CSTART
 
-class BaseScene : public Scene
+class BaseScene : public cocos2d::Scene
 {
-	typedef Scene Parent;
+	typedef cocos2d::Scene Parent;
 
 public:
 

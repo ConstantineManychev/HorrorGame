@@ -2,9 +2,12 @@
 
 #include "Managers/ViewManager.h"
 
-_USEC
+USING_NS_CC;
+_CSTART
 
 void MainGameScene::useDefaultView()
 {
 	VM->changeView("title");
 }
+
+_CEND

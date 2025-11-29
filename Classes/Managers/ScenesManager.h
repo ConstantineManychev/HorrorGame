@@ -2,13 +2,16 @@
 #define __SCENES_MANAGER_H__
 
 #include "CommonDefines.h"
-
 #include "Basics/BaseScene.h"
+#include "Basics/ServiceLocator.h" // Include
 
 _CSTART
 
 class ScenesManager
 {
+    friend class ServiceLocator;
+    friend class AppDelegate;
+
 private:
 
 	ScenesManager();
@@ -33,7 +36,7 @@ public:
 
 };
 
-#define SM ScenesManager::getInstance()
+#define SM SL->getService<ScenesManager>()
 
 _CEND
 

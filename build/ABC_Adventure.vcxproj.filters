@@ -79,6 +79,18 @@
     <ClCompile Include="..\Classes\Components\MovementComponent.cpp">
       <Filter>Source Files\Classes\components</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\Managers\InputManager.cpp">
+      <Filter>Source Files\Classes\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Managers\EventBus.cpp">
+      <Filter>Source Files\Classes\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Basics\ServiceLocator.cpp">
+      <Filter>Source Files\Classes\basics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Managers\GameSession.cpp">
+      <Filter>Source Files\Classes\managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\AppDelegate.h">
@@ -185,6 +197,21 @@
     </ClInclude>
     <ClInclude Include="..\Classes\Components\MovementComponent.h">
       <Filter>Source Files\Classes\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Managers\InputManager.h">
+      <Filter>Source Files\Classes\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Components\EditorMetadataComponent.h">
+      <Filter>Source Files\Classes\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Managers\EventBus.h">
+      <Filter>Source Files\Classes\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Basics\ServiceLocator.h">
+      <Filter>Source Files\Classes\basics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Managers\GameSession.h">
+      <Filter>Source Files\Classes\managers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

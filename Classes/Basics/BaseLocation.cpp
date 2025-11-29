@@ -1,8 +1,8 @@
 #include "BaseLocation.h"
-
 #include "Managers/GameDirector.h"
 
-_USEC
+USING_NS_CC;
+_CSTART
 
 BaseLocation* BaseLocation::create()
 {
@@ -10,8 +10,12 @@ BaseLocation* BaseLocation::create()
 	if (ret && ret->init())
 	{
 		ret->autorelease();
-		ret->setupGlobalTouchListener();
-		ret->setupGlobalKeyListener();
+        
+        if (!GD->isEditorMode()) // Disable logic listeners in editor
+        {
+            ret->setupGlobalTouchListener();
+            ret->setupGlobalKeyListener();
+        }
 		return ret;
 	}
 	else
@@ -23,6 +27,8 @@ BaseLocation* BaseLocation::create()
 
 void BaseLocation::onOpen()
 {
+    if (GD->isEditorMode()) return; // Disable logic in editor
+    
 	Parent::onOpen();
 	GD->setLocation(this);
 }
@@ -31,36 +37,36 @@ void BaseLocation::setupGlobalTouchListener()
 {
 	auto touchListener = EventListenerTouchAllAtOnce::create();
 
-	touchListener->onTouchesBegan = [this](const std::vector<Touch*>& touches, Event* event)
+	touchListener->onTouchesBegan = [this](const std::vector<cocos2d::Touch*>& touches, cocos2d::Event* event)
 	{
 		for (auto touch : touches)
 		{
-			this->onButtonTouchEvent(this, touch, ui::Widget::TouchEventType::BEGAN);
+			this->onButtonTouchEvent(this, touch, cocos2d::ui::Widget::TouchEventType::BEGAN);
 		}
 		return true;
 	};
 
-	touchListener->onTouchesMoved = [this](const std::vector<Touch*>& touches, Event* event)
+	touchListener->onTouchesMoved = [this](const std::vector<cocos2d::Touch*>& touches, cocos2d::Event* event)
 	{
 		for (auto touch : touches)
 		{
-			this->onButtonTouchEvent(this, touch, ui::Widget::TouchEventType::MOVED);
+			this->onButtonTouchEvent(this, touch, cocos2d::ui::Widget::TouchEventType::MOVED);
 		}
 	};
 
-	touchListener->onTouchesEnded = [this](const std::vector<Touch*>& touches, Event* event)
+	touchListener->onTouchesEnded = [this](const std::vector<Touch*>& touches, cocos2d::Event* event)
 	{
 		for (auto touch : touches)
 		{
-			this->onButtonTouchEvent(this, touch, ui::Widget::TouchEventType::ENDED);
+			this->onButtonTouchEvent(this, touch, cocos2d::ui::Widget::TouchEventType::ENDED);
 		}
 	};
 
-	touchListener->onTouchesCancelled = [this](const std::vector<Touch*>& touches, Event* event)
+	touchListener->onTouchesCancelled = [this](const std::vector<cocos2d::Touch*>& touches, cocos2d::Event* event)
 	{
 		for (auto touch : touches)
 		{
-			this->onButtonTouchEvent(this, touch, ui::Widget::TouchEventType::CANCELED);
+			this->onButtonTouchEvent(this, touch, cocos2d::ui::Widget::TouchEventType::CANCELED);
 		}
 	};
 
@@ -83,3 +89,5 @@ void BaseLocation::setupGlobalKeyListener()
 
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 }
+
+_CEND

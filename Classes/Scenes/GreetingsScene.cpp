@@ -1,3 +1,5 @@
 #include "GreetingsScene.h"
 
-_USEC
+USING_NS_CC;
+_CSTART
+_CEND

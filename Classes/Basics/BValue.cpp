@@ -3,7 +3,8 @@
 #include <iomanip>
 #include "base/ccUtils.h"
 
-_USEC
+USING_NS_CC;
+_CSTART
 #define kMaxStringLen (1024*100)
 
 const BValueVector BValueVectorNull;
@@ -2004,3 +2005,5 @@ void BValue::clearWithType( Type type )
 {
     reset( type, true );
 }
+
+_CEND

@@ -1,6 +1,7 @@
 #include "MovementComponent.h"
 
-_USEC
+USING_NS_CC;
+_CSTART
 
 MovementComponent* MovementComponent::create()
 {
@@ -53,3 +54,4 @@ Vec2 MovementComponent::getVelocity() const
     return mVelocity;
 }
 
+_CEND

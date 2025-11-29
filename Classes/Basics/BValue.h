@@ -64,16 +64,16 @@ public:
     /*explicit*/ BValue( const long double& v);
     
     /** Create a BValue by an Vec2 value. */
-    /*explicit*/ BValue( const Vec2& v );
+    /*explicit*/ BValue( const cocos2d::Vec2& v );
     
     /** Create a BValue by an Size value. */
-    /*explicit*/ BValue( const Size& v );
+    /*explicit*/ BValue( const cocos2d::Size& v );
     
     /** Create a BValue by an Color3B value. */
-    /*explicit*/ BValue( const Color3B& v );
+    /*explicit*/ BValue( const cocos2d::Color3B& v );
     
     /** Create a BValue by an Color4F value. */
-    /*explicit*/ BValue( const Color4F& v );
+    /*explicit*/ BValue( const cocos2d::Color4F& v );
     
     /** Create a BValue by a BValueVector object. */
     /*explicit*/ BValue(const BValueVector& v);
@@ -179,10 +179,10 @@ public:
     
     const long double& getLongDouble() const;
     
-    const Vec2& getVec2() const;
-    const Size& getSize() const;
-    const Color3B& getColor3B() const;
-    const Color4F& getColor4F() const;
+    const cocos2d::Vec2& getVec2() const;
+    const cocos2d::Size& getSize() const;
+    const cocos2d::Color3B& getColor3B() const;
+    const cocos2d::Color4F& getColor4F() const;
 
     std::string getStringForVisit() const;
     /** Gets as a BValueVector reference. Will convert to BValueVector if possible, or will trigger assert error. */
@@ -303,10 +303,10 @@ private:
         bool boolVal;
 
         long double* longDoubleVal;
-        Vec2* vec2Val;
-        Size* sizeVal;
-        Color3B* color3BVal;
-        Color4F* color4FVal;
+		cocos2d::Vec2* vec2Val;
+		cocos2d::Size* sizeVal;
+		cocos2d::Color3B* color3BVal;
+		cocos2d::Color4F* color4FVal;
         std::string* strVal;
         BValueVector* vectorVal;
         BValueMap* mapVal;

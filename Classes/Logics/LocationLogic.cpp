@@ -4,7 +4,8 @@
 #include "Managers/DataManager.h"
 #include "Managers/GameDirector.h"
 
-_USEC
+USING_NS_CC;
+using namespace GameSpace;
 
 static const int TAIL_TAG = 99;
 
@@ -25,7 +26,6 @@ void LocationLogic::onOpen()
 {
 	GD->setPlayer(mPlayer);
 }
-	
 
 void LocationLogic::onButtonTouchEvent(Ref* aSender, Touch* aTouch, ui::Widget::TouchEventType aEventType)
 {
@@ -35,26 +35,18 @@ void LocationLogic::onButtonTouchEvent(Ref* aSender, Touch* aTouch, ui::Widget::
 	{
 		switch (aEventType)
 		{
-			case ui::Widget::TouchEventType::BEGAN:
-			{
-				onButtonTouchBegin(node, aTouch);
-				break;
-			}
-			case ui::Widget::TouchEventType::CANCELED:
-			{
-				onButtonTouchCanceled(node, aTouch);
-				break;
-			}
-			case ui::Widget::TouchEventType::ENDED:
-			{
-				onButtonTouchFinish(node, aTouch);
-				break;
-			}
-			case ui::Widget::TouchEventType::MOVED:
-			{
-				onButtonTouchMove(node, aTouch);
-				break;
-			}
+		case ui::Widget::TouchEventType::BEGAN:
+			onButtonTouchBegin(node, aTouch);
+			break;
+		case ui::Widget::TouchEventType::CANCELED:
+			onButtonTouchCanceled(node, aTouch);
+			break;
+		case ui::Widget::TouchEventType::ENDED:
+			onButtonTouchFinish(node, aTouch);
+			break;
+		case ui::Widget::TouchEventType::MOVED:
+			onButtonTouchMove(node, aTouch);
+			break;
 		}
 	}
 }
@@ -69,13 +61,16 @@ void LocationLogic::onButtonTouchBegin(Node* aNode, Touch* aTouch)
 		{
 			mIsCurrentlyDrawing = true;
 			std::string particlePath;
-			const auto& path = DM->getGlobalValue("tale_paticle_path");
-			if (path.isString())
+			const auto& pathVal = DM->getGlobalValue("tale_paticle_path");
+
+			if (pathVal.getType() == Value::Type::STRING)
 			{
-				particlePath = path.getString();
+				particlePath = pathVal.asString();
 			}
 
-			mTaleParticles = ParticleSystemQuad::create(particlePath);
+			if (!particlePath.empty()) {
+				mTaleParticles = ParticleSystemQuad::create(particlePath);
+			}
 
 			auto location = aTouch->getLocation();
 
@@ -105,9 +100,7 @@ void LocationLogic::onButtonTouchFinish(Node* aNode, Touch* aTouch)
 			if (mTaleParticles)
 			{
 				float delayTime = mTaleParticles->getLife();
-
 				auto delay = DelayTime::create(delayTime);
-
 				Node* taleNode = mTaleParticles;
 
 				auto removeParticles = CallFunc::create([=]()
@@ -131,7 +124,7 @@ void LocationLogic::onButtonTouchFinish(Node* aNode, Touch* aTouch)
 		}
 		else
 		{
-			while ( aNode->getChildByTag(TAIL_TAG) )
+			while (aNode->getChildByTag(TAIL_TAG))
 			{
 				aNode->removeChildByTag(TAIL_TAG);
 			}
@@ -173,36 +166,23 @@ void LocationLogic::onButtonTouchMove(Node* aNode, Touch* aTouch)
 
 void LocationLogic::onKeyDown(Ref* aSender, EventKeyboard::KeyCode aKeyCode)
 {
-	Node* node = dynamic_cast<Node*>(aSender);
-
 	if (mPlayer)
 	{
-		if (aKeyCode == DM->getKey("left"))
-		{
+		if (aKeyCode == DM->getKey("left")) {
 			mPlayer->stopAllActions();
-			//auto repeatForeverAction = RepeatForever::create( MoveBy::create(1.f,Vec2(10.f, 0.f) ) );
-
-			//mPlayer->runAction(repeatForeverAction);
-
 			mPlayer->addForceX(-500.f);
 		}
-		else if (aKeyCode == DM->getKey("right"))
-		{
+		else if (aKeyCode == DM->getKey("right")) {
 			mPlayer->stopAllActions();
-
 			mPlayer->addForceX(500.f);
 		}
 
-		if (aKeyCode == DM->getKey("up"))
-		{
+		if (aKeyCode == DM->getKey("up")) {
 			mPlayer->stopAllActions();
-
 			mPlayer->addForceY(500.f);
 		}
-		else if (aKeyCode == DM->getKey("down"))
-		{
+		else if (aKeyCode == DM->getKey("down")) {
 			mPlayer->stopAllActions();
-
 			mPlayer->addForceY(-500.f);
 		}
 	}
@@ -212,23 +192,11 @@ void LocationLogic::onKeyUp(Ref* aSender, EventKeyboard::KeyCode aKeyCode)
 {
 	if (mPlayer)
 	{
-		if (aKeyCode == DM->getKey("left"))
-		{
-			mPlayer->addForceX(500.f);
-		}
-		else if (aKeyCode == DM->getKey("right"))
-		{
-			mPlayer->addForceX(-500.f);
-		}
+		if (aKeyCode == DM->getKey("left")) mPlayer->addForceX(500.f);
+		else if (aKeyCode == DM->getKey("right")) mPlayer->addForceX(-500.f);
 
-		if (aKeyCode == DM->getKey("up"))
-		{
-			mPlayer->addForceY(-500.f);
-		}
-		else if (aKeyCode == DM->getKey("down"))
-		{
-			mPlayer->addForceY(500.f);
-		}
+		if (aKeyCode == DM->getKey("up")) mPlayer->addForceY(-500.f);
+		else if (aKeyCode == DM->getKey("down")) mPlayer->addForceY(500.f);
 	}
 }
 
@@ -240,7 +208,7 @@ void LocationLogic::setupPlayer(Node* aNode)
 	}
 }
 
-float LocationLogic::roundToQuarter(float value) 
+float LocationLogic::roundToQuarter(float value)
 {
 	return std::round(value * 4) / 4.0f;
 }
@@ -316,7 +284,7 @@ bool LocationLogic::checkLetter(const std::vector<Vec2>& aPoints, const std::vec
 
 	for (auto& point : aLetterPoints)
 	{
-		if (std::find(aPoints.begin(),aPoints.end(), point) == aPoints.end())
+		if (std::find(aPoints.begin(), aPoints.end(), point) == aPoints.end())
 		{
 			result = false;
 			break;
@@ -333,17 +301,16 @@ char LocationLogic::recognizeLetter(const std::vector<Vec2>& aPoints)
 	char bestMatch = '?';
 	float minDistance = 0.08f;
 
-	for (const auto& ref : referenceLetters) 
+	for (const auto& ref : referenceLetters)
 	{
 		float distance = calculateTotalDistance(normalizedInput, ref.second);
-		if (distance < minDistance) 
+		if (distance < minDistance)
 		{
 			minDistance = distance;
 			bestMatch = ref.first;
 		}
 	}
 
-	CCLOG("The letter is: %c", bestMatch);
 	createLetter(bestMatch, Vec2::ZERO);
 
 	return bestMatch;
@@ -363,9 +330,11 @@ void LocationLogic::createLetter(char aLetter, const Vec2& aPoint)
 		sprite->initWithFile(spriteName);
 
 		auto loc = GD->getCurrentLocation();
-
-		loc->addChild(sprite);
-		sprite->setPosition(width / 2, heigh / 2);
-		sprite->setLocalZOrder(loc->getLocalZOrder() + 10);
+		if (loc)
+		{
+			loc->addChild(sprite);
+			sprite->setPosition(width / 2, heigh / 2);
+			sprite->setLocalZOrder(loc->getLocalZOrder() + 10);
+		}
 	}
 }

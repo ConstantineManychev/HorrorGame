@@ -829,7 +829,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="..\Classes\Basics\Enemy.h" />
     <ClInclude Include="..\Classes\Basics\Parallax.h" />
     <ClInclude Include="..\Classes\Basics\Player.h" />
+    <ClInclude Include="..\Classes\Basics\ServiceLocator.h" />
     <ClInclude Include="..\Classes\CommonDefines.h" />
+    <ClInclude Include="..\Classes\Components\EditorMetadataComponent.h" />
     <ClInclude Include="..\Classes\Components\GameComponent.h" />
     <ClInclude Include="..\Classes\Components\InputComponent.h" />
     <ClInclude Include="..\Classes\Components\MovementComponent.h" />
@@ -838,7 +840,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="..\Classes\Helpers\ViewFactory.h" />
     <ClInclude Include="..\Classes\Logics\LocationLogic.h" />
     <ClInclude Include="..\Classes\Managers\DataManager.h" />
+    <ClInclude Include="..\Classes\Managers\EventBus.h" />
     <ClInclude Include="..\Classes\Managers\GameDirector.h" />
+    <ClInclude Include="..\Classes\Managers\GameSession.h" />
+    <ClInclude Include="..\Classes\Managers\InputManager.h" />
     <ClInclude Include="..\Classes\Managers\ScenesManager.h" />
     <ClInclude Include="..\Classes\Managers\ViewManager.h" />
     <ClInclude Include="..\Classes\Scenes\EditorScene.h" />
@@ -858,6 +863,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="..\Classes\Basics\Enemy.cpp" />
     <ClCompile Include="..\Classes\Basics\Parallax.cpp" />
     <ClCompile Include="..\Classes\Basics\Player.cpp" />
+    <ClCompile Include="..\Classes\Basics\ServiceLocator.cpp" />
     <ClCompile Include="..\Classes\Components\InputComponent.cpp" />
     <ClCompile Include="..\Classes\Components\MovementComponent.cpp" />
     <ClCompile Include="..\Classes\Helpers\NodeHelper.cpp" />
@@ -865,7 +871,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="..\Classes\Helpers\ViewFactory.cpp" />
     <ClCompile Include="..\Classes\Logics\LocationLogic.cpp" />
     <ClCompile Include="..\Classes\Managers\DataManager.cpp" />
+    <ClCompile Include="..\Classes\Managers\EventBus.cpp" />
     <ClCompile Include="..\Classes\Managers\GameDirector.cpp" />
+    <ClCompile Include="..\Classes\Managers\GameSession.cpp" />
+    <ClCompile Include="..\Classes\Managers\InputManager.cpp" />
     <ClCompile Include="..\Classes\Managers\ScenesManager.cpp" />
     <ClCompile Include="..\Classes\Managers\ViewManager.cpp" />
     <ClCompile Include="..\Classes\Scenes\EditorScene.cpp" />

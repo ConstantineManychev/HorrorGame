@@ -2,91 +2,70 @@
 #define __DATA_MANAGER_H__
 
 #include "cocos2d.h"
-
-//json
-#include "external/json/reader.h"
-#include "external/json/document.h"
-#include "external/json/writer.h"
-#include "external/json/stringbuffer.h"
-#include "external/json/prettywriter.h"
-
-#include "CommonDefines.h"
-
-#include "Helpers/JsonHelper.h"
 #include "Types/BasicDataTypes.h"
-#include "Basics/BValue.h"
+#include "external/json/document.h" 
+#include "Basics/ServiceLocator.h" 
 
-#include <map>
+namespace GameSpace {
 
-_CSTART
+	class DataManager
+	{
+		friend class ServiceLocator;
+		friend class AppDelegate;
 
-class DataManager
-{
-private:
+	public:
+		static DataManager* getInstance();
 
-	DataManager();
+		void loadMainInfo(const std::string& aConfigPath);
+		void saveMainInfo();
 
-	void parseStartupInfo(const rapidjson::Value& aValue, sMainInfo& aMainInfo);
+		void parseViewConfigs();
 
-	std::string mResourcePath;
-	std::string mMainInfoConfigPath; // New member to store the path of main config file
+		void loadScene(const std::string& sceneFilePath);
+		void saveScene(const std::string& sceneFilePath, const std::vector<sSceneObjectInfo>& sceneObjects);
+		void saveView(const std::string& viewID, const std::vector<sSceneObjectInfo>& sceneObjects);
 
- 	sMainInfo mMainInfo;
-	BValueMap mGlobalValues;
-	std::map<std::string, EventKeyboard::KeyCode> mKeys;
+		const std::vector<sSceneObjectInfo>& getLoadedSceneObjects() const;
+		const sMainInfo& getMainInfo() const;
 
-	std::map< std::string, sWindowInfo > mWindowsInfos;
-	std::map< std::string, BValue > mViewsInfos;
+		void calcScale();
+		float getScaleY();
+		void setScale(float aX, float aY);
+		void setScaleY(float aY);
+		void setScaleX(float aX);
 
-	std::vector<sSceneObjectInfo> mLoadedSceneObjects;
+		const cocos2d::ValueMap& getViewInfoByID(const std::string& aID) const;
+		std::vector<std::string> getViewsIDs() const;
 
-	void parseViewConfig(const std::string& aConfigPath);
+		const cocos2d::Value& getGlobalValue(const std::string& aID);
 
-	EventKeyboard::KeyCode convertStringToKeyCode(const std::string& aID);
+		cocos2d::EventKeyboard::KeyCode getKey(const std::string& aID);
 
-public:
+		void setResourcePath(const std::string& aResPath);
 
-	void parseSceneObject(const BValueMap& aValue, sSceneObjectInfo& aSceneObjectInfo);
+	private:
+		DataManager();
 
-	static DataManager* getInstance();
+		std::string mResourcePath;
 
-	void setResourcePath(const std::string& resPath);
+		sMainInfo mMainInfo;
 
-	void loadMainInfo(const std::string& configPath);
-	void loadWindows(const std::string& folderPath);
-	void loadScene(const std::string& sceneFilePath);
+		std::map<std::string, cocos2d::ValueMap> mViewsInfos;
+		std::map<std::string, std::string> mViewFilePaths;
 
-	void saveScene(const std::string& sceneFilePath, const std::vector<sSceneObjectInfo>& sceneObjects);
-	void saveView(const std::string& viewID, const std::vector<sSceneObjectInfo>& sceneObjects);
+		cocos2d::ValueMap mGlobalValues;
+		std::map<std::string, cocos2d::EventKeyboard::KeyCode> mKeys;
 
-	const std::vector<sSceneObjectInfo>& getLoadedSceneObjects() const;
+		std::vector<sSceneObjectInfo> mLoadedSceneObjects;
 
-	void parseViewConfigs();
-	std::vector<std::string> getViewsIDs() const; // New method to get all loaded view IDs
+		void parseViewConfig(const std::string& aConfigPath);
+		void parseSceneObject(const cocos2d::ValueMap& aValue, sSceneObjectInfo& aSceneObjectInfo);
 
-	const sMainInfo& getMainInfo() const;
-	const sWindowInfo* getWindowInfo(const std::string& aWndID) const;
+		cocos2d::EventKeyboard::KeyCode convertStringToKeyCode(const std::string& aID);
+	};
 
-	const BValue& getViewInfoByID(const std::string& aID) const;
+}
 
-	void saveMainInfo();
+#define DM SL->getService<GameSpace::DataManager>()
 
-	void calcScale();
-
-	void setScale(float aX, float aY);
-	void setScaleY(float aY);
-	void setScaleX(float aX);
-
-	float getScaleY();
-
-	const BValue& getGlobalValue(const std::string& aID);
-	EventKeyboard::KeyCode getKey(const std::string& aID);
-
-
-};
-
-#define DM DataManager::getInstance()
-
-_CEND
-
-#endif // __DATA_MANAGER_H__
+#endif

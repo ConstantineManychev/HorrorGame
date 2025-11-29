@@ -1,7 +1,8 @@
 #include "BaseObject.h"
 #include <algorithm> // For std::min
 
-_USEC
+USING_NS_CC;
+_CSTART
 
 BaseObject::BaseObject()
 	: mMaxSpeed(1000.f)
@@ -157,3 +158,5 @@ void BaseObject::addForceY(float aForce)
 
 	this->scheduleUpdate();
 }
+
+_CEND

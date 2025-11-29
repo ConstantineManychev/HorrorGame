@@ -14,7 +14,7 @@ class LocationLogic
 {
 private:
 
-	std::map<char, std::vector<Vec2>> referenceLetters = {
+	std::map<char, std::vector<cocos2d::Vec2>> referenceLetters = {
 		{'A', { {0, 0}, {0.5, 1}, {1, 0}, {0.5, 0.5} } },
 		{'B', { {0, 0}, {0, 1}, {1, 0.75}, {1, 0.25} } },
 		{'C', { {0.5, 0}, {0.5, 1}, {0, 0.5} } },
@@ -43,36 +43,36 @@ private:
 		{'Z', { {0, 1}, {1, 1}, {0, 0}, {1, 0} } }
 	};
 
-	std::vector< Vec2 > mTouches;
+	std::vector< cocos2d::Vec2 > mTouches;
 
-	ParticleSystemQuad* mTaleParticles;
+	cocos2d::ParticleSystemQuad* mTaleParticles;
 	Player* mPlayer;
 
 	bool mIsCurrentlyDrawing;
 
-	virtual void onButtonTouchBegin(Node* aNode, Touch* aTouch);
-	virtual void onButtonTouchFinish(Node* aNode, Touch* aTouch);
-	virtual void onButtonTouchCanceled(Node* aNode, Touch* aTouch);
-	virtual void onButtonTouchMove(Node* aNode, Touch* aTouch);
+	virtual void onButtonTouchBegin(cocos2d::Node* aNode, cocos2d::Touch* aTouch);
+	virtual void onButtonTouchFinish(cocos2d::Node* aNode, cocos2d::Touch* aTouch);
+	virtual void onButtonTouchCanceled(cocos2d::Node* aNode, cocos2d::Touch* aTouch);
+	virtual void onButtonTouchMove(cocos2d::Node* aNode, cocos2d::Touch* aTouch);
 
 	float roundToQuarter(float value);
-	std::vector<Vec2> normalizePoints(const std::vector<Vec2>& aPoints);
-	float calculateDistance(const Vec2& aPoint1, const Vec2& aPoint2);
-	float calculateTotalDistance(const std::vector<Vec2>& aPoints, const std::vector<Vec2>& aLetterPoints);
-	bool checkLetter(const std::vector<Vec2>& aPoints, const std::vector<Vec2>& aLetterPoints);
-	char recognizeLetter(const std::vector<Vec2>& aPoints);
+	std::vector<cocos2d::Vec2> normalizePoints(const std::vector<cocos2d::Vec2>& aPoints);
+	float calculateDistance(const cocos2d::Vec2& aPoint1, const cocos2d::Vec2& aPoint2);
+	float calculateTotalDistance(const std::vector<cocos2d::Vec2>& aPoints, const std::vector<cocos2d::Vec2>& aLetterPoints);
+	bool checkLetter(const std::vector<cocos2d::Vec2>& aPoints, const std::vector<cocos2d::Vec2>& aLetterPoints);
+	char recognizeLetter(const std::vector<cocos2d::Vec2>& aPoints);
 
-	void createLetter(char aLetter, const Vec2& aPoint);
+	void createLetter(char aLetter, const cocos2d::Vec2& aPoint);
 
 protected:
 
-	virtual void onKeyDown(Ref* aSender, EventKeyboard::KeyCode aKeyCode);
-	virtual void onKeyUp(Ref* aSender, EventKeyboard::KeyCode aKeyCode);
+	virtual void onKeyDown(cocos2d::Ref* aSender, cocos2d::EventKeyboard::KeyCode aKeyCode);
+	virtual void onKeyUp(cocos2d::Ref* aSender, cocos2d::EventKeyboard::KeyCode aKeyCode);
 
 public:
 
-	void onButtonTouchEvent(Ref* aSender, Touch* touch, ui::Widget::TouchEventType aEventType);
-	void setupPlayer(Node* aNode);
+	void onButtonTouchEvent(cocos2d::Ref* aSender, cocos2d::Touch* touch, cocos2d::ui::Widget::TouchEventType aEventType);
+	void setupPlayer(cocos2d::Node* aNode);
 
 	virtual void onOpen();
 

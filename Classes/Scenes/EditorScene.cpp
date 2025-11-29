@@ -3,60 +3,134 @@
 #include "Helpers/NodeHelper.h"
 
 #include "ui/UIScrollView.h"
+#include "ui/UIText.h"
 #include "Managers/ScenesManager.h"
 #include "Managers/ViewManager.h"
+#include "Components/EditorMetadataComponent.h"
 
-_USEC
+USING_NS_CC;
+using namespace GameSpace;
+
+const Color3B EditorScene::UIConfig::COLOR_PANEL_BG = Color3B(50, 50, 50);
+const Color3B EditorScene::UIConfig::COLOR_TOOLBAR_BG = Color3B(40, 40, 40);
+const Color4F EditorScene::UIConfig::COLOR_SELECTION = Color4F::GREEN;
 
 BaseScene* EditorScene::createScene(const std::string& viewID)
 {
 	EditorScene* scene = static_cast<EditorScene*>(EditorScene::create());
-    if (scene)
-    {
+	if (scene)
+	{
 		scene->setCurrentViewID(viewID);
-		scene->setupEditorUI(); 
-		//scene->loadViewObjects(scene->mCurrentViewID.empty() ? "main" : scene->mCurrentViewID);
-		
-        return scene;
-    }
-    CC_SAFE_DELETE(scene);
-    return nullptr;
+		scene->setupEditorUI();
+
+		return scene;
+	}
+	CC_SAFE_DELETE(scene);
+	return nullptr;
 }
 
 bool EditorScene::init()
 {
-    if (!Scene::init())
-    {
-        return false;
-    }
+	if (!Scene::init())
+	{
+		return false;
+	}
 
-    return true;
+	mSelectionDrawNode = DrawNode::create();
+	this->addChild(mSelectionDrawNode, UIConfig::TAG_SELECTION_BOX);
+	mSelectionDrawNode->setTag(UIConfig::TAG_UI_LAYER);
+
+	this->scheduleUpdate();
+
+	return true;
+}
+
+void EditorScene::update(float delta)
+{
+	mSelectionDrawNode->clear();
+	if (mSelectedNode && mSelectedNode->getParent())
+	{
+		Rect bbox = mSelectedNode->getBoundingBox();
+
+		Vec2 bl = mSelectedNode->getParent()->convertToWorldSpace(bbox.origin);
+		Vec2 tr = mSelectedNode->getParent()->convertToWorldSpace(bbox.origin + bbox.size);
+		Vec2 br = Vec2(tr.x, bl.y);
+		Vec2 tl = Vec2(bl.x, tr.y);
+
+		Vec2 verts[] = { bl, br, tr, tl };
+		mSelectionDrawNode->drawPolygon(verts, 4, Color4F(0, 1, 0, 0), 2, UIConfig::COLOR_SELECTION);
+
+		updatePropertiesPanel();
+	}
 }
 
 void EditorScene::useDefaultView()
 {
-	VM->changeView("title");
 }
 
 void EditorScene::loadViewObjects(const std::string& viewID)
 {
-	CCLOG("EditorScene: Loading view from: %s", viewID.c_str());
-
+	mSelectedNode = nullptr;
 	VM->changeView(viewID);
 }
 
 void EditorScene::saveViewObjects(const std::string& viewID)
 {
-	CCLOG("EditorScene: Saving view to: %s", viewID.c_str());
-
-	std::vector<sSceneObjectInfo> sceneObjects;
+	Node* viewRoot = nullptr;
 
 	for (Node* child : this->getChildren())
 	{
+		if (child->getTag() == UIConfig::TAG_UI_LAYER) continue;
+		if (child == mSelectionDrawNode) continue;
+		if (child == mPropertiesLayout) continue;
+		if (dynamic_cast<Camera*>(child)) continue;
+
+		viewRoot = child;
+		break;
 	}
 
-	// Save to the original view config file, not a separate scene file
-	DM->saveView(viewID, sceneObjects); // This will require a new DataManager::saveView method
+	if (!viewRoot)
+	{
+		return;
+	}
+
+	std::vector<sSceneObjectInfo> objects;
+	auto visibleSize = Director::getInstance()->getVisibleSize();
+
+	for (Node* child : viewRoot->getChildren())
+	{
+		sSceneObjectInfo info;
+		info.name = child->getName();
+		if (info.name.empty()) info.name = "Node_" + std::to_string(objects.size());
+
+		auto metadata = dynamic_cast<EditorMetadataComponent*>(child->getComponent("EditorMetadata"));
+		if (metadata)
+		{
+			info.type = metadata->type;
+			info.textureFileName = metadata->textureFileName;
+		}
+		else
+		{
+			if (dynamic_cast<ui::Button*>(child)) info.type = "Button";
+			else if (dynamic_cast<Sprite*>(child)) info.type = "Sprite";
+			else info.type = "Node";
+		}
+
+		Size parentSize = viewRoot->getContentSize();
+		if (parentSize.width == 0) parentSize = visibleSize;
+
+		info.position.x = child->getPositionX() / parentSize.width;
+		info.position.y = child->getPositionY() / parentSize.height;
+
+		info.scaleX = child->getScaleX();
+		info.scaleY = child->getScaleY();
+		info.rotation = child->getRotation();
+		info.zOrder = child->getLocalZOrder();
+
+		objects.push_back(info);
+	}
+
+	DM->saveView(viewID, objects);
 }
 
 void EditorScene::setupEditorUI()
@@ -70,143 +144,223 @@ void EditorScene::setupEditorUI()
 
 	for (const auto& viewID : viewIDs)
 	{
-		mAvailableViews.push_back({viewID, viewID}); // Store view ID as both name and ID
+		mAvailableViews.push_back({ viewID, viewID });
 	}
 
 	auto viewScrollView = ui::ScrollView::create();
-	viewScrollView->setContentSize(Size(200, visibleSize.height - 100));
+	float scrollViewHeight = visibleSize.height - UIConfig::TOOLBAR_HEIGHT - (UIConfig::MARGIN * 2);
+	viewScrollView->setContentSize(Size(UIConfig::PANEL_WIDTH, scrollViewHeight));
 	viewScrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
 	viewScrollView->setBounceEnabled(true);
 	viewScrollView->setAnchorPoint(Vec2(0, 1));
-	viewScrollView->setPosition(Vec2(10, visibleSize.height - 10));
-	this->addChild(viewScrollView, 9999);
-	viewScrollView->setTag(9999);
+	viewScrollView->setPosition(Vec2(UIConfig::MARGIN, visibleSize.height - UIConfig::TOOLBAR_HEIGHT - UIConfig::MARGIN));
+	this->addChild(viewScrollView, UIConfig::TAG_UI_LAYER);
+	viewScrollView->setTag(UIConfig::TAG_UI_LAYER);
 
 	auto viewListLayout = ui::Layout::create();
 	viewListLayout->setLayoutType(ui::Layout::Type::VERTICAL);
-	viewListLayout->setContentSize(Size(200, mAvailableViews.size() * 30));
+	viewListLayout->setContentSize(Size(UIConfig::PANEL_WIDTH, mAvailableViews.size() * UIConfig::PANEL_ITEM_HEIGHT));
 	viewListLayout->setBackGroundColorType(ui::Layout::BackGroundColorType::SOLID);
-	viewListLayout->setBackGroundColor(Color3B::GRAY);
+	viewListLayout->setBackGroundColor(UIConfig::COLOR_PANEL_BG);
+	viewListLayout->setOpacity(200);
 	viewScrollView->addChild(viewListLayout);
-	viewListLayout->setTag(9999);
+	viewScrollView->setInnerContainerSize(viewListLayout->getContentSize());
+	viewListLayout->setTag(UIConfig::TAG_UI_LAYER);
 
-	float currentY = viewListLayout->getContentSize().height - 30;
+	float currentY = viewListLayout->getContentSize().height - UIConfig::BUTTON_HEIGHT;
 	for (const auto& viewPair : mAvailableViews)
 	{
 		auto viewButton = ui::Button::create();
 		viewButton->setTitleText(viewPair.first);
-		viewButton->setTitleFontSize(18);
-		viewButton->setContentSize(Size(180, 25));
+		viewButton->setTitleFontSize(UIConfig::FONT_SIZE_NORMAL);
+		viewButton->setContentSize(Size(UIConfig::BUTTON_WIDTH, UIConfig::BUTTON_HEIGHT));
+		viewButton->ignoreContentAdaptWithSize(false);
 		viewButton->setPosition(Vec2(viewListLayout->getContentSize().width / 2, currentY));
 		viewButton->addTouchEventListener([&, viewID = viewPair.second](Ref* sender, ui::Widget::TouchEventType type){
 			if (type == ui::Widget::TouchEventType::ENDED)
 			{
-				// Load the selected view
-				this->loadViewObjects(viewID); // Use the stored view ID
-				this->mCurrentViewID = viewID; // Update the current view ID
+				this->loadViewObjects(viewID);
+				this->mCurrentViewID = viewID;
 			}
 		});
 		viewListLayout->addChild(viewButton);
-		viewButton->setTag(9999); // Ensure button is also tagged
-		currentY -= 30;
+		currentY -= UIConfig::PANEL_ITEM_HEIGHT;
 	}
 
-	auto nodesScrollView = ui::ScrollView::create();
-	nodesScrollView->setContentSize(Size(200, visibleSize.height - 100));
-	nodesScrollView->setDirection(ui::ScrollView::Direction::VERTICAL);
-	nodesScrollView->setBounceEnabled(true);
-	nodesScrollView->setAnchorPoint(Vec2(0, 1));
-	nodesScrollView->setPosition(Vec2(10, visibleSize.height - 10));
-	this->addChild(viewScrollView, 9999);
-	nodesScrollView->setTag(9999);
+	auto toolbar = ui::Layout::create();
+	toolbar->setContentSize(Size(visibleSize.width, UIConfig::TOOLBAR_HEIGHT));
+	toolbar->setBackGroundColorType(ui::Layout::BackGroundColorType::SOLID);
+	toolbar->setBackGroundColor(UIConfig::COLOR_TOOLBAR_BG);
+	toolbar->setPosition(Vec2(0, visibleSize.height - UIConfig::TOOLBAR_HEIGHT));
+	toolbar->setAnchorPoint(Vec2(0, 0));
+	this->addChild(toolbar, UIConfig::TAG_UI_LAYER);
+	toolbar->setTag(UIConfig::TAG_UI_LAYER);
 
-	auto mNodesListLayout = ui::Layout::create();
-	mNodesListLayout->setLayoutType(ui::Layout::Type::VERTICAL);
-	mNodesListLayout->setContentSize(Size(200, 10 * 30));
-	mNodesListLayout->setBackGroundColorType(ui::Layout::BackGroundColorType::SOLID);
-	mNodesListLayout->setBackGroundColor(Color3B::GRAY);
-	mNodesListLayout->setName("node_list");
-	nodesScrollView->addChild(mNodesListLayout);
-	mNodesListLayout->setTag(9999);
+	float btnY = UIConfig::TOOLBAR_HEIGHT / 2;
+	float btnStartX = 60.0f;
+	float btnGap = 100.0f;
 
-	updateCurrentNodeList(this);
-	
-
-	// Add Node button
 	auto addNodeButton = ui::Button::create();
 	addNodeButton->setTitleText("Add Node");
-	addNodeButton->setTitleFontSize(20);
-	addNodeButton->setPosition(Vec2(origin.x + addNodeButton->getContentSize().width / 2 + 10, visibleSize.height - 30));
-	addNodeButton->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type){
-		if (type == ui::Widget::TouchEventType::ENDED)
-		{
-			addNodeToScene("Node");
-		}
+	addNodeButton->setTitleFontSize(UIConfig::FONT_SIZE_BUTTON);
+	addNodeButton->setPosition(Vec2(btnStartX, btnY));
+	addNodeButton->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type) {
+		if (type == ui::Widget::TouchEventType::ENDED) addNodeToScene("Node");
 	});
-	this->addChild(addNodeButton, 9999);
+	toolbar->addChild(addNodeButton);
 
-	// Add Sprite button
 	auto addSpriteButton = ui::Button::create();
 	addSpriteButton->setTitleText("Add Sprite");
-	addSpriteButton->setTitleFontSize(20);
-	addSpriteButton->setPosition(Vec2(origin.x + addNodeButton->getContentSize().width + addSpriteButton->getContentSize().width / 2 + 20, visibleSize.height - 30));
-	addSpriteButton->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type){
-		if (type == ui::Widget::TouchEventType::ENDED)
-		{
-			addNodeToScene("Sprite", "HelloWorld.png"); // Example texture
-		}
+	addSpriteButton->setTitleFontSize(UIConfig::FONT_SIZE_BUTTON);
+	addSpriteButton->setPosition(Vec2(btnStartX + btnGap, btnY));
+	addSpriteButton->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type) {
+		if (type == ui::Widget::TouchEventType::ENDED) addNodeToScene("Sprite", "HelloWorld.png");
 	});
-	this->addChild(addSpriteButton, 9999);
+	toolbar->addChild(addSpriteButton);
 
-	// Save Scene button
 	auto saveButton = ui::Button::create();
-	saveButton->setTitleText("Save Scene");
-	saveButton->setTitleFontSize(20);
-	saveButton->setPosition(Vec2(visibleSize.width - saveButton->getContentSize().width / 2 - 10, visibleSize.height - 30));
-	saveButton->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type){
-		if (type == ui::Widget::TouchEventType::ENDED)
-		{
-			saveViewObjects(this->mCurrentViewID); // Use the current view ID
-		}
+	saveButton->setTitleText("Save");
+	saveButton->setTitleFontSize(UIConfig::FONT_SIZE_BUTTON);
+	saveButton->setPosition(Vec2(visibleSize.width - 60, btnY));
+	saveButton->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type) {
+		if (type == ui::Widget::TouchEventType::ENDED) saveViewObjects(this->mCurrentViewID);
 	});
-	this->addChild(saveButton, 9999);
+	toolbar->addChild(saveButton);
 
-	// Back to Game button
 	auto backButton = ui::Button::create();
-	backButton->setTitleText("Back to Game");
-	backButton->setTitleFontSize(20);
-	backButton->setPosition(Vec2(visibleSize.width - backButton->getContentSize().width / 2 - 10, visibleSize.height - 80));
-	backButton->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type){
-		if (type == ui::Widget::TouchEventType::ENDED)
-		{
-			SM->runGameScene(); // We will implement runGameScene in ScenesManager
-		}
+	backButton->setTitleText("Play Game");
+	backButton->setTitleFontSize(UIConfig::FONT_SIZE_BUTTON);
+	backButton->setPosition(Vec2(visibleSize.width - 160, btnY));
+	backButton->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type) {
+		if (type == ui::Widget::TouchEventType::ENDED) SM->runGameScene();
 	});
-	this->addChild(backButton, 9999);
+	toolbar->addChild(backButton);
 
-	// Basic touch event for selecting nodes
+	setupPropertiesPanel();
+
 	auto touchListener = EventListenerTouchOneByOne::create();
+	touchListener->setSwallowTouches(true);
 	touchListener->onTouchBegan = [&](Touch* touch, Event* event) {
-		Vec2 touchLocation = touch->getLocation();
-		Node* hitNode = nullptr;
+		Vec2 touchLoc = touch->getLocation();
+
+		bool hitUI = false;
 		for (Node* child : this->getChildren())
 		{
-			if (child->getBoundingBox().containsPoint(touchLocation) && child->getTag() != 9999)
+			if (child->getTag() == UIConfig::TAG_UI_LAYER && child->isVisible())
 			{
-				hitNode = child;
-				break;
+				if (child->getBoundingBox().containsPoint(touchLoc))
+				{
+					hitUI = true;
+					break;
+				}
 			}
 		}
+		if (hitUI) return false;
+
+		Node* hitNode = nullptr;
+
+		std::function<Node*(Node*)> findHit = [&](Node* root) -> Node* {
+			auto& children = root->getChildren();
+			for (auto it = children.rbegin(); it != children.rend(); ++it) {
+				Node* child = *it;
+				if (child->getTag() == UIConfig::TAG_UI_LAYER) continue;
+				if (!child->isVisible()) continue;
+				if (child == mSelectionDrawNode) continue;
+				if (child == mPropertiesLayout) continue;
+				if (dynamic_cast<Camera*>(child)) continue;
+
+				Node* hit = findHit(child);
+				if (hit) return hit;
+
+				Rect bbox = child->getBoundingBox();
+				Vec2 worldPos = child->getParent()->convertToWorldSpace(bbox.origin);
+				Rect worldBox(worldPos.x, worldPos.y, bbox.size.width, bbox.size.height);
+
+				if (worldBox.containsPoint(touchLoc)) {
+					return child;
+				}
+			}
+			return nullptr;
+		};
+
+		hitNode = findHit(this);
+
 		mSelectedNode = hitNode;
+
+		if (mSelectedNode && mSelectedNode->getParent())
+		{
+			cocos2d::Vec2 touchInParent = mSelectedNode->getParent()->convertToNodeSpace(touchLoc);
+			mTouchOffset = mSelectedNode->getPosition() - touchInParent;
+		}
+
 		return true;
 	};
 	touchListener->onTouchMoved = [&](Touch* touch, Event* event) {
-		if (mSelectedNode)
+		if (mSelectedNode && mSelectedNode->getParent())
 		{
-			mSelectedNode->setPosition(touch->getLocation());
+			cocos2d::Vec2 touchLoc = touch->getLocation();
+			cocos2d::Vec2 touchInParent = mSelectedNode->getParent()->convertToNodeSpace(touchLoc);
+			mSelectedNode->setPosition(touchInParent + mTouchOffset);
 		}
 	};
+
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
+}
+
+void EditorScene::setupPropertiesPanel()
+{
+	auto visibleSize = Director::getInstance()->getVisibleSize();
+
+	mPropertiesLayout = ui::Layout::create();
+	mPropertiesLayout->setContentSize(Size(UIConfig::PANEL_WIDTH, UIConfig::PROPERTIES_PANEL_HEIGHT));
+	mPropertiesLayout->setBackGroundColorType(ui::Layout::BackGroundColorType::SOLID);
+	mPropertiesLayout->setBackGroundColor(UIConfig::COLOR_PANEL_BG);
+	mPropertiesLayout->setOpacity(200);
+	mPropertiesLayout->setAnchorPoint(Vec2(1, 0));
+	mPropertiesLayout->setPosition(Vec2(visibleSize.width - UIConfig::MARGIN, UIConfig::MARGIN));
+	this->addChild(mPropertiesLayout, UIConfig::TAG_UI_LAYER);
+	mPropertiesLayout->setTag(UIConfig::TAG_UI_LAYER);
+
+	float startY = UIConfig::PROPERTIES_PANEL_HEIGHT - 30.0f;
+	float gapY = 30.0f;
+
+	auto createField = [&](const std::string& title, int y) {
+		auto label = ui::Text::create(title, "Arial", UIConfig::FONT_SIZE_NORMAL);
+		label->setAnchorPoint(Vec2(0, 0.5));
+		label->setPosition(Vec2(10, y));
+		mPropertiesLayout->addChild(label);
+
+		auto field = ui::TextField::create("0.00", "Arial", UIConfig::FONT_SIZE_NORMAL);
+		field->setPosition(Vec2(100, y));
+		field->setContentSize(Size(80, 20));
+		field->setName(title);
+		mPropertiesLayout->addChild(field);
+		return field;
+	};
+
+	createField("Pos X", startY);
+	createField("Pos Y", startY - gapY);
+	createField("Scale X", startY - gapY * 2);
+	createField("Scale Y", startY - gapY * 3);
+	createField("Rotation", startY - gapY * 4);
+}
+
+void EditorScene::updatePropertiesPanel()
+{
+	if (!mSelectedNode || !mPropertiesLayout) return;
+
+	auto setVal = [&](const std::string& name, float val) {
+		auto field = dynamic_cast<ui::TextField*>(mPropertiesLayout->getChildByName(name));
+		if (field && !field->isFocused()) {
+			field->setString(StringUtils::format("%.2f", val));
+		}
+	};
+
+	setVal("Pos X", mSelectedNode->getPositionX());
+	setVal("Pos Y", mSelectedNode->getPositionY());
+	setVal("Scale X", mSelectedNode->getScaleX());
+	setVal("Scale Y", mSelectedNode->getScaleY());
+	setVal("Rotation", mSelectedNode->getRotation());
 }
 
 void EditorScene::addNodeToScene(const std::string& type, const std::string& textureFileName)
@@ -219,67 +373,38 @@ void EditorScene::addNodeToScene(const std::string& type, const std::string& tex
 
 	if (type == "Button" && !textureFileName.empty())
 	{
-		BValue customData;
-		customData.clearWithType(BValue::Type::MAP);
-		customData.getValueMap()["textureFileName"] = BValue(textureFileName);
-		objInfo.customData = customData;
+		ValueMap customDataMap;
+		customDataMap["textureFileName"] = Value(textureFileName);
+		objInfo.customData = Value(customDataMap);
 	}
 
 	Node* newNode = NodeHelper::createNodeFromSceneObjectInfo(objInfo);
 	if (newNode)
 	{
-		this->addChild(newNode);
+		auto metadata = EditorMetadataComponent::create();
+		metadata->type = type;
+		metadata->textureFileName = textureFileName;
+		newNode->addComponent(metadata);
+
+		Node* viewRoot = nullptr;
+		for (Node* child : this->getChildren()) {
+			if (child->getTag() == UIConfig::TAG_UI_LAYER) continue;
+			if (dynamic_cast<Camera*>(child)) continue;
+			viewRoot = child;
+			break;
+		}
+		if (viewRoot) viewRoot->addChild(newNode);
+		else this->addChild(newNode);
+
 		mSelectedNode = newNode;
 	}
 }
 
 void EditorScene::updateCurrentNodeList(Node* aNode)
 {
-	if (mNodesListLayout && aNode)
-	{
-		mNodesListLayout->removeAllChildrenWithCleanup(true);
-		auto currentY = mNodesListLayout->getContentSize().height - 30;
-		if (aNode != this && mSelectedFolder)
-		{
-			auto viewButton = createButtonForChangeFolder("...", mSelectedFolder, currentY);
-
-			currentY -= 30;
-		}
-		mSelectedFolder = aNode;
-
-		auto viewButton = createButtonForChangeFolder(mSelectedFolder->getName(), mSelectedFolder, currentY);
-		currentY -= 30;
-
-		for (Node* child : mSelectedFolder->getChildren())
-		{
-			auto viewButton = createButtonForChangeFolder(child->getName(), mSelectedFolder, currentY);
-			
-			currentY -= 30;
-		}
-	}
 }
 
 ui::Button* EditorScene::createButtonForChangeFolder(const std::string& aName, Node* aNode, float aCurrentY)
 {
-	auto result = ui::Button::create();
-	if (aNode && mNodesListLayout)
-	{
-		const std::string& name = aNode->getName();
-		result->setTitleText(name);
-		result->setTitleFontSize(18);
-		result->setContentSize(Size(180, 25));
-		result->setPosition(Vec2(mNodesListLayout->getContentSize().width / 2, aCurrentY));
-		result->addTouchEventListener([&, name](Ref* sender, ui::Widget::TouchEventType type)
-		{
-			if (type == ui::Widget::TouchEventType::ENDED)
-			{
-				updateCurrentNodeList(aNode);
-			}
-		});
-
-		mNodesListLayout->addChild(result);
-		result->setTag(9999);
-	}
-
-	return result;
+	return nullptr;
 }

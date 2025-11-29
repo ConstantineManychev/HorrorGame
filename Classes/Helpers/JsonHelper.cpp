@@ -1,319 +1,150 @@
 #include "JsonHelper.h"
+#include "external/json/stringbuffer.h"
+#include "external/json/prettywriter.h"
 
-_USEC
+USING_NS_CC;
 
-bool JsonHelper::saveBValueToJsonValue( rapidjson::Value& aJSONValue, const BValue& aBValue, rapidjson::Document::AllocatorType& aAllocator )
-{
-    bool result = false;
-    auto valueType = aBValue.getType();
-    
-    if ( valueType != BValue::Type::NONE )
-    {
-        switch( valueType )
-        {
-            case BValue::Type::BYTE:
-            case BValue::Type::INTEGER:
-            {
-                aJSONValue = rapidjson::Value( rapidjson::kNumberType );
-                aJSONValue.SetInt( aBValue.getInt() );
-                
-                result = true;
-            }
-                break;
-            case BValue::Type::DOUBLE:
-            case BValue::Type::FLOAT:
-            {
-                aJSONValue = rapidjson::Value( rapidjson::kNumberType );
-                aJSONValue.SetDouble( aBValue.getDouble() );
-                
-                result = true;
-            }
-                break;
-                
-            case BValue::Type::BOOLEAN:
-            {
-                aJSONValue = rapidjson::Value( aBValue.getBool() ? rapidjson::kTrueType : rapidjson::kFalseType );
-                
-                result = true;
-            }
-                break;
-                
-            case BValue::Type::STRING:
-            {
-                aJSONValue = rapidjson::Value( rapidjson::kStringType );
+namespace GameSpace {
 
-				std::string saveStr = aBValue.getString();
-                aJSONValue.SetString(saveStr.c_str(), (rapidjson::SizeType)saveStr.size(), aAllocator);
-                
-                result = true;
-            }
-                break;
-			case BValue::Type::VEC2:
-			{
-				aJSONValue = rapidjson::Value( rapidjson::kStringType );
-
-				std::string saveStr = aBValue.getString();
-				saveStr = "?" + saveStr;
-				aJSONValue.SetString( saveStr.c_str(), ( rapidjson::SizeType )saveStr.size(), aAllocator);
-
-				result = true;
-			}
-			break;
-			case BValue::Type::SIZE:
-			{
-				aJSONValue = rapidjson::Value( rapidjson::kStringType );
-
-				std::string saveStr = aBValue.getString();
-				saveStr = "!" + saveStr;
-				aJSONValue.SetString( saveStr.c_str(), ( rapidjson::SizeType )saveStr.size(), aAllocator);
-
-				result = true;
-			}
-			break;
-			case BValue::Type::COLOR3B:
-			{
-				aJSONValue = rapidjson::Value( rapidjson::kStringType );
-
-				std::string saveStr = aBValue.getString();
-				saveStr = "<" + saveStr;
-				aJSONValue.SetString( saveStr.c_str(), ( rapidjson::SizeType )saveStr.size(), aAllocator);
-
-				result = true;
-			}
-			break;
-			case BValue::Type::COLOR4F:
-			{
-				aJSONValue = rapidjson::Value( rapidjson::kStringType );
-
-				std::string saveStr = aBValue.getString();
-				saveStr = ">" + saveStr;
-				aJSONValue.SetString( saveStr.c_str(), ( rapidjson::SizeType )saveStr.size(), aAllocator);
-
-				result = true;
-			}
-			break;
-            case BValue::Type::VECTOR:
-            {
-                aJSONValue = rapidjson::Value( rapidjson::kArrayType );
-                
-                const BValueVector& valueVector = aBValue.getValueVector();
-                
-                for ( unsigned i = 0; i < valueVector.size(); ++i)
-                {
-                    rapidjson::Value val;
-                    if ( saveBValueToJsonValue( val, valueVector[ i ], aAllocator) )
-                    {
-                        aJSONValue.PushBack( val, aAllocator);
-                    }
-                }
-                
-                result = true;
-            }
-                break;
-                
-            case BValue::Type::MAP:
-            {
-                aJSONValue = rapidjson::Value( rapidjson::kObjectType );
-                
-                const BValueMap& valueMap = aBValue.getValueMap();
-                
-                for ( auto mapIt : valueMap )
-                {
-                    std::string mapKey = mapIt.first;
-                    
-                    rapidjson::Value jsonMapValue;
-                    if ( saveBValueToJsonValue( jsonMapValue, mapIt.second, aAllocator) )
-                    {
-                        rapidjson::Value jsonMapKey( rapidjson::kStringType );
-                        jsonMapKey.SetString( mapKey.c_str(), (rapidjson::SizeType)mapKey.size(), aAllocator);
-                        
-                        aJSONValue.AddMember( jsonMapKey, jsonMapValue, aAllocator);
-                    }
-                    
-                }
-
-				result = true;
-            }
-                break;
-            case BValue::Type::UN_MAP:
-            {
-                aJSONValue = rapidjson::Value( rapidjson::kObjectType );
-                
-                const BValueUnMap& valueMap = aBValue.getValueUnMap();
-                
-                for ( auto mapIt : valueMap )
-                {
-                    std::string mapKey = mapIt.first;
-                    
-                    rapidjson::Value jsonMapValue;
-                    if ( saveBValueToJsonValue( jsonMapValue, mapIt.second, aAllocator) )
-                    {
-                        rapidjson::Value jsonMapKey( rapidjson::kStringType );
-                        jsonMapKey.SetString( mapKey.c_str(), (rapidjson::SizeType)mapKey.size(), aAllocator);
-                        
-                        aJSONValue.AddMember( jsonMapKey, jsonMapValue, aAllocator);
-                    }
-                    
-                }
-				result = true;
-            }
-                break;
-            case BValue::Type::INT_MAP:
-            {
-                aJSONValue = rapidjson::Value( rapidjson::kObjectType );
-                
-                const BValueIntMap& valueMap = aBValue.getValueIntMap();
-                
-                for ( auto mapIt : valueMap )
-                {
-                    BValue bMapKey( mapIt.first );
-                    std::string mapKey = bMapKey.getString();
-                    
-                    rapidjson::Value jsonMapValue;
-                    if ( saveBValueToJsonValue( jsonMapValue, mapIt.second, aAllocator ) )
-                    {
-                        rapidjson::Value jsonMapKey( rapidjson::kStringType );
-                        jsonMapKey.SetString( mapKey.c_str(), (rapidjson::SizeType)mapKey.size(), aAllocator);
-                        
-                        aJSONValue.AddMember( jsonMapKey, jsonMapValue, aAllocator);
-                    }
-                    
-                }
-				result = true;
-            }
-                break;
-            case BValue::Type::INT_UN_MAP:
-            {
-                aJSONValue = rapidjson::Value( rapidjson::kObjectType );
-                
-                const BValueIntUnMap& valueMap = aBValue.getValueIntUnMap();
-                
-                for ( auto mapIt : valueMap )
-                {
-                    BValue bMapKey( mapIt.first );
-                    std::string mapKey = bMapKey.getString();
-                    
-                    rapidjson::Value jsonMapValue;
-                    if ( saveBValueToJsonValue( jsonMapValue, mapIt.second, aAllocator) )
-                    {
-                        rapidjson::Value jsonMapKey( rapidjson::kStringType );
-                        jsonMapKey.SetString( mapKey.c_str(), (rapidjson::SizeType)mapKey.size(), aAllocator);
-                        
-                        aJSONValue.AddMember( jsonMapKey, jsonMapValue, aAllocator);
-                    }
-                    
-                }
-				result = true;
-            }
-                break;
-        };
-
-    }
-    
-    return result;
-}
-
-void JsonHelper::parseBValueFromJsonValue( const rapidjson::Value& aJSONValue, BValue& aBValue)
-{
-    if (aJSONValue.IsObject() )
-    {
-        //parse map
-		aBValue.clearWithType( BValue::Type::MAP );
-        BValueMap& valueMap = aBValue.getValueMap();
-        
-        for ( auto it = aJSONValue.MemberBegin(); it != aJSONValue.MemberEnd(); ++it )
-        {
-            BValue& fillValue = valueMap[ (*it).name.GetString() ];
-            parseBValueFromJsonValue( (*it).value, fillValue );
-        }
-        
-    }
-    else if (aJSONValue.IsArray() )
-    {
-        //parse array
-		aBValue.clearWithType( BValue::Type::VECTOR );
-        BValueVector& valueVec = aBValue.getValueVector();
-        
-        for ( int i = 0; i != aJSONValue.Size() ; ++i )
-        {
-            BValue fillValue;
-            parseBValueFromJsonValue(aJSONValue[ i ], fillValue );
-            valueVec.push_back( fillValue );
-        }
-    }
-    else if (aJSONValue.IsFloat() || aJSONValue.IsDouble() )
-    {
-		aBValue = aJSONValue.GetDouble();
-    }
-    else if (aJSONValue.IsBool() )
-    {
-		aBValue = aJSONValue.GetBool();
-    }
-    else if (aJSONValue.IsString() )
-    {
-		std::string jsonStr = aJSONValue.GetString();
-		aBValue = jsonStr;
-
-		if ( !jsonStr.empty() )
-		{
-			const char checkSym = jsonStr[0];
-
-			switch ( checkSym )
-			{
-
-				case '?' :
-				{
-					BValue tmpVal( jsonStr.substr( 1, jsonStr.size() - 1 ) );
-					aBValue = tmpVal.getVec2();
-				}
-				break;
-
-				case '!':
-				{
-					BValue tmpVal( jsonStr.substr( 1, jsonStr.size() - 1) );
-					aBValue = tmpVal.getSize();
-				}
-				break;
-
-				case '<':
-				{
-					BValue tmpVal( jsonStr.substr( 1, jsonStr.size() - 1) );
-					aBValue = tmpVal.getColor3B();
-				}
-				break;
-
-				case '>':
-				{
-					BValue tmpVal( jsonStr.substr(1, jsonStr.size() - 1) );
-					aBValue = tmpVal.getColor4F();
-				}
-				break;
-
-				default:
-					break;
-			}
-		}
-    }
-    else if (aJSONValue.IsNumber() )
-    {
-		aBValue = aJSONValue.GetInt();
-    }
-    
-}
-
-void JsonHelper::parseBValueFromJsonConfig(const std::string& aConfigPath, BValue& aBValue)
-{
-	std::string content = FileUtils::getInstance()->getStringFromFile(aConfigPath);
-
-	bool isLoadingCorrect = false;
-
-	if (!content.empty())
+	ValueMap JsonHelper::getValueMapFromJson(const std::string& aConfigPath)
 	{
-		rapidjson::Document document;
-		document.Parse<0>(content.c_str());
-		if (!document.HasParseError())
-		{
-			parseBValueFromJsonValue(document, aBValue);
+		Value val = getValueFromJson(aConfigPath);
+		if (val.getType() == Value::Type::MAP) {
+			return val.asValueMap();
+		}
+		return ValueMap();
+	}
+
+	Value JsonHelper::getValueFromJson(const std::string& aConfigPath)
+	{
+		std::string content = FileUtils::getInstance()->getStringFromFile(aConfigPath);
+		if (content.empty()) return Value::Null;
+
+		rapidjson::Document doc;
+		doc.Parse<0>(content.c_str());
+		if (doc.HasParseError()) {
+			return Value::Null;
+		}
+
+		return parseRapidJson(doc);
+	}
+
+	void JsonHelper::saveValueToJson(const std::string& aConfigPath, const Value& aValue)
+	{
+		rapidjson::Document doc;
+
+		if (aValue.getType() == Value::Type::VECTOR) {
+			doc.SetArray();
+		}
+		else {
+			doc.SetObject();
+		}
+
+		saveValueToRapidJson(doc, aValue, doc.GetAllocator());
+
+		rapidjson::StringBuffer buffer;
+		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+		doc.Accept(writer);
+
+		std::string fullPath = FileUtils::getInstance()->fullPathForFilename(aConfigPath);
+		if (fullPath.empty()) fullPath = aConfigPath;
+
+		FileUtils::getInstance()->writeStringToFile(buffer.GetString(), fullPath);
+	}
+
+	Value JsonHelper::parseRapidJson(const rapidjson::Value& v)
+	{
+		if (v.IsBool()) return Value(v.GetBool());
+		if (v.IsInt()) return Value(v.GetInt());
+		if (v.IsDouble()) return Value(v.GetDouble());
+		if (v.IsString()) return Value(v.GetString());
+
+		if (v.IsArray()) {
+			ValueVector vec;
+			for (auto& elem : v.GetArray()) {
+				vec.push_back(parseRapidJson(elem));
+			}
+			return Value(vec);
+		}
+
+		if (v.IsObject()) {
+			ValueMap map;
+			for (auto& m : v.GetObject()) {
+				map[m.name.GetString()] = parseRapidJson(m.value);
+			}
+			return Value(map);
+		}
+
+		return Value::Null;
+	}
+
+	void JsonHelper::saveValueToRapidJson(rapidjson::Value& jsonVal, const Value& val, rapidjson::Document::AllocatorType& allocator)
+	{
+		switch (val.getType()) {
+		case Value::Type::BOOLEAN: jsonVal.SetBool(val.asBool()); break;
+		case Value::Type::INTEGER: jsonVal.SetInt(val.asInt()); break;
+		case Value::Type::FLOAT:   jsonVal.SetDouble(val.asFloat()); break;
+		case Value::Type::DOUBLE:  jsonVal.SetDouble(val.asDouble()); break;
+		case Value::Type::STRING:  jsonVal.SetString(val.asString().c_str(), allocator); break;
+		case Value::Type::VECTOR: {
+			if (!jsonVal.IsArray()) jsonVal.SetArray();
+			for (const auto& v : val.asValueVector()) {
+				rapidjson::Value child;
+				saveValueToRapidJson(child, v, allocator);
+				jsonVal.PushBack(child, allocator);
+			}
+			break;
+		}
+		case Value::Type::MAP: {
+			if (!jsonVal.IsObject()) jsonVal.SetObject();
+			for (const auto& pair : val.asValueMap()) {
+				rapidjson::Value child;
+				saveValueToRapidJson(child, pair.second, allocator);
+				rapidjson::Value name(pair.first.c_str(), allocator);
+				jsonVal.AddMember(name, child, allocator);
+			}
+			break;
+		}
+		default: break;
 		}
 	}
+
+	Vec2 JsonHelper::toVec2(const Value& val)
+	{
+		if (val.getType() == Value::Type::MAP) {
+			auto m = val.asValueMap();
+			float x = m.count("x") ? m.at("x").asFloat() : 0.0f;
+			float y = m.count("y") ? m.at("y").asFloat() : 0.0f;
+			return Vec2(x, y);
+		}
+		std::string s = val.asString();
+		if (s.empty()) return Vec2::ZERO;
+		if (s[0] == '?') s = s.substr(1);
+		return PointFromString(s);
+	}
+
+	Size JsonHelper::toSize(const Value& val)
+	{
+		if (val.getType() == Value::Type::MAP) {
+			auto m = val.asValueMap();
+			float w = m.count("width") ? m.at("width").asFloat() : 0.0f;
+			float h = m.count("height") ? m.at("height").asFloat() : 0.0f;
+			return Size(w, h);
+		}
+		std::string s = val.asString();
+		if (s.empty()) return Size::ZERO;
+		if (s[0] == '!') s = s.substr(1);
+		return SizeFromString(s);
+	}
+
+	Color3B JsonHelper::toColor3B(const Value& val)
+	{
+		return Color3B::WHITE;
+	}
+
+	Color4F JsonHelper::toColor4F(const Value& val)
+	{
+		return Color4F::WHITE;
+	}
+
 }

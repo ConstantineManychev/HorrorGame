@@ -1,412 +1,419 @@
 #include "ViewFactory.h"
 #include "NodeHelper.h"
-#include "Managers/ViewManager.h" // Для вызова VM->changeView в CallFunc
+#include "Managers/ViewManager.h" 
 #include "Managers/DataManager.h"
 #include "Managers/ScenesManager.h"
+#include "Managers/GameDirector.h" 
 #include "Basics/BaseLocation.h"
 #include "ui/UIButton.h"
+#include "Components/EditorMetadataComponent.h"
+#include "Helpers/JsonHelper.h"
 
-_CSTART
+USING_NS_CC;
 
-const std::unordered_set<std::string> ViewFactory::cExcludeParams = { "children", "actions", "creation" };
+namespace GameSpace {
 
-const std::unordered_map<std::string, ViewFactory::Params> ViewFactory::cParamTypeMap = {
-	{"children", Params::CHILDREN}, {"params", Params::PARAMS}, {"actions", Params::ACTIONS},
-	{"id", Params::ID}, {"res", Params::RES},
-	{"res_normal", Params::RES_NORMAL},{"res_pressed", Params::RES_PRESSED},{"res_disable", Params::RES_DISABLE},
-	{"layer", Params::LAYER}, {"opacity", Params::OPACITY},
-	{"pos_x", Params::POS_X}, {"pos_y", Params::POS_Y},{"anch_x", Params::ANCH_X}, {"anch_y", Params::ANCH_Y}
-};
+	const std::unordered_set<std::string> ViewFactory::cExcludeParams = { "children", "actions", "creation" };
 
-static const BValueMap MapNull;
+	const std::unordered_map<std::string, ViewFactory::Params> ViewFactory::cParamTypeMap = {
+		{"children", Params::CHILDREN}, {"params", Params::PARAMS}, {"actions", Params::ACTIONS},
+		{"id", Params::ID}, {"res", Params::RES},
+		{"res_normal", Params::RES_NORMAL},{"res_pressed", Params::RES_PRESSED},{"res_disable", Params::RES_DISABLE},
+		{"layer", Params::LAYER}, {"opacity", Params::OPACITY},
+		{"pos_x", Params::POS_X}, {"pos_y", Params::POS_Y},{"anch_x", Params::ANCH_X}, {"anch_y", Params::ANCH_Y},
+		{"scale_x", Params::SCALE_X}, {"scale_y", Params::SCALE_Y}, {"rotation", Params::ROTATION}, {"is_visible", Params::IS_VISIBLE},
+		{"color", Params::COLOR}
+	};
 
-Node* ViewFactory::createNodeFromBValue(const BValue& aBValue, Node* aParentNode)
-{
-	// Так как ViewFactory статический, нам нужно временное хранилище для actions, 
-	// которое мы потом передадим в ViewManager, или ViewManager должен предоставлять метод регистрации.
-	// В данном архитектурном решении, ViewFactory создает ноды, но действия регистрируются через ViewManager
-	// Однако, рекурсивный парсинг требует прокидывания контекста.
-	// Упрощение: Мы используем ViewManager::getInstance() для регистрации действий напрямую в process.
-	
-	Node* result = nullptr;
+	static const cocos2d::ValueMap MapNull;
 
-	if (aBValue.isMap())
+	cocos2d::Node* ViewFactory::createNodeFromValue(const cocos2d::Value& aValue, cocos2d::Node* aParentNode)
 	{
-		const auto& valMap = aBValue.getValueMap();
+		cocos2d::Node* result = nullptr;
 
-		auto it = valMap.find("type");
-		if (it != valMap.end() && it->second.isString())
+		if (aValue.getType() == cocos2d::Value::Type::MAP)
 		{
-			auto typeName = it->second.getString();
-			result = NodeHelper::createNodeForType(typeName);
+			const auto& valMap = aValue.asValueMap();
 
-			if (result && typeName == "Player")
+			auto it = valMap.find("type");
+			std::string typeName = "Node";
+			if (it != valMap.end() && it->second.getType() == cocos2d::Value::Type::STRING)
 			{
-				auto location = dynamic_cast<BaseLocation*>(aParentNode);
-				if (location)
+				typeName = it->second.asString();
+				result = NodeHelper::createNodeForType(typeName);
+
+				if (result && typeName == "Player")
 				{
-					location->setupPlayer(result);
-				}
-			}
-		}
-
-		if (result)
-		{
-			// Настройка свойств
-			std::string paramName;
-			
-			// Нам нужно собрать actions для этого конкретного узла и его детей
-			// В текущей архитектуре actions хранятся в ViewManager. 
-			// Мы будем регистрировать их там.
-			
-			auto& vmActions = VM->getActionsMap(); // Friendship or public accessor needed
-
-			for (auto it = valMap.begin(); it != valMap.end(); ++it)
-			{
-				paramName = it->first;
-				if (cExcludeParams.find(paramName) == cExcludeParams.end())
-				{
-					fillNodeParamFromBValue(result, paramName, it->second, vmActions, aParentNode);
-				}
-			}
-
-			auto itChildren = valMap.find("children");
-			if (itChildren != valMap.end())
-			{
-				fillNodeParamFromBValue(result, itChildren->first, itChildren->second, vmActions, aParentNode);
-			}
-
-			auto itActions = valMap.find("actions");
-			if (itActions != valMap.end())
-			{
-				// Специальная обработка для actions
-				parseActions(itActions->second, result, vmActions);
-			}
-			
-			// Setup Listeners
-			if (SM->getCurrentSceneID() != "editor")
-			{
-				VM->runActionForNode(result, "onCreate");
-			}
-
-			auto btn = dynamic_cast<ui::Button*>(result);
-			if (btn)
-			{
-				btn->addTouchEventListener([result](Ref* sender, ui::Widget::TouchEventType type) {
-					switch (type)
+					auto location = dynamic_cast<BaseLocation*>(aParentNode);
+					if (location)
 					{
-					case ui::Widget::TouchEventType::BEGAN:
-						VM->runActionForNode(result, "onBtnClickDown");
-						break;
-					case ui::Widget::TouchEventType::MOVED:
-						VM->runActionForNode(result, "onBtnClickMove");
-						break;
-					case ui::Widget::TouchEventType::ENDED:
-						VM->runActionForNode(result, "onBtnClickUp");
-						break;
-					case ui::Widget::TouchEventType::CANCELED:
-						VM->runActionForNode(result, "onBtnClickCancel");
-						break;
-					default:
-						break;
-					}
-				});
-			}
-		}
-	}
-
-	return result;
-}
-
-void ViewFactory::fillNodeParamFromBValue(Node* aNode, const std::string& aParamID, const BValue& aBValue, std::unordered_map<Node*, std::unordered_map<std::string, Vector<FiniteTimeAction*>>>& outActionsMap, Node* aParentNode)
-{
-	if (!aNode) return;
-
-	auto itParam = cParamTypeMap.find(aParamID);
-	Params paramType = (itParam != cParamTypeMap.end()) ? itParam->second : Params::NONE;
-
-	auto valueType = aBValue.getType();
-
-	switch (valueType)
-	{
-	case BValue::Type::MAP:
-	{
-		const auto& valMap = aBValue.getValueMap();
-		for (auto it = valMap.begin(); it != valMap.end(); ++it)
-		{
-			switch (paramType)
-			{
-			case Params::CHILDREN:
-				// Pass 'aNode' as parent for children
-				aNode->addChild(createNodeFromBValue(it->second, aNode));
-				break;
-			case Params::PARAMS:
-				fillNodeParamFromBValue(aNode, it->first, it->second, outActionsMap, aParentNode);
-				break;
-			case Params::ACTIONS:
-				parseActions(it->second, aNode, outActionsMap);
-				break;
-			default:
-				break;
-			}
-		}
-		break;
-	}
-	case BValue::Type::VECTOR:
-	{
-		const auto& valVector = aBValue.getValueVector();
-		for (auto& val : valVector)
-		{
-			switch (paramType)
-			{
-			case Params::CHILDREN:
-				aNode->addChild(createNodeFromBValue(val, aNode));
-				break;
-			case Params::ACTIONS:
-				parseActions(val, aNode, outActionsMap);
-				break;
-			default:
-				break;
-			}
-		}
-		break;
-	}
-	case BValue::Type::STRING:
-	{
-		switch (paramType)
-		{
-		case Params::ID:
-			aNode->setName(aBValue.getString());
-			break;
-		case Params::RES:
-		{
-			auto sprite = dynamic_cast<Sprite*>(aNode);
-			if (sprite) sprite->initWithFile(aBValue.getString());
-			break;
-		}
-		case Params::RES_NORMAL:
-		{
-			auto btn = dynamic_cast<ui::Button*>(aNode);
-			if (btn) btn->loadTextureNormal(aBValue.getString());
-			break;
-		}
-		case Params::RES_PRESSED:
-		{
-			auto btn = dynamic_cast<ui::Button*>(aNode);
-			if (btn) btn->loadTexturePressed(aBValue.getString());
-			break;
-		}
-		case Params::RES_DISABLE:
-		{
-			auto btn = dynamic_cast<ui::Button*>(aNode);
-			if (btn) btn->loadTextureDisabled(aBValue.getString());
-			break;
-		}
-		}
-		break;
-	}
-	case BValue::Type::BOOLEAN:
-	{
-		if (paramType == Params::IS_VISIBLE)
-		{
-			aNode->setVisible(aBValue.getBool());
-		}
-		break;
-	}
-	case BValue::Type::INTEGER:
-	{
-		if (paramType == Params::LAYER) aNode->setLocalZOrder(aBValue.getInt());
-		else if (paramType == Params::OPACITY) aNode->setOpacity(aBValue.getInt());
-		break;
-	}
-	case BValue::Type::FLOAT:
-	case BValue::Type::DOUBLE:
-	{
-		Size parentSize = Size::ZERO;
-		
-		// Use explicit parent if provided, otherwise check actual parent (which is likely null during creation)
-		Node* parent = aParentNode;
-		if (!parent)
-		{
-			parent = aNode->getParent();
-		}
-
-		if (parent)
-		{
-			parentSize = parent->getContentSize();
-		}
-		else
-		{
-			parentSize = Director::getInstance()->getWinSize();
-		}
-
-		float val = aBValue.getFloat();
-
-		switch (paramType)
-		{
-		case Params::POS_X: aNode->setPositionX(parentSize.width * val); break;
-		case Params::POS_Y: aNode->setPositionY(parentSize.height * val); break;
-		case Params::ANCH_X: 
-		{
-			auto anch = aNode->getAnchorPoint();
-			anch.x = val;
-			aNode->setAnchorPoint(anch);
-			break;
-		}
-		case Params::ANCH_Y:
-		{
-			auto anch = aNode->getAnchorPoint();
-			anch.y = val;
-			aNode->setAnchorPoint(anch);
-			break;
-		}
-		}
-		break;
-	}
-	case BValue::Type::COLOR3B:
-		aNode->setColor(aBValue.getColor3B());
-		break;
-	case BValue::Type::SIZE:
-		aNode->setContentSize(aBValue.getSize());
-		break;
-	default:
-		break;
-	}
-}
-
-void ViewFactory::parseActions(const BValue& aBValue, Node* aNode, std::unordered_map<Node*, std::unordered_map<std::string, Vector<FiniteTimeAction*>>>& outActionsMap)
-{
-	if (aBValue.isMap())
-	{
-		const auto& valMap = aBValue.getValueMap();
-		for (auto it = valMap.begin(); it != valMap.end(); ++it)
-		{
-			if (it->second.isVector())
-			{
-				std::string actionVecName = it->first;
-				const auto& actionsVec = it->second.getValueVector();
-
-				for (auto action : actionsVec)
-				{
-					FiniteTimeAction* result = createActionFromBValue(action, aNode);
-					if (aNode && !actionVecName.empty() && result)
-					{
-						outActionsMap[aNode][actionVecName].pushBack(result);
-						// Retain action logic handled by Vector implicitly if copied? 
-						// No, Vector holds Ref*, need to be careful. 
-						// Cocos Vector retains added objects.
-						// But we are filling the map that lives in ViewManager.
+						location->setupPlayer(result);
 					}
 				}
 			}
-		}
-	}
-}
 
-FiniteTimeAction* ViewFactory::createActionFromBValue(const BValue& aBValue, Node* aNode)
-{
-	FiniteTimeAction* result = nullptr;
+			if (result)
+			{
+				auto metadata = EditorMetadataComponent::create();
+				metadata->type = typeName;
 
-	if (aBValue.isMap())
-	{
-		const auto& actionMap = aBValue.getValueMap();
-		auto it = actionMap.find("runAction");
-		if (it != actionMap.end() && it->second.isString())
-		{
-			std::string actionName = it->second.getString();
-			if (actionName == "fade_in")
-			{
-				result = FadeIn::create(getParamFloat(actionMap, "duration"));
-			}
-			else if (actionName == "fade_out")
-			{
-				result = FadeOut::create(getParamFloat(actionMap, "duration"));
-			}
-			else if (actionName == "delay_time")
-			{
-				result = DelayTime::create(getParamFloat(actionMap, "duration"));
-			}
-			else if (actionName == "change_view")
-			{
-				auto viewID = getParamString(actionMap, "id");
-				result = CallFunc::create([viewID]()
+				auto itRes = valMap.find("res");
+				if (itRes != valMap.end() && itRes->second.getType() == cocos2d::Value::Type::STRING)
+					metadata->textureFileName = itRes->second.asString();
+				else
 				{
-					if (SM->getCurrentSceneID() != "editor")
-					{
-						VM->changeView(viewID);
+					auto itParams = valMap.find("params");
+					if (itParams != valMap.end() && itParams->second.getType() == cocos2d::Value::Type::MAP) {
+						auto& pMap = itParams->second.asValueMap();
+						auto itResP = pMap.find("res");
+						if (itResP != pMap.end() && itResP->second.getType() == cocos2d::Value::Type::STRING)
+							metadata->textureFileName = itResP->second.asString();
 					}
-				});
-			}
-			else if (actionName == "forget_button")
-			{
-				auto btn = dynamic_cast<ui::Button*>(aNode);
+				}
+				if (metadata->textureFileName.empty()) {
+					auto itResN = valMap.find("res_normal");
+					if (itResN != valMap.end() && itResN->second.getType() == cocos2d::Value::Type::STRING)
+						metadata->textureFileName = itResN->second.asString();
+				}
+
+				result->addComponent(metadata);
+
+				std::string paramName;
+				auto& vmActions = VM->getActionsMap();
+
+				for (auto it = valMap.begin(); it != valMap.end(); ++it)
+				{
+					paramName = it->first;
+					if (cExcludeParams.find(paramName) == cExcludeParams.end())
+					{
+						fillNodeParamFromValue(result, paramName, it->second, vmActions, aParentNode);
+					}
+				}
+
+				auto itChildren = valMap.find("children");
+				if (itChildren != valMap.end())
+				{
+					fillNodeParamFromValue(result, itChildren->first, itChildren->second, vmActions, aParentNode);
+				}
+
+				auto itActions = valMap.find("actions");
+				if (itActions != valMap.end())
+				{
+					parseActions(itActions->second, result, vmActions);
+				}
+
+				auto itParams = valMap.find("params");
+				if (itParams != valMap.end())
+				{
+					fillNodeParamFromValue(result, itParams->first, itParams->second, vmActions, aParentNode);
+				}
+
+				if (!GD->isEditorMode())
+				{
+					VM->runActionForNode(result, "onCreate");
+				}
+
+				auto btn = dynamic_cast<cocos2d::ui::Button*>(result);
 				if (btn)
 				{
-					result = CallFunc::create([actionMap, btn]()
+					if (GD->isEditorMode())
 					{
-						auto conditions = getParamMap(actionMap, "conditions");
-						bool isAllConditions = isAllConditionsMeetRequirements(conditions, btn);
+						btn->setTouchEnabled(false);
+					}
+					else
+					{
+						btn->addTouchEventListener([result](cocos2d::Ref* sender, cocos2d::ui::Widget::TouchEventType type) {
+							switch (type)
+							{
+							case cocos2d::ui::Widget::TouchEventType::BEGAN:
+								VM->runActionForNode(result, "onBtnClickDown");
+								break;
+							case cocos2d::ui::Widget::TouchEventType::MOVED:
+								VM->runActionForNode(result, "onBtnClickMove");
+								break;
+							case cocos2d::ui::Widget::TouchEventType::ENDED:
+								VM->runActionForNode(result, "onBtnClickUp");
+								break;
+							case cocos2d::ui::Widget::TouchEventType::CANCELED:
+								VM->runActionForNode(result, "onBtnClickCancel");
+								break;
+							default:
+								break;
+							}
+						});
+					}
+				}
+			}
+		}
 
-						if (isAllConditions)
+		return result;
+	}
+
+	void ViewFactory::fillNodeParamFromValue(cocos2d::Node* aNode, const std::string& aParamID, const cocos2d::Value& aValue, std::unordered_map<cocos2d::Node*, std::unordered_map<std::string, cocos2d::Vector<cocos2d::FiniteTimeAction*>>>& outActionsMap, cocos2d::Node* aParentNode)
+	{
+		if (!aNode) return;
+
+		auto itParam = cParamTypeMap.find(aParamID);
+		Params paramType = (itParam != cParamTypeMap.end()) ? itParam->second : Params::NONE;
+
+		auto valueType = aValue.getType();
+
+		switch (valueType)
+		{
+		case cocos2d::Value::Type::MAP:
+		{
+			const auto& valMap = aValue.asValueMap();
+			for (auto it = valMap.begin(); it != valMap.end(); ++it)
+			{
+				switch (paramType)
+				{
+				case Params::CHILDREN:
+				{
+					cocos2d::Node* child = createNodeFromValue(it->second, aNode);
+					if (child) {
+						if (child->getName().empty()) child->setName(it->first);
+						aNode->addChild(child);
+					}
+					break;
+				}
+				case Params::PARAMS:
+					fillNodeParamFromValue(aNode, it->first, it->second, outActionsMap, aParentNode);
+					break;
+				case Params::ACTIONS:
+					parseActions(it->second, aNode, outActionsMap);
+					break;
+				default:
+					break;
+				}
+			}
+			break;
+		}
+		case cocos2d::Value::Type::VECTOR:
+		{
+			const auto& valVector = aValue.asValueVector();
+			for (auto& val : valVector)
+			{
+				switch (paramType)
+				{
+				case Params::CHILDREN:
+					aNode->addChild(createNodeFromValue(val, aNode));
+					break;
+				case Params::ACTIONS:
+					parseActions(val, aNode, outActionsMap);
+					break;
+				default:
+					break;
+				}
+			}
+			break;
+		}
+		case cocos2d::Value::Type::STRING:
+		{
+			switch (paramType)
+			{
+			case Params::ID:
+				aNode->setName(aValue.asString());
+				break;
+			case Params::RES:
+			{
+				auto sprite = dynamic_cast<cocos2d::Sprite*>(aNode);
+				if (sprite) sprite->initWithFile(aValue.asString());
+				break;
+			}
+			case Params::RES_NORMAL:
+			{
+				auto btn = dynamic_cast<cocos2d::ui::Button*>(aNode);
+				if (btn) btn->loadTextureNormal(aValue.asString());
+				break;
+			}
+			case Params::RES_PRESSED:
+			{
+				auto btn = dynamic_cast<cocos2d::ui::Button*>(aNode);
+				if (btn) btn->loadTexturePressed(aValue.asString());
+				break;
+			}
+			case Params::RES_DISABLE:
+			{
+				auto btn = dynamic_cast<cocos2d::ui::Button*>(aNode);
+				if (btn) btn->loadTextureDisabled(aValue.asString());
+				break;
+			}
+			case Params::COLOR:
+				aNode->setColor(JsonHelper::toColor3B(aValue));
+				break;
+			}
+			break;
+		}
+		case cocos2d::Value::Type::BOOLEAN:
+		{
+			if (paramType == Params::IS_VISIBLE)
+			{
+				aNode->setVisible(aValue.asBool());
+			}
+			break;
+		}
+		case cocos2d::Value::Type::INTEGER:
+		{
+			if (paramType == Params::LAYER) aNode->setLocalZOrder(aValue.asInt());
+			else if (paramType == Params::OPACITY) aNode->setOpacity(aValue.asInt());
+			break;
+		}
+		case cocos2d::Value::Type::FLOAT:
+		case cocos2d::Value::Type::DOUBLE:
+		{
+			cocos2d::Size parentSize = cocos2d::Size::ZERO;
+
+			cocos2d::Node* parent = aParentNode;
+			if (!parent)
+			{
+				parent = aNode->getParent();
+			}
+
+			if (parent)
+			{
+				parentSize = parent->getContentSize();
+			}
+			else
+			{
+				parentSize = cocos2d::Director::getInstance()->getWinSize();
+			}
+
+			float val = aValue.asFloat();
+
+			switch (paramType)
+			{
+			case Params::POS_X: aNode->setPositionX(parentSize.width * val); break;
+			case Params::POS_Y: aNode->setPositionY(parentSize.height * val); break;
+			case Params::SCALE_X: aNode->setScaleX(val); break;
+			case Params::SCALE_Y: aNode->setScaleY(val); break;
+			case Params::ROTATION: aNode->setRotation(val); break;
+			case Params::ANCH_X:
+			{
+				auto anch = aNode->getAnchorPoint();
+				anch.x = val;
+				aNode->setAnchorPoint(anch);
+				break;
+			}
+			case Params::ANCH_Y:
+			{
+				auto anch = aNode->getAnchorPoint();
+				anch.y = val;
+				aNode->setAnchorPoint(anch);
+				break;
+			}
+			}
+			break;
+		}
+		default:
+			break;
+		}
+	}
+
+	void ViewFactory::parseActions(const cocos2d::Value& aValue, cocos2d::Node* aNode, std::unordered_map<cocos2d::Node*, std::unordered_map<std::string, cocos2d::Vector<cocos2d::FiniteTimeAction*>>>& outActionsMap)
+	{
+		if (aValue.getType() == cocos2d::Value::Type::MAP)
+		{
+			const auto& valMap = aValue.asValueMap();
+			for (auto it = valMap.begin(); it != valMap.end(); ++it)
+			{
+				if (it->second.getType() == cocos2d::Value::Type::VECTOR)
+				{
+					std::string actionVecName = it->first;
+					const auto& actionsVec = it->second.asValueVector();
+
+					for (auto& action : actionsVec)
+					{
+						cocos2d::FiniteTimeAction* result = createActionFromValue(action, aNode);
+						if (aNode && !actionVecName.empty() && result)
 						{
-							// Logic here
+							outActionsMap[aNode][actionVecName].pushBack(result);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	cocos2d::FiniteTimeAction* ViewFactory::createActionFromValue(const cocos2d::Value& aValue, cocos2d::Node* aNode)
+	{
+		cocos2d::FiniteTimeAction* result = nullptr;
+
+		if (aValue.getType() == cocos2d::Value::Type::MAP)
+		{
+			const auto& actionMap = aValue.asValueMap();
+
+			auto it = actionMap.find("runAction");
+			if (it != actionMap.end() && it->second.getType() == cocos2d::Value::Type::STRING)
+			{
+				std::string actionName = it->second.asString();
+
+				auto getFloat = [&](const std::string& key) {
+					return (actionMap.find(key) != actionMap.end()) ? actionMap.at(key).asFloat() : 0.0f;
+				};
+
+				if (actionName == "fade_in")
+				{
+					result = cocos2d::FadeIn::create(getFloat("duration"));
+				}
+				else if (actionName == "fade_out")
+				{
+					result = cocos2d::FadeOut::create(getFloat("duration"));
+				}
+				else if (actionName == "delay_time")
+				{
+					result = cocos2d::DelayTime::create(getFloat("duration"));
+				}
+				else if (actionName == "change_view")
+				{
+					std::string viewID = (actionMap.find("id") != actionMap.end()) ? actionMap.at("id").asString() : "";
+					result = cocos2d::CallFunc::create([viewID]()
+					{
+						if (!GD->isEditorMode())
+						{
+							VM->changeView(viewID);
 						}
 					});
 				}
+				else if (actionName == "forget_button")
+				{
+					auto btn = dynamic_cast<cocos2d::ui::Button*>(aNode);
+					if (btn && actionMap.count("conditions"))
+					{
+						ValueMap conditions = actionMap.at("conditions").asValueMap();
+						result = cocos2d::CallFunc::create([conditions, btn]()
+						{
+							bool isAllConditions = isAllConditionsMeetRequirements(conditions, btn);
+							if (isAllConditions)
+							{
+							}
+						});
+					}
+				}
 			}
 		}
+		return result;
 	}
-	return result;
-}
 
-bool ViewFactory::isAllConditionsMeetRequirements(const BValueMap& aMap, Node* aNode)
-{
-	bool result = true;
-	for (auto it = aMap.begin(); it != aMap.end(); ++it)
+	bool ViewFactory::isAllConditionsMeetRequirements(const cocos2d::ValueMap& aMap, cocos2d::Node* aNode)
 	{
-		if (it->second.isBoolean())
+		bool result = true;
+		for (auto it = aMap.begin(); it != aMap.end(); ++it)
 		{
-			bool value = it->second.getBool();
-			if (it->first == "is_Highlighted")
+			if (it->second.getType() == cocos2d::Value::Type::BOOLEAN)
 			{
-				auto btn = dynamic_cast<ui::Button*>(aNode);
-				if (btn) result = (btn->isHighlighted() == value);
-				else result = false;
+				bool value = it->second.asBool();
+				if (it->first == "is_Highlighted")
+				{
+					auto btn = dynamic_cast<cocos2d::ui::Button*>(aNode);
+					if (btn) result = (btn->isHighlighted() == value);
+					else result = false;
+				}
 			}
+			else result = false;
+
+			if (!result) break;
 		}
-		else result = false;
-		
-		if (!result) break;
+		return result;
 	}
-	return result;
-}
 
-const BValueMap& ViewFactory::getParamMap(const BValueMap& aMap, const std::string& aParam)
-{
-	auto it = aMap.find(aParam);
-	if (it != aMap.end() && it->second.isMap()) return it->second.getValueMap();
-	return MapNull;
 }
-
-std::string ViewFactory::getParamString(const BValueMap& aMap, const std::string& aParam)
-{
-	auto it = aMap.find(aParam);
-	if (it != aMap.end() && it->second.isString()) return it->second.getString();
-	return "";
-}
-
-float ViewFactory::getParamFloat(const BValueMap& aMap, const std::string& aParam)
-{
-	auto it = aMap.find(aParam);
-	if (it != aMap.end() && (it->second.isFloat() || it->second.isDouble())) return it->second.getFloat();
-	return 0.f;
-}
-
-bool ViewFactory::getParamBool(const BValueMap& aMap, const std::string& aParam)
-{
-	auto it = aMap.find(aParam);
-	if (it != aMap.end() && it->second.isBoolean()) return it->second.getBool();
-	return false;
-}
-
-_CEND

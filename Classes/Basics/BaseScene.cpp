@@ -1,6 +1,7 @@
 #include "BaseScene.h"
 
-_USEC
+USING_NS_CC;
+_CSTART
 
 static void problemLoading(const char* filename)
 {
@@ -18,3 +19,5 @@ void BaseScene::menuCloseCallback(Ref* pSender)
 {
     Director::getInstance()->end();
 }
+
+_CEND

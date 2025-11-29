@@ -1,16 +1,18 @@
 #include "GameDirector.h"
 
 #include "ScenesManager.h"
-
 #include "Scenes/MainGameScene.h"
 #include "DataManager.h"
 #include "ViewManager.h"
+#include "InputManager.h" // Added for context switching
 
-_USEC
+USING_NS_CC;
+_CSTART
 
 GameDirector::GameDirector()
 	: mCurrentLocation(nullptr)
 	, mCurrentPlayer(nullptr)
+    , mIsEditorMode(false)
 {
 
 }
@@ -23,12 +25,28 @@ GameDirector* GameDirector::getInstance()
 
 void GameDirector::startGame()
 {
+    mIsEditorMode = false;
+    
+    // Switch to Game Input Context
+    IM->switchContext("Game");
+
 	DM->parseViewConfigs();
 
 	auto mainGameScene = MainGameScene::create();
 	SM->registerScene("main", mainGameScene);
 
 	SM->openScene("main");
+}
+
+void GameDirector::startEditor()
+{
+    mIsEditorMode = true;
+    
+    // Switch to Editor Input Context
+    IM->switchContext("Editor");
+
+	DM->parseViewConfigs();
+	SM->runEditorScene();
 }
 
 void GameDirector::setLocation(BaseLocation* aLocation)
@@ -49,3 +67,5 @@ Player* GameDirector::getCurrentPlayer()
 {
 	return mCurrentPlayer;
 }
+
+_CEND

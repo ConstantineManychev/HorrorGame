@@ -7,7 +7,7 @@
 
 _CSTART
 
-class BaseObject : public Sprite
+class BaseObject : public cocos2d::Sprite
 {
 public:
 
@@ -24,7 +24,7 @@ public:
 	void setForceX(float aForce);
 	void setForceY(float aForce);
 
-	Vec2 getSpeed();
+	cocos2d::Vec2 getSpeed();
 	float getMaxSpeed();
 
 	float getForceX();
@@ -40,10 +40,10 @@ private:
 
 	float mMaxSpeed;
 
-	Vec2 mCurrentSpeed;
-	Vec2 mCurrentForce;
+	cocos2d::Vec2 mCurrentSpeed;
+	cocos2d::Vec2 mCurrentForce;
 
-	Vec2 mBodyPos;
+	cocos2d::Vec2 mBodyPos;
 
 	
 

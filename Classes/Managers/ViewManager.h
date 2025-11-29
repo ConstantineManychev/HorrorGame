@@ -5,40 +5,42 @@
 #include <unordered_map>
 #include "cocos2d.h"
 #include "CommonDefines.h"
-#include "Basics/BValue.h"
 #include "Basics/BaseAction.h"
+#include "Basics/ServiceLocator.h"
 
-_CSTART
+namespace GameSpace {
 
-class ViewManager
-{
-public:
-	static ViewManager* getInstance();
+	class ViewManager
+	{
+		friend class ServiceLocator;
+		friend class AppDelegate;
 
-	// Lifecycle
-	Node* createViewByID(const std::string& aID);
-	void removeViewByID(const std::string& aID);
-	Node* getViewByID(const std::string& aID);
-	void changeView(const std::string& aViewID);
+	public:
+		static ViewManager* getInstance();
 
-	// Actions
-	void runActionForNode(Node* aNode, const std::string& aID);
-	
-	// Accessor for Factory (Friendship preferred but public for simplicity in refactoring)
-	std::unordered_map<Node*, std::unordered_map<std::string, Vector<FiniteTimeAction*>>>& getActionsMap() { return mViewsActions; }
+		// Lifecycle
+		cocos2d::Node* createViewByID(const std::string& aID);
+		void removeViewByID(const std::string& aID);
+		cocos2d::Node* getViewByID(const std::string& aID);
+		void changeView(const std::string& aViewID);
 
-private:
-	ViewManager();
-	~ViewManager(); // Added Destructor for cleanup
+		// Actions
+		void runActionForNode(cocos2d::Node* aNode, const std::string& aID);
 
-	std::unordered_map<std::string, Node*> mViews;
-	std::unordered_map<Node*, std::unordered_map<std::string, Vector<FiniteTimeAction*>>> mViewsActions;
+		std::unordered_map<cocos2d::Node*, std::unordered_map<std::string, cocos2d::Vector<cocos2d::FiniteTimeAction*>>>& getActionsMap() { return mViewsActions; }
 
-	void cleanupNodeActions(Node* aNode);
-};
+	private:
+		ViewManager();
+		~ViewManager();
 
-#define VM ViewManager::getInstance()
+		std::unordered_map<std::string, cocos2d::Node*> mViews;
+		std::unordered_map<cocos2d::Node*, std::unordered_map<std::string, cocos2d::Vector<cocos2d::FiniteTimeAction*>>> mViewsActions;
 
-_CEND
+		void cleanupNodeActions(cocos2d::Node* aNode);
+	};
+
+#define VM SL->getService<ViewManager>()
+
+} // namespace GameSpace
 
 #endif // __VIEW_MANAGER_H__

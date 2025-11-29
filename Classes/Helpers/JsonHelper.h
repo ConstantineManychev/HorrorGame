@@ -1,29 +1,29 @@
 #ifndef __JsonHelper_H__
 #define __JsonHelper_H__
 
-#include "CommonDefines.h"
-#include "Basics/BValue.h"
-
 #include "cocos2d.h"
-
-//json
-#include "external/json/reader.h"
 #include "external/json/document.h"
-#include "external/json/writer.h"
-#include "external/json/stringbuffer.h"
-#include "external/json/prettywriter.h"
 
-_CSTART
+namespace GameSpace {
 
-class JsonHelper
-{
-public:
+	class JsonHelper
+	{
+	public:
+		static cocos2d::ValueMap getValueMapFromJson(const std::string& aConfigPath);
+		static cocos2d::Value getValueFromJson(const std::string& aConfigPath);
 
-	static void parseBValueFromJsonConfig(const std::string& aConfigPath, BValue& aBValue);
-    static bool saveBValueToJsonValue( rapidjson::Value& jsonValue, const BValue& bValue, rapidjson::Document::AllocatorType& allocator );
-    static void parseBValueFromJsonValue( const rapidjson::Value& jsonValue, BValue& bValue );
-};
+		static void saveValueToJson(const std::string& aConfigPath, const cocos2d::Value& aValue);
 
-_CEND
+		static cocos2d::Vec2 toVec2(const cocos2d::Value& val);
+		static cocos2d::Size toSize(const cocos2d::Value& val);
+		static cocos2d::Color3B toColor3B(const cocos2d::Value& val);
+		static cocos2d::Color4F toColor4F(const cocos2d::Value& val);
 
-#endif __JsonHelper_H__
+	private:
+		static cocos2d::Value parseRapidJson(const rapidjson::Value& jsonValue);
+		static void saveValueToRapidJson(rapidjson::Value& jsonVal, const cocos2d::Value& val, rapidjson::Document::AllocatorType& allocator);
+	};
+
+}
+
+#endif

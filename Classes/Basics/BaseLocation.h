@@ -8,7 +8,7 @@
 _CSTART
 
 class BaseLocation 
-	: public Node
+	: public cocos2d::Node
 	, public LocationLogic
 {
 	typedef LocationLogic Parent;

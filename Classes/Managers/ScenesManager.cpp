@@ -9,7 +9,8 @@
 
 #include "Helpers/NodeHelper.h"
 
-_USEC
+USING_NS_CC;
+_CSTART
 
 ScenesManager::ScenesManager()
 	: mCurrentScene(nullptr)
@@ -50,25 +51,6 @@ void ScenesManager::openScene(const std::string& aSceneID)
 		if (currentView.empty())
 		{
 			mCurrentScene->useDefaultView();
-
-#if DEVELOP_MODE == 1
-			if (mCurrentSceneID != "editor")
-			{
-				auto editButton = ui::Button::create();
-				editButton->setTitleText("Edit Scene");
-				editButton->setTitleFontSize(24);
-
-				auto visibleSize = Director::getInstance()->getVisibleSize();
-				editButton->setPosition(Vec2(visibleSize.width - editButton->getContentSize().width / 2 - 10, visibleSize.height - 30));
-				editButton->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type) {
-					if (type == ui::Widget::TouchEventType::ENDED)
-					{
-						SM->runEditorScene();
-					}
-				});
-				mCurrentScene->addChild(editButton, 9999);
-			}
-#endif
 		}
 		else
 		{
@@ -134,3 +116,5 @@ std::string& ScenesManager::getCurrentSceneID()
 {
 	return mCurrentSceneID;
 }
+
+_CEND

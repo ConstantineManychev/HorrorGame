@@ -1,6 +1,8 @@
 #include "Player.h"
+#include "Managers/GameDirector.h"
 
-_USEC
+USING_NS_CC;
+_CSTART
 
 Player* Player::create()
 {
@@ -35,6 +37,9 @@ bool Player::init()
 
 void Player::onInputAction(GameAction action, bool isPressed)
 {
+    // No check for GD->isEditorMode() needed! 
+    // The Input Context handles what actions are triggered.
+
 	float speed = 200.0f;
 	if (isPressed)
 	{
@@ -54,3 +59,5 @@ void Player::onInputAction(GameAction action, bool isPressed)
 		mMovement->setVelocity(Vec2::ZERO); 
 	}
 }
+
+_CEND

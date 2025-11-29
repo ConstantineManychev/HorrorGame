@@ -3,60 +3,58 @@
 
 #include "cocos2d.h"
 #include "CommonDefines.h"
-#include "Basics/BValue.h"
 #include <unordered_set>
 #include <unordered_map>
 
-_CSTART
+namespace GameSpace {
 
-class ViewFactory
-{
-public:
-	enum class Params
+	class ViewFactory
 	{
-		NONE = 0,
-		CHILDREN,
-		PARAMS,
-		ACTIONS,
+	public:
+		enum class Params
+		{
+			NONE = 0,
+			CHILDREN,
+			PARAMS,
+			ACTIONS,
 
-		ID,
-		RES,
-		RES_NORMAL,
-		RES_PRESSED,
-		RES_DISABLE,
+			ID,
+			RES,
+			RES_NORMAL,
+			RES_PRESSED,
+			RES_DISABLE,
 
-		LAYER,
-		OPACITY,
+			LAYER,
+			OPACITY,
 
-		IS_VISIBLE,
+			IS_VISIBLE,
 
-		POS_X,
-		POS_Y,
-		ANCH_X,
-		ANCH_Y,
+			POS_X,
+			POS_Y,
+			SCALE_X,
+			SCALE_Y,
+			ROTATION,
+			ANCH_X,
+			ANCH_Y,
+
+			COLOR
+		};
+
+		// Заменили BValue на cocos2d::Value
+		static cocos2d::Node* createNodeFromValue(const cocos2d::Value& aValue, cocos2d::Node* aParentNode = nullptr);
+
+		static void parseActions(const cocos2d::Value& aValue, cocos2d::Node* aNode, std::unordered_map<cocos2d::Node*, std::unordered_map<std::string, cocos2d::Vector<cocos2d::FiniteTimeAction*>>>& outActionsMap);
+
+	private:
+		static void fillNodeParamFromValue(cocos2d::Node* aNode, const std::string& aParamID, const cocos2d::Value& aValue, std::unordered_map<cocos2d::Node*, std::unordered_map<std::string, cocos2d::Vector<cocos2d::FiniteTimeAction*>>>& outActionsMap, cocos2d::Node* aParentNode);
+		static cocos2d::FiniteTimeAction* createActionFromValue(const cocos2d::Value& aValue, cocos2d::Node* aNode);
+
+		static const std::unordered_set<std::string> cExcludeParams;
+		static const std::unordered_map<std::string, Params> cParamTypeMap;
+
+		static bool isAllConditionsMeetRequirements(const cocos2d::ValueMap& aMap, cocos2d::Node* aNode);
 	};
 
-	static Node* createNodeFromBValue(const BValue& aBValue, Node* aParentNode = nullptr);
-	
-	// Парсинг действий вынесен в публичный метод, чтобы ViewManager мог использовать его отдельно
-	static void parseActions(const BValue& aBValue, Node* aNode, std::unordered_map<Node*, std::unordered_map<std::string, Vector<FiniteTimeAction*>>>& outActionsMap);
-
-private:
-	// Added aParentNode parameter to correctly calculate relative positions
-	static void fillNodeParamFromBValue(Node* aNode, const std::string& aParamID, const BValue& aBValue, std::unordered_map<Node*, std::unordered_map<std::string, Vector<FiniteTimeAction*>>>& outActionsMap, Node* aParentNode);
-	static FiniteTimeAction* createActionFromBValue(const BValue& aBValue, Node* aNode);
-
-	static const std::unordered_set<std::string> cExcludeParams;
-	static const std::unordered_map<std::string, Params> cParamTypeMap;
-
-	// Хелперы для парсинга
-	static const BValueMap& getParamMap(const BValueMap& aMap, const std::string& aParam);
-	static std::string getParamString(const BValueMap& aMap, const std::string& aParam);
-	static float getParamFloat(const BValueMap& aMap, const std::string& aParam);
-	static bool getParamBool(const BValueMap& aMap, const std::string& aParam);
-	static bool isAllConditionsMeetRequirements(const BValueMap& aMap, Node* aNode);
-};
-
-_CEND
+} // namespace GameSpace
 
 #endif // __VIEW_FACTORY_H__

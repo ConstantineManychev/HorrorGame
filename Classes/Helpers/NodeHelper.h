@@ -12,10 +12,10 @@ class NodeHelper
 {
 public:
 
-	static Node* createNodeForType(const std::string& aType);
-	static Node* createNodeFromSceneObjectInfo(const sSceneObjectInfo& objectInfo);
+	static cocos2d::Node* createNodeForType(const std::string& aType);
+	static cocos2d::Node* createNodeFromSceneObjectInfo(const sSceneObjectInfo& objectInfo);
 
-	static void stopAllActionsRecursive(Node* aNode);
+	static void stopAllActionsRecursive(cocos2d::Node* aNode);
 
 };
 

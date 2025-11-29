@@ -33,7 +33,6 @@
 
 Private inheritance here hides part of interface from Director.
 */
-_CSTART
 
 class  AppDelegate : private cocos2d::Application
 {
@@ -51,8 +50,6 @@ public:
 
 	void onInit();
 };
-
-_CEND
 
 #endif // _APP_DELEGATE_H_
 

@@ -1,6 +1,9 @@
 #include "InputComponent.h"
+#include "Managers/EventBus.h"
+#include "Managers/GameDirector.h"
 
-_USEC
+USING_NS_CC;
+_CSTART
 
 InputComponent* InputComponent::create()
 {
@@ -22,10 +25,6 @@ bool InputComponent::init()
 {
     if (!GameComponent::init()) return false;
     setName("InputComponent");
-    
-    // Generate unique listener ID based on instance address
-    mListenerID = StringUtils::format("InputComp_%p", this);
-    
     return true;
 }
 
@@ -33,20 +32,26 @@ void InputComponent::onEnter()
 {
     GameComponent::onEnter();
     
-    // Register for all movement actions
-    auto callback = [this](GameAction action, bool isPressed) {
-        if (mCallback) mCallback(action, isPressed);
-    };
-
-    IM->addActionListener(GameAction::MoveLeft, mListenerID, callback);
-    IM->addActionListener(GameAction::MoveRight, mListenerID, callback);
-    IM->addActionListener(GameAction::MoveUp, mListenerID, callback);
-    IM->addActionListener(GameAction::MoveDown, mListenerID, callback);
+    // Subscribe to EventBus
+    mBusListenerId = EB->subscribe(EventType::INPUT_ACTION_TRIGGERED, [this](void* data) {
+        if (data)
+        {
+            InputActionData* inputData = static_cast<InputActionData*>(data);
+            if (mCallback) 
+            {
+                mCallback((GameAction)inputData->action, inputData->isPressed);
+            }
+        }
+    });
 }
 
 void InputComponent::onExit()
 {
-    IM->removeListener(mListenerID);
+    if (mBusListenerId != 0)
+    {
+        EB->unsubscribe(EventType::INPUT_ACTION_TRIGGERED, mBusListenerId);
+        mBusListenerId = 0;
+    }
     GameComponent::onExit();
 }
 
@@ -55,3 +60,4 @@ void InputComponent::setActionCallback(std::function<void(GameAction, bool)> cal
     mCallback = callback;
 }
 
+_CEND

@@ -13,12 +13,12 @@ public:
     virtual bool init() override;
     virtual void update(float delta) override;
 
-    void setVelocity(const Vec2& velocity);
-    void addVelocity(const Vec2& velocity);
-    Vec2 getVelocity() const;
+    void setVelocity(const cocos2d::Vec2& velocity);
+    void addVelocity(const cocos2d::Vec2& velocity);
+	cocos2d::Vec2 getVelocity() const;
 
 private:
-    Vec2 mVelocity;
+	cocos2d::Vec2 mVelocity;
 };
 
 _CEND
