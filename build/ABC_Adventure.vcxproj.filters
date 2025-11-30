@@ -19,9 +19,6 @@
     <ClCompile Include="..\Classes\Helpers\JsonHelper.cpp">
       <Filter>Source Files\Classes\helpers</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Basics\BValue.cpp">
-      <Filter>Source Files\Classes\basics</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\Managers\GameDirector.cpp">
       <Filter>Source Files\Classes\managers</Filter>
     </ClCompile>
@@ -70,9 +67,6 @@
     <ClCompile Include="..\Classes\Scenes\EditorScene.cpp">
       <Filter>Source Files\Classes\scenes</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Helpers\ViewFactory.cpp">
-      <Filter>Source Files\Classes\managers</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\Components\InputComponent.cpp">
       <Filter>Source Files\Classes\components</Filter>
     </ClCompile>
@@ -90,6 +84,15 @@
     </ClCompile>
     <ClCompile Include="..\Classes\Managers\GameSession.cpp">
       <Filter>Source Files\Classes\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Logics\GestureRecognizer.cpp">
+      <Filter>Source Files\Classes\logics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Factories\EntityFactory.cpp">
+      <Filter>Source Files\Classes\Factories</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Factories\ViewFactory.cpp">
+      <Filter>Source Files\Classes\Factories</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -134,9 +137,6 @@
     </ClInclude>
     <ClInclude Include="..\Classes\CommonDefines.h">
       <Filter>Source Files\Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Basics\BValue.h">
-      <Filter>Source Files\Classes\basics</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\Managers\GameDirector.h">
       <Filter>Source Files\Classes\managers</Filter>
@@ -186,9 +186,6 @@
     <ClInclude Include="..\Classes\Scenes\EditorScene.h">
       <Filter>Source Files\Classes\scenes</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Helpers\ViewFactory.h">
-      <Filter>Source Files\Classes\managers</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\Components\GameComponent.h">
       <Filter>Source Files\Classes\components</Filter>
     </ClInclude>
@@ -212,6 +209,21 @@
     </ClInclude>
     <ClInclude Include="..\Classes\Managers\GameSession.h">
       <Filter>Source Files\Classes\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Constants.h">
+      <Filter>Source Files\Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Managers\EventData.h">
+      <Filter>Source Files\Classes\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Logics\GestureRecognizer.h">
+      <Filter>Source Files\Classes\logics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Factories\EntityFactory.h">
+      <Filter>Source Files\Classes\Factories</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Factories\ViewFactory.h">
+      <Filter>Source Files\Classes\Factories</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -264,6 +276,9 @@
     </Filter>
     <Filter Include="Source Files\Classes\components">
       <UniqueIdentifier>{9a38a190-e0a6-4126-8139-33da68ce4557}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Classes\Factories">
+      <UniqueIdentifier>{bf4f73fd-698e-4453-9848-0e0a768c72c2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

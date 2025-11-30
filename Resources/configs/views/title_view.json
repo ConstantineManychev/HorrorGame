@@ -14,34 +14,13 @@
 	},
 	"children" : 
 	{
-		"title" : 
+		"title_logo" : 
 		{
 			"type" : "Sprite",
-			"actions" : 
-			{
-				"onCreate" : 
-				[
-					{
-						"runAction" : "fade_in",
-						"duration" : 2.5
-					},
-					{
-						"runAction" : "delay_time",
-						"duration" : 2.5
-					},
-					{
-						"runAction" : "fade_out",
-						"duration" : 2.5
-					},
-					{
-						"runAction" : "change_view",
-						"id" : "main_menu"
-					}
-				]
-			},
+			"id" : "logo_sprite",
 			"params" :
 			{
-				"res": "res/Title.png",
+				"sprite_frame": "Title.png",
 				"pos_x" : 0.5,
 				"pos_y" : 0.7,
 				"anch_x" : 0.5,
@@ -50,5 +29,6 @@
 				"opacity" : 0
 			}
 		}
-	}
+	},
+	"on_enter_cutscene": "configs/cutscenes/intro.json"
 }

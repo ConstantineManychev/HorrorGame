@@ -1,0 +1,12 @@
+{
+	"type" : "Sprite",
+	"params" :
+	{
+		"anch_x" : 0.5,
+		"anch_y" : 0.5,
+		"layer" : 3,
+		"scale_x" : 1.0,
+		"scale_y" : 1.0,
+		"opacity" : 255
+	}
+}

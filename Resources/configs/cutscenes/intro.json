@@ -1,0 +1,23 @@
+{
+	"target_view_id": "title",
+	"sequence": [
+		{
+			"target_node": "logo_sprite",
+			"action": "fade_in",
+			"duration": 2.5
+		},
+		{
+			"action": "wait",
+			"duration": 2.5
+		},
+		{
+			"target_node": "logo_sprite",
+			"action": "fade_out",
+			"duration": 2.5
+		},
+		{
+			"action": "change_view",
+			"view_id": "main_menu"
+		}
+	]
+}

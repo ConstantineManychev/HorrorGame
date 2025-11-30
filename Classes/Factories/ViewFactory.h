@@ -17,9 +17,11 @@ namespace GameSpace {
 			CHILDREN,
 			PARAMS,
 			ACTIONS,
+			PREFAB,
 
 			ID,
 			RES,
+			SPRITE_FRAME,
 			RES_NORMAL,
 			RES_PRESSED,
 			RES_DISABLE,
@@ -40,7 +42,6 @@ namespace GameSpace {
 			COLOR
 		};
 
-		// Заменили BValue на cocos2d::Value
 		static cocos2d::Node* createNodeFromValue(const cocos2d::Value& aValue, cocos2d::Node* aParentNode = nullptr);
 
 		static void parseActions(const cocos2d::Value& aValue, cocos2d::Node* aNode, std::unordered_map<cocos2d::Node*, std::unordered_map<std::string, cocos2d::Vector<cocos2d::FiniteTimeAction*>>>& outActionsMap);
@@ -55,6 +56,6 @@ namespace GameSpace {
 		static bool isAllConditionsMeetRequirements(const cocos2d::ValueMap& aMap, cocos2d::Node* aNode);
 	};
 
-} // namespace GameSpace
+}
 
-#endif // __VIEW_FACTORY_H__
+#endif

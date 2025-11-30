@@ -18,7 +18,7 @@
 			"type" : "Sprite",
 			"params" :
 			{
-				"res": "res/main_menu/MM_Background.png",
+				"sprite_frame": "MM_Background.png",
 				"pos_x" : 0.5,
 				"pos_y" : 0.5,
 				"anch_x" : 0.5,
@@ -31,7 +31,7 @@
 			"type" : "Sprite",
 			"params" :
 			{
-				"res": "res/main_menu/MM_ground.png",
+				"sprite_frame": "MM_ground.png",
 				"pos_x" : 0.5,
 				"pos_y" : 0.4,
 				"anch_x" : 0.5,
@@ -41,41 +41,32 @@
 		},
 		"A_Letter" : 
 		{
-			"type" : "Sprite",
+			"prefab": "configs/prefabs/letter_prefab.json",
 			"params" :
 			{
-				"res": "res/main_menu/MM_A_Letter.png",
+				"sprite_frame": "MM_A_Letter.png",
 				"pos_x" : 0.3,
-				"pos_y" : 0.7,
-				"anch_x" : 0.5,
-				"anch_y" : 0.5,
-				"layer" : 3
+				"pos_y" : 0.7
 			}
 		},
 		"B_Letter" : 
 		{
-			"type" : "Sprite",
+			"prefab": "configs/prefabs/letter_prefab.json",
 			"params" :
 			{
-				"res": "res/main_menu/MM_B_Letter.png",
+				"sprite_frame": "MM_B_Letter.png",
 				"pos_x" : 0.4,
-				"pos_y" : 0.7,
-				"anch_x" : 0.5,
-				"anch_y" : 0.5,
-				"layer" : 3
+				"pos_y" : 0.7
 			}
 		},
 		"C_Letter" : 
 		{
-			"type" : "Sprite",
+			"prefab": "configs/prefabs/letter_prefab.json",
 			"params" :
 			{
-				"res": "res/main_menu/MM_C_Letter.png",
+				"sprite_frame": "MM_C_Letter.png",
 				"pos_x" : 0.5,
-				"pos_y" : 0.7,
-				"anch_x" : 0.5,
-				"anch_y" : 0.5,
-				"layer" : 3
+				"pos_y" : 0.7
 			}
 		},
 		"btnStart" : 
@@ -84,32 +75,18 @@
 			"id" : "btnStart",
 			"actions" : 
 			{
-				"onBtnClickDown" : 
-				[
-				],
 				"onBtnClickUp" : 
 				[
 					{
 						"runAction" : "change_view",
 						"id" : "stage_A"
 					}
-				],
-				"onBtnClickMove" : 
-				[
-					{
-						"runAction" : "forget_button",
-						"conditions" : 
-						{
-							"is_Highlighted" : false
-						}
-					}
 				]
 			},
 			"params" :
 			{
-				"res_normal": "res/main_menu/MM_A_Letter.png",
-				"res_pressed": "res/main_menu/MM_B_Letter.png",
-				"res_disable": "res/main_menu/MM_C_Letter.png",
+				"res_normal": "res/ui/btn_normal.png",
+				"res_pressed": "res/ui/btn_pressed.png",
 				"pos_x" : 0.8,
 				"pos_y" : 0.7,
 				"anch_x" : 0.5,

@@ -10,16 +10,19 @@
 			"height" : 2160,
 			"width" : 3840
 		},
-		"keys" : {
-			"left" : "A",
-			"right" : "D",
-			"up" : "W",
-			"down" : "S",
-			"use": "E",
-			"jump": "SPACE",
-			"run": "SHIFT",
-			"always_run": "CAPS LOCK",
-			"console": "`"
+		"preload_atlases": [
+			"res/main_menu/main_menu.plist",
+			"res/gameplay/gameplay.plist"
+		],
+		"input_bindings" : {
+			"MoveLeft" : ["KEY_A", "KEY_LEFT_ARROW"],
+			"MoveRight" : ["KEY_D", "KEY_RIGHT_ARROW"],
+			"MoveUp" : ["KEY_W", "KEY_UP_ARROW"],
+			"MoveDown" : ["KEY_S", "KEY_DOWN_ARROW"],
+			"Use": ["KEY_E"],
+			"Jump": ["KEY_SPACE"],
+			"Run": ["KEY_SHIFT"],
+			"Console": ["KEY_GRAVE"] 
 		}
 	},
 	"global_values" : 

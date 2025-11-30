@@ -1,5 +1,5 @@
 #include "ViewFactory.h"
-#include "NodeHelper.h"
+#include "Helpers/NodeHelper.h"
 #include "Managers/ViewManager.h" 
 #include "Managers/DataManager.h"
 #include "Managers/ScenesManager.h"
@@ -8,16 +8,17 @@
 #include "ui/UIButton.h"
 #include "Components/EditorMetadataComponent.h"
 #include "Helpers/JsonHelper.h"
+#include "EntityFactory.h"
 
 USING_NS_CC;
 
 namespace GameSpace {
 
-	const std::unordered_set<std::string> ViewFactory::cExcludeParams = { "children", "actions", "creation" };
+	const std::unordered_set<std::string> ViewFactory::cExcludeParams = { "children", "actions", "creation", "prefab" };
 
 	const std::unordered_map<std::string, ViewFactory::Params> ViewFactory::cParamTypeMap = {
-		{"children", Params::CHILDREN}, {"params", Params::PARAMS}, {"actions", Params::ACTIONS},
-		{"id", Params::ID}, {"res", Params::RES},
+		{"children", Params::CHILDREN}, {"params", Params::PARAMS}, {"actions", Params::ACTIONS}, {"prefab", Params::PREFAB},
+		{"id", Params::ID}, {"res", Params::RES}, {"sprite_frame", Params::SPRITE_FRAME},
 		{"res_normal", Params::RES_NORMAL},{"res_pressed", Params::RES_PRESSED},{"res_disable", Params::RES_DISABLE},
 		{"layer", Params::LAYER}, {"opacity", Params::OPACITY},
 		{"pos_x", Params::POS_X}, {"pos_y", Params::POS_Y},{"anch_x", Params::ANCH_X}, {"anch_y", Params::ANCH_Y},
@@ -33,14 +34,45 @@ namespace GameSpace {
 
 		if (aValue.getType() == cocos2d::Value::Type::MAP)
 		{
-			const auto& valMap = aValue.asValueMap();
+			ValueMap valMap = aValue.asValueMap();
+
+			if (valMap.find("prefab") != valMap.end())
+			{
+				std::string prefabPath = valMap.at("prefab").asString();
+				Value prefabVal = JsonHelper::getValueFromJson(prefabPath);
+				if (prefabVal.getType() == Value::Type::MAP)
+				{
+					ValueMap prefabMap = prefabVal.asValueMap();
+
+					for (auto& kv : prefabMap) {
+						if (kv.first == "params" && valMap.count("params")) {
+							ValueMap& targetParams = valMap["params"].asValueMap();
+							ValueMap sourceParams = kv.second.asValueMap();
+							for (auto& pkv : sourceParams) {
+								if (targetParams.find(pkv.first) == targetParams.end()) {
+									targetParams[pkv.first] = pkv.second;
+								}
+							}
+						}
+						else if (valMap.find(kv.first) == valMap.end()) {
+							valMap[kv.first] = kv.second;
+						}
+					}
+				}
+			}
 
 			auto it = valMap.find("type");
 			std::string typeName = "Node";
 			if (it != valMap.end() && it->second.getType() == cocos2d::Value::Type::STRING)
 			{
 				typeName = it->second.asString();
-				result = NodeHelper::createNodeForType(typeName);
+
+				if (typeName == "Entity") {
+					result = EF->createEntityFromConfig(valMap);
+				}
+				else {
+					result = NodeHelper::createNodeForType(typeName);
+				}
 
 				if (result && typeName == "Player")
 				{
@@ -57,25 +89,14 @@ namespace GameSpace {
 				auto metadata = EditorMetadataComponent::create();
 				metadata->type = typeName;
 
-				auto itRes = valMap.find("res");
-				if (itRes != valMap.end() && itRes->second.getType() == cocos2d::Value::Type::STRING)
-					metadata->textureFileName = itRes->second.asString();
-				else
-				{
-					auto itParams = valMap.find("params");
-					if (itParams != valMap.end() && itParams->second.getType() == cocos2d::Value::Type::MAP) {
-						auto& pMap = itParams->second.asValueMap();
-						auto itResP = pMap.find("res");
-						if (itResP != pMap.end() && itResP->second.getType() == cocos2d::Value::Type::STRING)
-							metadata->textureFileName = itResP->second.asString();
-					}
+				std::string textureName;
+				if (valMap.count("res")) textureName = valMap.at("res").asString();
+				else if (valMap.count("params")) {
+					auto& p = valMap.at("params").asValueMap();
+					if (p.count("res")) textureName = p.at("res").asString();
+					else if (p.count("sprite_frame")) textureName = p.at("sprite_frame").asString();
 				}
-				if (metadata->textureFileName.empty()) {
-					auto itResN = valMap.find("res_normal");
-					if (itResN != valMap.end() && itResN->second.getType() == cocos2d::Value::Type::STRING)
-						metadata->textureFileName = itResN->second.asString();
-				}
-
+				metadata->textureFileName = textureName;
 				result->addComponent(metadata);
 
 				std::string paramName;
@@ -218,6 +239,24 @@ namespace GameSpace {
 			{
 				auto sprite = dynamic_cast<cocos2d::Sprite*>(aNode);
 				if (sprite) sprite->initWithFile(aValue.asString());
+				break;
+			}
+			case Params::SPRITE_FRAME:
+			{
+				auto sprite = dynamic_cast<cocos2d::Sprite*>(aNode);
+				if (sprite)
+				{
+					std::string frameName = aValue.asString();
+					auto frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(frameName);
+					if (frame)
+					{
+						sprite->setSpriteFrame(frame);
+					}
+					else
+					{
+						CCLOG("ViewFactory ERROR: SpriteFrame '%s' not found. Check .plist loaded or name in json.", frameName.c_str());
+					}
+				}
 				break;
 			}
 			case Params::RES_NORMAL:

@@ -1,6 +1,8 @@
 #include "DataManager.h"
 #include "Helpers/JsonHelper.h"
 #include "Managers/GameDirector.h"
+#include "Managers/InputManager.h"
+#include "Constants.h"
 
 USING_NS_CC;
 
@@ -51,10 +53,47 @@ namespace GameSpace {
 						mMainInfo.spritesHeight = sz.height;
 					}
 
-					if (settingsMap.count("keys")) {
-						ValueMap keysMap = settingsMap.at("keys").asValueMap();
-						for (auto& pair : keysMap) {
-							mKeys[pair.first] = convertStringToKeyCode(pair.second.asString());
+					if (settingsMap.count("preload_atlases"))
+					{
+						const auto& atlases = settingsMap.at("preload_atlases").asValueVector();
+						for (const auto& atlas : atlases)
+						{
+							SpriteFrameCache::getInstance()->addSpriteFramesWithFile(atlas.asString());
+						}
+					}
+
+					if (settingsMap.count("input_bindings")) {
+						ValueMap bindingsMap = settingsMap.at("input_bindings").asValueMap();
+
+						std::map<std::string, GameAction> strToAction = {
+							{"MoveLeft", GameAction::MoveLeft},
+							{"MoveRight", GameAction::MoveRight},
+							{"MoveUp", GameAction::MoveUp},
+							{"MoveDown", GameAction::MoveDown},
+							{"Use", GameAction::Use},
+							{"Jump", GameAction::Jump},
+							{"Run", GameAction::None},
+							{"Console", GameAction::None}
+						};
+
+						for (auto& pair : bindingsMap) {
+							std::string actionStr = pair.first;
+							GameAction action = GameAction::None;
+							if (strToAction.count(actionStr)) action = strToAction[actionStr];
+
+							if (action != GameAction::None)
+							{
+								if (pair.second.getType() == Value::Type::VECTOR) {
+									for (const auto& keyVal : pair.second.asValueVector()) {
+										EventKeyboard::KeyCode code = convertStringToKeyCode(keyVal.asString());
+										IM->bindKeyToContext(Constants::Contexts::GAME, code, action);
+									}
+								}
+								else if (pair.second.getType() == Value::Type::STRING) {
+									EventKeyboard::KeyCode code = convertStringToKeyCode(pair.second.asString());
+									IM->bindKeyToContext(Constants::Contexts::GAME, code, action);
+								}
+							}
 						}
 					}
 				}
@@ -337,26 +376,21 @@ namespace GameSpace {
 
 	EventKeyboard::KeyCode DataManager::convertStringToKeyCode(const std::string& aID)
 	{
-		if (aID == "A") return EventKeyboard::KeyCode::KEY_A;
-		if (aID == "D") return EventKeyboard::KeyCode::KEY_D;
-		if (aID == "S") return EventKeyboard::KeyCode::KEY_S;
-		if (aID == "W") return EventKeyboard::KeyCode::KEY_W;
-		if (aID == "E") return EventKeyboard::KeyCode::KEY_E;
-		if (aID == "Q") return EventKeyboard::KeyCode::KEY_Q;
-		if (aID == "I") return EventKeyboard::KeyCode::KEY_I;
-		if (aID == "SPACE") return EventKeyboard::KeyCode::KEY_SPACE;
-		if (aID == "SHIFT") return EventKeyboard::KeyCode::KEY_SHIFT;
-		if (aID == "CTRL") return EventKeyboard::KeyCode::KEY_CTRL;
-		if (aID == "ALT") return EventKeyboard::KeyCode::KEY_ALT;
-		if (aID == "TAB") return EventKeyboard::KeyCode::KEY_TAB;
-		if (aID == "ESC") return EventKeyboard::KeyCode::KEY_ESCAPE;
-		if (aID == "`") return EventKeyboard::KeyCode::KEY_TILDE;
-		if (aID == "CAPS LOCK") return EventKeyboard::KeyCode::KEY_CAPS_LOCK;
+		if (aID == "KEY_A" || aID == "A") return EventKeyboard::KeyCode::KEY_A;
+		if (aID == "KEY_D" || aID == "D") return EventKeyboard::KeyCode::KEY_D;
+		if (aID == "KEY_S" || aID == "S") return EventKeyboard::KeyCode::KEY_S;
+		if (aID == "KEY_W" || aID == "W") return EventKeyboard::KeyCode::KEY_W;
+		if (aID == "KEY_E" || aID == "E") return EventKeyboard::KeyCode::KEY_E;
+		if (aID == "KEY_Q" || aID == "Q") return EventKeyboard::KeyCode::KEY_Q;
+		if (aID == "KEY_SPACE" || aID == "SPACE") return EventKeyboard::KeyCode::KEY_SPACE;
+		if (aID == "KEY_SHIFT" || aID == "SHIFT") return EventKeyboard::KeyCode::KEY_SHIFT;
+		if (aID == "KEY_CTRL" || aID == "CTRL") return EventKeyboard::KeyCode::KEY_CTRL;
+		if (aID == "KEY_GRAVE" || aID == "`") return EventKeyboard::KeyCode::KEY_GRAVE;
 
-		if (aID == "LEFT") return EventKeyboard::KeyCode::KEY_LEFT_ARROW;
-		if (aID == "RIGHT") return EventKeyboard::KeyCode::KEY_RIGHT_ARROW;
-		if (aID == "UP") return EventKeyboard::KeyCode::KEY_UP_ARROW;
-		if (aID == "DOWN") return EventKeyboard::KeyCode::KEY_DOWN_ARROW;
+		if (aID == "KEY_LEFT_ARROW" || aID == "LEFT") return EventKeyboard::KeyCode::KEY_LEFT_ARROW;
+		if (aID == "KEY_RIGHT_ARROW" || aID == "RIGHT") return EventKeyboard::KeyCode::KEY_RIGHT_ARROW;
+		if (aID == "KEY_UP_ARROW" || aID == "UP") return EventKeyboard::KeyCode::KEY_UP_ARROW;
+		if (aID == "KEY_DOWN_ARROW" || aID == "DOWN") return EventKeyboard::KeyCode::KEY_DOWN_ARROW;
 
 		return EventKeyboard::KeyCode::KEY_NONE;
 	}

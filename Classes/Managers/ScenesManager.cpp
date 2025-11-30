@@ -6,6 +6,7 @@
 #include "ui/UIButton.h"
 #include "CommonDefines.h"
 #include "Managers/ViewManager.h"
+#include "Constants.h"
 
 #include "Helpers/NodeHelper.h"
 
@@ -58,10 +59,6 @@ void ScenesManager::openScene(const std::string& aSceneID)
 		}
 
 	}
-	else
-	{
-
-	}
 }
 
 void ScenesManager::registerScene(const std::string& aSceneID, BaseScene* aScene)
@@ -71,10 +68,10 @@ void ScenesManager::registerScene(const std::string& aSceneID, BaseScene* aScene
 
 void ScenesManager::runEditorScene()
 {
-	CCLOG("ScenesManager: Running Editor Scene."); 
-	std::string editorSceneID = "editor";
+	CCLOG("ScenesManager: Running Editor Scene.");
+	std::string editorSceneID = Constants::Scenes::EDITOR;
 
-	std::string currentViewID = "main";
+	std::string currentViewID = Constants::Scenes::MAIN;
 	if (mCurrentScene && !mCurrentScene->getCurrentViewID().empty())
 	{
 		currentViewID = mCurrentScene->getCurrentViewID();
@@ -94,7 +91,7 @@ void ScenesManager::runEditorScene()
 void ScenesManager::runGameScene()
 {
 	CCLOG("ScenesManager: Running Main Game Scene.");
-	std::string mainSceneID = "main";
+	std::string mainSceneID = Constants::Scenes::MAIN;
 
 	auto sceneIt = mScenes.find(mainSceneID);
 

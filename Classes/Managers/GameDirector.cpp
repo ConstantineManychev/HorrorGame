@@ -4,7 +4,8 @@
 #include "Scenes/MainGameScene.h"
 #include "DataManager.h"
 #include "ViewManager.h"
-#include "InputManager.h" // Added for context switching
+#include "InputManager.h"
+#include "Constants.h"
 
 USING_NS_CC;
 _CSTART
@@ -12,7 +13,7 @@ _CSTART
 GameDirector::GameDirector()
 	: mCurrentLocation(nullptr)
 	, mCurrentPlayer(nullptr)
-    , mIsEditorMode(false)
+	, mIsEditorMode(false)
 {
 
 }
@@ -25,25 +26,23 @@ GameDirector* GameDirector::getInstance()
 
 void GameDirector::startGame()
 {
-    mIsEditorMode = false;
-    
-    // Switch to Game Input Context
-    IM->switchContext("Game");
+	mIsEditorMode = false;
+
+	IM->switchContext(Constants::Contexts::GAME);
 
 	DM->parseViewConfigs();
 
 	auto mainGameScene = MainGameScene::create();
-	SM->registerScene("main", mainGameScene);
+	SM->registerScene(Constants::Scenes::MAIN, mainGameScene);
 
-	SM->openScene("main");
+	SM->openScene(Constants::Scenes::MAIN);
 }
 
 void GameDirector::startEditor()
 {
-    mIsEditorMode = true;
-    
-    // Switch to Editor Input Context
-    IM->switchContext("Editor");
+	mIsEditorMode = true;
+
+	IM->switchContext(Constants::Contexts::EDITOR);
 
 	DM->parseViewConfigs();
 	SM->runEditorScene();

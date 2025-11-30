@@ -16,3 +16,4 @@ void ServiceLocator::destroyInstance()
     CC_SAFE_DELETE(s_SharedLocator);
 }
 
+

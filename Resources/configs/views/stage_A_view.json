@@ -18,11 +18,9 @@
 			"type" : "Sprite",
 			"params" :
 			{
-				"res": "res/main_menu/MM_Background.png",
+				"sprite_frame": "MM_Background.png",
 				"pos_x" : 0.5,
 				"pos_y" : 0.5,
-				"anch_x" : 0.5,
-				"anch_y" : 0.5,
 				"layer" : 1
 			}
 		},
@@ -31,26 +29,44 @@
 			"type" : "Sprite",
 			"params" :
 			{
-				"res": "res/main_menu/MM_ground.png",
+				"sprite_frame": "MM_ground.png",
 				"pos_x" : 0.5,
 				"pos_y" : 0.4,
-				"anch_x" : 0.5,
-				"anch_y" : 0.5,
 				"layer" : 2
 			}
 		},
-		"A_Letter" : 
+		"PlayerStart" : 
 		{
-			"type" : "Player",
+			"type" : "Node",
+			"params" : { "pos_x" : 0.3, "pos_y" : 0.7 },
+			"metadata" : {
+				"spawn_entity": "Player",
+				"spawn_on_load": true
+			}
+		},
+		"Enemy_Test" : 
+		{
+			"type" : "Entity",
+			"components": [
+				{
+					"type": "SpriteComponent",
+					"sprite_frame": "MM_A_Letter.png" 
+				},
+				{
+					"type": "MovementComponent",
+					"max_speed": 100.0,
+					"behavior": "patrol"
+				},
+				{
+					"type": "HealthComponent",
+					"hp": 50
+				}
+			],
 			"params" :
 			{
-				"res": "res/main_menu/MM_A_Letter.png",
-				"pos_x" : 0.3,
+				"pos_x" : 0.7,
 				"pos_y" : 0.7,
-				"anch_x" : 0.5,
-				"anch_y" : 0.5,
-				"layer" : 3,
-				"is_visible" : false
+				"layer" : 3
 			}
 		}
 	}

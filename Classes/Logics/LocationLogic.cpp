@@ -1,8 +1,9 @@
 #include "LocationLogic.h"
-
 #include "Managers/ViewManager.h"
 #include "Managers/DataManager.h"
 #include "Managers/GameDirector.h"
+#include "Logics/GestureRecognizer.h"
+#include "Constants.h"
 
 USING_NS_CC;
 using namespace GameSpace;
@@ -30,7 +31,6 @@ void LocationLogic::onOpen()
 void LocationLogic::onButtonTouchEvent(Ref* aSender, Touch* aTouch, ui::Widget::TouchEventType aEventType)
 {
 	Node* node = dynamic_cast<Node*>(aSender);
-
 	if (node)
 	{
 		switch (aEventType)
@@ -55,13 +55,13 @@ void LocationLogic::onButtonTouchBegin(Node* aNode, Touch* aTouch)
 {
 	if (aNode)
 	{
-		VM->runActionForNode(aNode, "onBtnClickDown");
+		VM->runActionForNode(aNode, Constants::Actions::BTN_CLICK_DOWN);
 
 		if (aTouch)
 		{
 			mIsCurrentlyDrawing = true;
 			std::string particlePath;
-			const auto& pathVal = DM->getGlobalValue("tale_paticle_path");
+			const auto& pathVal = DM->getGlobalValue(Constants::Keys::PARTICLE_PATH);
 
 			if (pathVal.getType() == Value::Type::STRING)
 			{
@@ -91,9 +91,10 @@ void LocationLogic::onButtonTouchFinish(Node* aNode, Touch* aTouch)
 {
 	if (aNode)
 	{
-		VM->runActionForNode(aNode, "onBtnClickUp");
+		VM->runActionForNode(aNode, Constants::Actions::BTN_CLICK_UP);
 
-		char recognizedLetter = recognizeLetter(mTouches);
+		char recognizedLetter = GR->recognize(mTouches);
+		CCLOG("Gesture Recognized: %c", recognizedLetter);
 
 		if (recognizedLetter == '?')
 		{
@@ -106,7 +107,6 @@ void LocationLogic::onButtonTouchFinish(Node* aNode, Touch* aTouch)
 				auto removeParticles = CallFunc::create([=]()
 				{
 					aNode->removeChild(taleNode);
-
 					auto child = aNode->getChildByTag(TAIL_TAG);
 					if (!child && !mIsCurrentlyDrawing)
 					{
@@ -117,7 +117,6 @@ void LocationLogic::onButtonTouchFinish(Node* aNode, Touch* aTouch)
 
 				auto sequence = Sequence::create(delay, removeParticles, nullptr);
 				sequence->setTag(TAIL_TAG);
-
 				mTaleParticles->stop();
 				aNode->runAction(sequence);
 			}
@@ -130,9 +129,10 @@ void LocationLogic::onButtonTouchFinish(Node* aNode, Touch* aTouch)
 			}
 			mTaleParticles = nullptr;
 			mTouches.clear();
+
+			createLetter(recognizedLetter, Vec2::ZERO);
 		}
 	}
-
 	mIsCurrentlyDrawing = false;
 }
 
@@ -140,7 +140,7 @@ void LocationLogic::onButtonTouchCanceled(Node* aNode, Touch* aTouch)
 {
 	if (aNode)
 	{
-		VM->runActionForNode(aNode, "onBtnClickCanceled");
+		VM->runActionForNode(aNode, Constants::Actions::BTN_CLICK_CANCEL);
 	}
 }
 
@@ -148,15 +148,14 @@ void LocationLogic::onButtonTouchMove(Node* aNode, Touch* aTouch)
 {
 	if (aNode)
 	{
-		VM->runActionForNode(aNode, "onBtnClickMove");
+		VM->runActionForNode(aNode, Constants::Actions::BTN_CLICK_MOVE);
 
 		if (aTouch && mTaleParticles)
 		{
 			auto location = aTouch->getLocation();
-
 			mTaleParticles->setPosition(aNode->convertToNodeSpace(location));
 
-			if (calculateDistance(mTouches.back(), location) >= 100.f)
+			if (mTouches.empty() || mTouches.back().distance(location) >= 20.f)
 			{
 				mTouches.push_back(location);
 			}
@@ -168,23 +167,11 @@ void LocationLogic::onKeyDown(Ref* aSender, EventKeyboard::KeyCode aKeyCode)
 {
 	if (mPlayer)
 	{
-		if (aKeyCode == DM->getKey("left")) {
-			mPlayer->stopAllActions();
-			mPlayer->addForceX(-500.f);
-		}
-		else if (aKeyCode == DM->getKey("right")) {
-			mPlayer->stopAllActions();
-			mPlayer->addForceX(500.f);
-		}
+		if (aKeyCode == DM->getKey(Constants::Keys::LEFT)) { mPlayer->stopAllActions(); mPlayer->addForceX(-500.f); }
+		else if (aKeyCode == DM->getKey(Constants::Keys::RIGHT)) { mPlayer->stopAllActions(); mPlayer->addForceX(500.f); }
 
-		if (aKeyCode == DM->getKey("up")) {
-			mPlayer->stopAllActions();
-			mPlayer->addForceY(500.f);
-		}
-		else if (aKeyCode == DM->getKey("down")) {
-			mPlayer->stopAllActions();
-			mPlayer->addForceY(-500.f);
-		}
+		if (aKeyCode == DM->getKey(Constants::Keys::UP)) { mPlayer->stopAllActions(); mPlayer->addForceY(500.f); }
+		else if (aKeyCode == DM->getKey(Constants::Keys::DOWN)) { mPlayer->stopAllActions(); mPlayer->addForceY(-500.f); }
 	}
 }
 
@@ -192,11 +179,11 @@ void LocationLogic::onKeyUp(Ref* aSender, EventKeyboard::KeyCode aKeyCode)
 {
 	if (mPlayer)
 	{
-		if (aKeyCode == DM->getKey("left")) mPlayer->addForceX(500.f);
-		else if (aKeyCode == DM->getKey("right")) mPlayer->addForceX(-500.f);
+		if (aKeyCode == DM->getKey(Constants::Keys::LEFT)) mPlayer->addForceX(500.f);
+		else if (aKeyCode == DM->getKey(Constants::Keys::RIGHT)) mPlayer->addForceX(-500.f);
 
-		if (aKeyCode == DM->getKey("up")) mPlayer->addForceY(-500.f);
-		else if (aKeyCode == DM->getKey("down")) mPlayer->addForceY(500.f);
+		if (aKeyCode == DM->getKey(Constants::Keys::UP)) mPlayer->addForceY(-500.f);
+		else if (aKeyCode == DM->getKey(Constants::Keys::DOWN)) mPlayer->addForceY(500.f);
 	}
 }
 
@@ -208,132 +195,27 @@ void LocationLogic::setupPlayer(Node* aNode)
 	}
 }
 
-float LocationLogic::roundToQuarter(float value)
-{
-	return std::round(value * 4) / 4.0f;
-}
-
-std::vector<Vec2> LocationLogic::normalizePoints(const std::vector<Vec2>& aPoints)
-{
-	std::vector<Vec2> normalizedPoints;
-	if (!aPoints.empty())
-	{
-		float minX = aPoints[0].x, minY = aPoints[0].y;
-		float maxX = minX, maxY = minY;
-
-		for (const auto& point : aPoints)
-		{
-			minX = std::min(minX, point.x);
-			minY = std::min(minY, point.y);
-			maxX = std::max(maxX, point.x);
-			maxY = std::max(maxY, point.y);
-		}
-
-		std::set<Vec2> uniqueNormalizedPoints;
-
-		for (const auto& point : aPoints)
-		{
-			float normX = (point.x - minX) / (maxX - minX);
-			float normY = (point.y - minY) / (maxY - minY);
-
-			normX = roundToQuarter(normX);
-			normY = roundToQuarter(normY);
-
-			uniqueNormalizedPoints.emplace(normX, normY);
-		}
-
-		normalizedPoints = std::vector<Vec2>(uniqueNormalizedPoints.begin(), uniqueNormalizedPoints.end());
-	}
-
-	return normalizedPoints;
-}
-
-float LocationLogic::calculateDistance(const Vec2& aPoint1, const Vec2& aPoint2)
-{
-	float dx = aPoint1.x - aPoint2.x;
-	float dy = aPoint1.y - aPoint2.y;
-	return std::sqrt(dx * dx + dy * dy);
-}
-
-float LocationLogic::calculateTotalDistance(const std::vector<Vec2>& aPoint, const std::vector<Vec2>& aLetterPoints) {
-	float totalDistance = 0.0f;
-
-	for (const auto& letterPoint : aLetterPoints)
-	{
-		float letterPointDistance = std::numeric_limits<float>::max();
-
-		for (const auto& point : aPoint)
-		{
-			auto distance = calculateDistance(point, letterPoint);
-
-			if (distance < letterPointDistance)
-			{
-				letterPointDistance = distance;
-			}
-		}
-
-		totalDistance += letterPointDistance;
-	}
-
-	return totalDistance / aLetterPoints.size();
-}
-
-bool LocationLogic::checkLetter(const std::vector<Vec2>& aPoints, const std::vector<Vec2>& aLetterPoints)
-{
-	bool result = !aLetterPoints.empty();
-
-	for (auto& point : aLetterPoints)
-	{
-		if (std::find(aPoints.begin(), aPoints.end(), point) == aPoints.end())
-		{
-			result = false;
-			break;
-		}
-	}
-
-	return result;
-}
-
-char LocationLogic::recognizeLetter(const std::vector<Vec2>& aPoints)
-{
-	std::vector<Vec2> normalizedInput = normalizePoints(aPoints);
-
-	char bestMatch = '?';
-	float minDistance = 0.08f;
-
-	for (const auto& ref : referenceLetters)
-	{
-		float distance = calculateTotalDistance(normalizedInput, ref.second);
-		if (distance < minDistance)
-		{
-			minDistance = distance;
-			bestMatch = ref.first;
-		}
-	}
-
-	createLetter(bestMatch, Vec2::ZERO);
-
-	return bestMatch;
-}
-
 void LocationLogic::createLetter(char aLetter, const Vec2& aPoint)
 {
 	if (aLetter != '?')
 	{
 		std::string spriteName = "res/main_menu/MM_" + std::string(1, aLetter) + "_Letter.png";
-
 		auto mainInfo = DM->getMainInfo();
-		auto heigh = mainInfo.screenHeight;
-		auto width = mainInfo.screenWidth;
 
 		Sprite* sprite = Sprite::create();
-		sprite->initWithFile(spriteName);
+		if (FileUtils::getInstance()->isFileExist(spriteName)) {
+			sprite->initWithFile(spriteName);
+		}
+		else {
+			sprite = Sprite::create("HelloWorld.png");
+			sprite->setColor(Color3B::MAGENTA);
+		}
 
 		auto loc = GD->getCurrentLocation();
 		if (loc)
 		{
 			loc->addChild(sprite);
-			sprite->setPosition(width / 2, heigh / 2);
+			sprite->setPosition(mainInfo.screenWidth / 2, mainInfo.screenHeight / 2);
 			sprite->setLocalZOrder(loc->getLocalZOrder() + 10);
 		}
 	}

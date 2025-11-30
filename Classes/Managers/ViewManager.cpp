@@ -2,7 +2,7 @@
 #include "DataManager.h"
 #include "ScenesManager.h"
 #include "Basics/BaseLocation.h"
-#include "Helpers/ViewFactory.h" 
+#include "Factories/ViewFactory.h" 
 
 USING_NS_CC;
 using namespace GameSpace;
