@@ -1,5 +1,5 @@
 {
-	"id" : "title",
+	"id" : "title_view",
 	"type" : "Node",
 	"params" :
 	{
@@ -9,8 +9,17 @@
 		"anch_x" : 0.5,
 		"anch_y" : 0.5,
 		"content_size" : "!3840, 2160",
-		"layer" : 1,
-		"opacity" : 0
+		"layer" : 1
+	},
+	"actions" : 
+	{
+		"onCreate" : 
+		[
+			{
+				"runAction" : "play_cutscene",
+				"path" : "configs/cutscenes/intro.json"
+			}
+		]
 	},
 	"children" : 
 	{
@@ -20,7 +29,7 @@
 			"id" : "logo_sprite",
 			"params" :
 			{
-				"sprite_frame": "Title.png",
+				"res": "res/Title.png",
 				"pos_x" : 0.5,
 				"pos_y" : 0.7,
 				"anch_x" : 0.5,
@@ -29,6 +38,5 @@
 				"opacity" : 0
 			}
 		}
-	},
-	"on_enter_cutscene": "configs/cutscenes/intro.json"
+	}
 }

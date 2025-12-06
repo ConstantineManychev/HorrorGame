@@ -4,9 +4,6 @@
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\AppDelegate.cpp">
       <Filter>Source Files\Classes</Filter>
     </ClCompile>
-    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\HelloWorldScene.cpp">
-      <Filter>Source Files\Classes</Filter>
-    </ClCompile>
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\proj.win32\main.cpp">
       <Filter>Source Files\proj.win32</Filter>
     </ClCompile>
@@ -21,9 +18,6 @@
     </ClCompile>
     <ClCompile Include="..\Classes\Managers\GameDirector.cpp">
       <Filter>Source Files\Classes\managers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Scenes\GreetingsScene.cpp">
-      <Filter>Source Files\Classes\scenes</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\Basics\BaseScene.cpp">
       <Filter>Source Files\Classes\basics</Filter>
@@ -46,9 +40,6 @@
     <ClCompile Include="..\Classes\Helpers\NodeHelper.cpp">
       <Filter>Source Files\Classes\helpers</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Basics\BaseAction.cpp">
-      <Filter>Source Files\Classes\basics</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\Basics\Enemy.cpp">
       <Filter>Source Files\Classes\basics</Filter>
     </ClCompile>
@@ -58,19 +49,10 @@
     <ClCompile Include="..\Classes\Basics\Parallax.cpp">
       <Filter>Source Files\Classes\basics</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Basics\BaseObject.cpp">
-      <Filter>Source Files\Classes\basics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Basics\BaseBeing.cpp">
-      <Filter>Source Files\Classes\basics</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\Scenes\EditorScene.cpp">
       <Filter>Source Files\Classes\scenes</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\Components\InputComponent.cpp">
-      <Filter>Source Files\Classes\components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Components\MovementComponent.cpp">
       <Filter>Source Files\Classes\components</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\Managers\InputManager.cpp">
@@ -94,12 +76,27 @@
     <ClCompile Include="..\Classes\Factories\ViewFactory.cpp">
       <Filter>Source Files\Classes\Factories</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\Systems\CameraSystem.cpp">
+      <Filter>Source Files\Classes\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Managers\AudioManager.cpp">
+      <Filter>Source Files\Classes\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Components\PhysicsBodyComponent.cpp">
+      <Filter>Source Files\Classes\components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Components\PhysicsMovementComponent.cpp">
+      <Filter>Source Files\Classes\components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Basics\GameEntity.cpp">
+      <Filter>Source Files\Classes\basics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Managers\CutsceneManager.cpp">
+      <Filter>Source Files\Classes\managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\AppDelegate.h">
-      <Filter>Source Files\Classes</Filter>
-    </ClInclude>
-    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\HelloWorldScene.h">
       <Filter>Source Files\Classes</Filter>
     </ClInclude>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\proj.win32\main.h">
@@ -141,9 +138,6 @@
     <ClInclude Include="..\Classes\Managers\GameDirector.h">
       <Filter>Source Files\Classes\managers</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Scenes\GreetingsScene.h">
-      <Filter>Source Files\Classes\scenes</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\Basics\BaseScene.h">
       <Filter>Source Files\Classes\basics</Filter>
     </ClInclude>
@@ -165,9 +159,6 @@
     <ClInclude Include="..\Classes\Helpers\NodeHelper.h">
       <Filter>Source Files\Classes\helpers</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Basics\BaseAction.h">
-      <Filter>Source Files\Classes\basics</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\Basics\Enemy.h">
       <Filter>Source Files\Classes\basics</Filter>
     </ClInclude>
@@ -177,12 +168,6 @@
     <ClInclude Include="..\Classes\Basics\Parallax.h">
       <Filter>Source Files\Classes\basics</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Basics\BaseObject.h">
-      <Filter>Source Files\Classes\basics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Basics\BaseBeing.h">
-      <Filter>Source Files\Classes\basics</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\Scenes\EditorScene.h">
       <Filter>Source Files\Classes\scenes</Filter>
     </ClInclude>
@@ -190,9 +175,6 @@
       <Filter>Source Files\Classes\components</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\Components\InputComponent.h">
-      <Filter>Source Files\Classes\components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Components\MovementComponent.h">
       <Filter>Source Files\Classes\components</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\Managers\InputManager.h">
@@ -224,6 +206,24 @@
     </ClInclude>
     <ClInclude Include="..\Classes\Factories\ViewFactory.h">
       <Filter>Source Files\Classes\Factories</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Systems\CameraSystem.h">
+      <Filter>Source Files\Classes\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Managers\AudioManager.h">
+      <Filter>Source Files\Classes\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Components\PhysicsBodyComponent.h">
+      <Filter>Source Files\Classes\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Components\PhysicsMovementComponent.h">
+      <Filter>Source Files\Classes\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Basics\GameEntity.h">
+      <Filter>Source Files\Classes\basics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Managers\CutsceneManager.h">
+      <Filter>Source Files\Classes\managers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -279,6 +279,9 @@
     </Filter>
     <Filter Include="Source Files\Classes\Factories">
       <UniqueIdentifier>{bf4f73fd-698e-4453-9848-0e0a768c72c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Classes\systems">
+      <UniqueIdentifier>{686f6696-01f6-4fec-a3cc-3f5e9df2d1fa}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

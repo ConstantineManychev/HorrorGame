@@ -820,9 +820,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Classes\Basics\BaseAction.h" />
-    <ClInclude Include="..\Classes\Basics\BaseBeing.h" />
-    <ClInclude Include="..\Classes\Basics\BaseObject.h" />
+    <ClInclude Include="..\Classes\Basics\GameEntity.h" />
     <ClInclude Include="..\Classes\Basics\BaseLocation.h" />
     <ClInclude Include="..\Classes\Basics\BaseScene.h" />
     <ClInclude Include="..\Classes\Basics\Enemy.h" />
@@ -833,7 +831,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="..\Classes\Components\EditorMetadataComponent.h" />
     <ClInclude Include="..\Classes\Components\GameComponent.h" />
     <ClInclude Include="..\Classes\Components\InputComponent.h" />
-    <ClInclude Include="..\Classes\Components\MovementComponent.h" />
+    <ClInclude Include="..\Classes\Components\PhysicsBodyComponent.h" />
+    <ClInclude Include="..\Classes\Components\PhysicsMovementComponent.h" />
     <ClInclude Include="..\Classes\Constants.h" />
     <ClInclude Include="..\Classes\Factories\EntityFactory.h" />
     <ClInclude Include="..\Classes\Factories\ViewFactory.h" />
@@ -841,6 +840,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="..\Classes\Helpers\JsonHelper.h" />
     <ClInclude Include="..\Classes\Logics\GestureRecognizer.h" />
     <ClInclude Include="..\Classes\Logics\LocationLogic.h" />
+    <ClInclude Include="..\Classes\Managers\AudioManager.h" />
+    <ClInclude Include="..\Classes\Managers\CutsceneManager.h" />
     <ClInclude Include="..\Classes\Managers\DataManager.h" />
     <ClInclude Include="..\Classes\Managers\EventBus.h" />
     <ClInclude Include="..\Classes\Managers\EventData.h" />
@@ -850,16 +851,13 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="..\Classes\Managers\ScenesManager.h" />
     <ClInclude Include="..\Classes\Managers\ViewManager.h" />
     <ClInclude Include="..\Classes\Scenes\EditorScene.h" />
-    <ClInclude Include="..\Classes\Scenes\GreetingsScene.h" />
     <ClInclude Include="..\Classes\Scenes\MainGameScene.h" />
+    <ClInclude Include="..\Classes\Systems\CameraSystem.h" />
     <ClInclude Include="..\Classes\Types\BasicDataTypes.h" />
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\AppDelegate.h" />
-    <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\HelloWorldScene.h" />
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\proj.win32\main.h" />
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\proj.win32\resource.h" />
-    <ClCompile Include="..\Classes\Basics\BaseAction.cpp" />
-    <ClCompile Include="..\Classes\Basics\BaseBeing.cpp" />
-    <ClCompile Include="..\Classes\Basics\BaseObject.cpp" />
+    <ClCompile Include="..\Classes\Basics\GameEntity.cpp" />
     <ClCompile Include="..\Classes\Basics\BaseLocation.cpp" />
     <ClCompile Include="..\Classes\Basics\BaseScene.cpp" />
     <ClCompile Include="..\Classes\Basics\Enemy.cpp" />
@@ -867,13 +865,16 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="..\Classes\Basics\Player.cpp" />
     <ClCompile Include="..\Classes\Basics\ServiceLocator.cpp" />
     <ClCompile Include="..\Classes\Components\InputComponent.cpp" />
-    <ClCompile Include="..\Classes\Components\MovementComponent.cpp" />
+    <ClCompile Include="..\Classes\Components\PhysicsBodyComponent.cpp" />
+    <ClCompile Include="..\Classes\Components\PhysicsMovementComponent.cpp" />
     <ClCompile Include="..\Classes\Factories\EntityFactory.cpp" />
     <ClCompile Include="..\Classes\Factories\ViewFactory.cpp" />
     <ClCompile Include="..\Classes\Helpers\NodeHelper.cpp" />
     <ClCompile Include="..\Classes\Helpers\JsonHelper.cpp" />
     <ClCompile Include="..\Classes\Logics\GestureRecognizer.cpp" />
     <ClCompile Include="..\Classes\Logics\LocationLogic.cpp" />
+    <ClCompile Include="..\Classes\Managers\AudioManager.cpp" />
+    <ClCompile Include="..\Classes\Managers\CutsceneManager.cpp" />
     <ClCompile Include="..\Classes\Managers\DataManager.cpp" />
     <ClCompile Include="..\Classes\Managers\EventBus.cpp" />
     <ClCompile Include="..\Classes\Managers\GameDirector.cpp" />
@@ -882,10 +883,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="..\Classes\Managers\ScenesManager.cpp" />
     <ClCompile Include="..\Classes\Managers\ViewManager.cpp" />
     <ClCompile Include="..\Classes\Scenes\EditorScene.cpp" />
-    <ClCompile Include="..\Classes\Scenes\GreetingsScene.cpp" />
     <ClCompile Include="..\Classes\Scenes\MainGameScene.cpp" />
+    <ClCompile Include="..\Classes\Systems\CameraSystem.cpp" />
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\AppDelegate.cpp" />
-    <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\HelloWorldScene.cpp" />
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\proj.win32\main.cpp" />
     <ResourceCompile Include="E:\My Cocos2dx projects\ABC_Adventure\proj.win32\game.rc" />
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Resources\CloseNormal.png" />

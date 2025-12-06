@@ -1,13 +1,12 @@
 #ifndef __PLAYER_H__
 #define __PLAYER_H__
 
-#include "BaseBeing.h"
+#include "GameEntity.h"
 #include "Components/InputComponent.h"
-#include "Components/MovementComponent.h"
 
 _CSTART
 
-class Player : public BaseBeing
+class Player : public GameEntity
 {
 public:
 	static Player* create();
@@ -16,7 +15,7 @@ public:
 
 private:
 	InputComponent* mInput;
-	MovementComponent* mMovement;
+	PhysicsMovementComponent* mMovement;
 	
 	void onInputAction(GameAction action, bool isPressed);
 };

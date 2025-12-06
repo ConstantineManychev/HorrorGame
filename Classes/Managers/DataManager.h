@@ -17,6 +17,8 @@ namespace GameSpace {
 		static DataManager* getInstance();
 
 		void loadMainInfo(const std::string& aConfigPath);
+		void preloadResources();
+
 		void saveMainInfo();
 
 		void parseViewConfigs();
@@ -49,6 +51,7 @@ namespace GameSpace {
 		std::string mResourcePath;
 
 		sMainInfo mMainInfo;
+		std::vector<std::string> mAtlasesToLoad;
 
 		std::map<std::string, cocos2d::ValueMap> mViewsInfos;
 		std::map<std::string, std::string> mViewFilePaths;

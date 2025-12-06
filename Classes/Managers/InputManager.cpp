@@ -14,11 +14,9 @@ InputManager* InputManager::getInstance()
 
 InputManager::InputManager()
 {
-	// Create default contexts
 	createContext(Constants::Contexts::GAME);
 	createContext(Constants::Contexts::EDITOR);
 
-	// Setup Game Context Bindings
 	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_A, GameAction::MoveLeft);
 	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_LEFT_ARROW, GameAction::MoveLeft);
 	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_D, GameAction::MoveRight);
@@ -29,8 +27,9 @@ InputManager::InputManager()
 	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_DOWN_ARROW, GameAction::MoveDown);
 	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_SPACE, GameAction::Jump);
 	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_E, GameAction::Use);
+	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_ESCAPE, GameAction::Pause);
+	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_P, GameAction::Pause);
 
-	// Set default context
 	switchContext(Constants::Contexts::GAME);
 }
 
@@ -46,39 +45,63 @@ void InputManager::init(Node* aInputNode)
 	setupMouseListeners(aInputNode);
 }
 
-void InputManager::createContext(const std::string& contextName)
+void InputManager::createContext(const std::string& aContextName)
 {
-	if (mContexts.find(contextName) == mContexts.end())
+	if (mContexts.find(aContextName) == mContexts.end())
 	{
 		InputContext context;
-		context.name = contextName;
-		mContexts[contextName] = context;
+		context.name = aContextName;
+		mContexts[aContextName] = context;
 	}
 }
 
-void InputManager::switchContext(const std::string& contextName)
+void InputManager::switchContext(const std::string& aContextName)
 {
-	auto it = mContexts.find(contextName);
+	auto it = mContexts.find(aContextName);
 	if (it != mContexts.end())
 	{
 		mActiveContext = &it->second;
-		CCLOG("InputManager: Switched to context '%s'", contextName.c_str());
-	}
-	else
-	{
-		CCLOG("InputManager: Failed to switch to context '%s'. Not found.", contextName.c_str());
 	}
 }
 
-void InputManager::bindKeyToContext(const std::string& contextName, EventKeyboard::KeyCode aKeyCode, GameAction aAction)
+void InputManager::bindKeyToContext(const std::string& aContextName, EventKeyboard::KeyCode aKeyCode, GameAction aAction)
 {
-	auto it = mContexts.find(contextName);
+	auto it = mContexts.find(aContextName);
 	if (it != mContexts.end())
 	{
 		it->second.keyBindings[aKeyCode] = aAction;
 	}
 }
 
+void InputManager::rebindKey(const std::string& aContextName, EventKeyboard::KeyCode aNewKey, GameAction aAction)
+{
+	auto it = mContexts.find(aContextName);
+	if (it != mContexts.end())
+	{
+		auto& bindings = it->second.keyBindings;
+		for (auto bIt = bindings.begin(); bIt != bindings.end(); )
+		{
+			if (bIt->second == aAction)
+			{
+				bIt = bindings.erase(bIt);
+			}
+			else
+			{
+				++bIt;
+			}
+		}
+		bindings[aNewKey] = aAction;
+	}
+}
+
+bool InputManager::isControllerConnected() const
+{
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+	return cocos2d::Controller::getAllController().size() > 0;
+#else
+	return true;
+#endif
+}
 
 void InputManager::setupKeyboardListeners(Node* aNode)
 {

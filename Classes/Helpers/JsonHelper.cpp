@@ -134,6 +134,10 @@ namespace GameSpace {
 		std::string s = val.asString();
 		if (s.empty()) return Size::ZERO;
 		if (s[0] == '!') s = s.substr(1);
+		if (s.find('{') == std::string::npos) {
+			s = "{" + s + "}";
+		}
+
 		return SizeFromString(s);
 	}
 

@@ -12,11 +12,19 @@ class MainGameScene : public BaseScene
 
 public:
 
-	virtual void useDefaultView() override;
+	bool init() override;
+	void useDefaultView() override;
 
-    CREATE_FUNC(MainGameScene);
+	virtual void update(float aDelta) override;
+	virtual void onExit() override;
+
+	CREATE_FUNC(MainGameScene);
+
+private:
+	size_t mEntityCreatedListenerId = 0;
+	void setupCameraForPlayer(cocos2d::Node* aPlayer);
 };
 
 _CEND
 
-#endif // __MAIN_GAME_SCENE_H__
+#endif

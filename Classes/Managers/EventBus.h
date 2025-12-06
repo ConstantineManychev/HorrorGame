@@ -21,7 +21,8 @@ enum class EventType
 	PLAYER_DEATH,
 	EDITOR_NODE_SELECTED,
 	EDITOR_MODE_CHANGED,
-	CONFIG_RELOADED
+	CONFIG_RELOADED,
+	ENTITY_CREATED
 };
 
 using EventCallback = std::function<void(const EventData*)>;
@@ -35,33 +36,33 @@ public:
 	static EventBus* getInstance();
 
 	template <typename T>
-	size_t subscribe(EventType type, std::function<void(const T*)> callback)
+	size_t subscribe(EventType aType, std::function<void(const T*)> aCallback)
 	{
-		return subscribeInternal(type, [callback, type](const EventData* baseData) {
-			const T* typedData = dynamic_cast<const T*>(baseData);
+		return subscribeInternal(aType, [aCallback, aType](const EventData* aBaseData) {
+			const T* typedData = dynamic_cast<const T*>(aBaseData);
 			if (typedData) {
-				callback(typedData);
+				aCallback(typedData);
 			}
-			else if (baseData == nullptr) {
-				callback(nullptr);
+			else if (aBaseData == nullptr) {
+				aCallback(nullptr);
 			}
 			else {
-				CCLOG("EventBus Error: Data type mismatch for event type %d", (int)type);
+				CCLOG("EventBus Error: Data type mismatch for event type %d", (int)aType);
 			}
 		});
 	}
 
-	size_t subscribeRaw(EventType type, EventCallback callback);
+	size_t subscribeRaw(EventType aType, EventCallback aCallback);
 
-	void unsubscribe(EventType type, size_t listenerId);
+	void unsubscribe(EventType aType, size_t aListenerId);
 
-	void publish(EventType type, const EventData* data = nullptr);
+	void publish(EventType aType, const EventData* aData = nullptr);
 
 private:
 	EventBus() = default;
 	~EventBus() = default;
 
-	size_t subscribeInternal(EventType type, EventCallback callback);
+	size_t subscribeInternal(EventType aType, EventCallback aCallback);
 
 	struct Listener
 	{

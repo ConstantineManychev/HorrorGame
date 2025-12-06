@@ -1,5 +1,5 @@
 {
-	"id" : "main_menu",
+	"id" : "main_menu_view",
 	"type" : "Node",
 	"params" :
 	{
@@ -18,7 +18,7 @@
 			"type" : "Sprite",
 			"params" :
 			{
-				"sprite_frame": "MM_Background.png",
+				"res": "res/main_menu/MM_Background.png",
 				"pos_x" : 0.5,
 				"pos_y" : 0.5,
 				"anch_x" : 0.5,
@@ -31,22 +31,12 @@
 			"type" : "Sprite",
 			"params" :
 			{
-				"sprite_frame": "MM_ground.png",
+				"res": "res/main_menu/MM_ground.png",
 				"pos_x" : 0.5,
 				"pos_y" : 0.4,
 				"anch_x" : 0.5,
 				"anch_y" : 0.5,
 				"layer" : 2
-			}
-		},
-		"A_Letter" : 
-		{
-			"prefab": "configs/prefabs/letter_prefab.json",
-			"params" :
-			{
-				"sprite_frame": "MM_A_Letter.png",
-				"pos_x" : 0.3,
-				"pos_y" : 0.7
 			}
 		},
 		"B_Letter" : 
@@ -55,7 +45,7 @@
 			"params" :
 			{
 				"sprite_frame": "MM_B_Letter.png",
-				"pos_x" : 0.4,
+				"pos_x" : 0.2,
 				"pos_y" : 0.7
 			}
 		},
@@ -85,8 +75,8 @@
 			},
 			"params" :
 			{
-				"res_normal": "res/ui/btn_normal.png",
-				"res_pressed": "res/ui/btn_pressed.png",
+				"res_normal": "res/main_menu/MM_A_Letter.png",
+				"res_pressed": "res/main_menu/MM_B_Letter.png",
 				"pos_x" : 0.8,
 				"pos_y" : 0.7,
 				"anch_x" : 0.5,

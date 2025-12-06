@@ -165,26 +165,10 @@ void LocationLogic::onButtonTouchMove(Node* aNode, Touch* aTouch)
 
 void LocationLogic::onKeyDown(Ref* aSender, EventKeyboard::KeyCode aKeyCode)
 {
-	if (mPlayer)
-	{
-		if (aKeyCode == DM->getKey(Constants::Keys::LEFT)) { mPlayer->stopAllActions(); mPlayer->addForceX(-500.f); }
-		else if (aKeyCode == DM->getKey(Constants::Keys::RIGHT)) { mPlayer->stopAllActions(); mPlayer->addForceX(500.f); }
-
-		if (aKeyCode == DM->getKey(Constants::Keys::UP)) { mPlayer->stopAllActions(); mPlayer->addForceY(500.f); }
-		else if (aKeyCode == DM->getKey(Constants::Keys::DOWN)) { mPlayer->stopAllActions(); mPlayer->addForceY(-500.f); }
-	}
 }
 
 void LocationLogic::onKeyUp(Ref* aSender, EventKeyboard::KeyCode aKeyCode)
 {
-	if (mPlayer)
-	{
-		if (aKeyCode == DM->getKey(Constants::Keys::LEFT)) mPlayer->addForceX(500.f);
-		else if (aKeyCode == DM->getKey(Constants::Keys::RIGHT)) mPlayer->addForceX(-500.f);
-
-		if (aKeyCode == DM->getKey(Constants::Keys::UP)) mPlayer->addForceY(-500.f);
-		else if (aKeyCode == DM->getKey(Constants::Keys::DOWN)) mPlayer->addForceY(500.f);
-	}
 }
 
 void LocationLogic::setupPlayer(Node* aNode)

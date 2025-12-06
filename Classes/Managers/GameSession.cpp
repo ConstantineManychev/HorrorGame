@@ -1,5 +1,6 @@
 #include "GameSession.h"
 #include "Helpers/JsonHelper.h"
+#include "Constants.h"
 
 USING_NS_CC;
 
@@ -29,7 +30,7 @@ namespace GameSpace {
 
 	void GameSession::loadDefaultConfig()
 	{
-		Value configVal = JsonHelper::getValueFromJson("configs/new_game_config.json");
+		Value configVal = JsonHelper::getValueFromJson(Constants::Configs::NEW_GAME);
 
 		if (configVal.getType() == Value::Type::MAP)
 		{
@@ -57,7 +58,7 @@ namespace GameSpace {
 		}
 	}
 
-	void GameSession::saveSession(const std::string& filePath)
+	void GameSession::saveSession(const std::string& aFilePath)
 	{
 		ValueMap saveMap;
 
@@ -75,12 +76,12 @@ namespace GameSpace {
 			saveMap["session_data"] = mSessionData;
 		}
 
-		JsonHelper::saveValueToJson(filePath, Value(saveMap));
+		JsonHelper::saveValueToJson(aFilePath, Value(saveMap));
 	}
 
-	void GameSession::loadSession(const std::string& filePath)
+	void GameSession::loadSession(const std::string& aFilePath)
 	{
-		Value configVal = JsonHelper::getValueFromJson(filePath);
+		Value configVal = JsonHelper::getValueFromJson(aFilePath);
 
 		if (configVal.getType() == Value::Type::MAP)
 		{
@@ -108,21 +109,21 @@ namespace GameSpace {
 		}
 	}
 
-	void GameSession::setPlayerPosition(const Vec2& pos) { mPlayerPosition = pos; }
+	void GameSession::setPlayerPosition(const Vec2& aPos) { mPlayerPosition = aPos; }
 	Vec2 GameSession::getPlayerPosition() const { return mPlayerPosition; }
 
-	void GameSession::setCurrentLocationID(const std::string& locationID) { mCurrentLocationID = locationID; }
+	void GameSession::setCurrentLocationID(const std::string& aLocationID) { mCurrentLocationID = aLocationID; }
 	std::string GameSession::getCurrentLocationID() const { return mCurrentLocationID; }
 
-	void GameSession::setGameTime(float time) { mGameTime = time; }
+	void GameSession::setGameTime(float aTime) { mGameTime = aTime; }
 	float GameSession::getGameTime() const { return mGameTime; }
-	void GameSession::addGameTime(float delta) { mGameTime += delta; }
+	void GameSession::addGameTime(float aDelta) { mGameTime += aDelta; }
 
-	void GameSession::setSessionValue(const std::string& key, const Value& value) { mSessionData[key] = value; }
+	void GameSession::setSessionValue(const std::string& aKey, const Value& aValue) { mSessionData[aKey] = aValue; }
 
-	Value GameSession::getSessionValue(const std::string& key) const
+	Value GameSession::getSessionValue(const std::string& aKey) const
 	{
-		auto it = mSessionData.find(key);
+		auto it = mSessionData.find(aKey);
 		if (it != mSessionData.end()) return it->second;
 		return Value::Null;
 	}

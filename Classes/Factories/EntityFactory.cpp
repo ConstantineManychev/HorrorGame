@@ -5,8 +5,11 @@
 #include "Basics/Parallax.h"
 #include "ui/UIButton.h"
 #include "Constants.h"
-#include "Components/MovementComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/PhysicsBodyComponent.h"
+#include "Components/PhysicsMovementComponent.h"
+#include "Managers/EventBus.h"
+#include "Managers/EventData.h"
 
 USING_NS_CC;
 _CSTART
@@ -29,49 +32,70 @@ EntityFactory::EntityFactory()
 	registerEntity(Constants::Types::ENEMY, []() { return Enemy::create(); });
 }
 
-void EntityFactory::registerEntity(const std::string& type, EntityCreator creator)
+void EntityFactory::registerEntity(const std::string& aType, EntityCreator aCreator)
 {
-	mCreators[type] = creator;
+	mCreators[aType] = aCreator;
 }
 
-Node* EntityFactory::createEntity(const std::string& type)
+Node* EntityFactory::createEntity(const std::string& aType)
 {
-	auto it = mCreators.find(type);
+	auto it = mCreators.find(aType);
 	if (it != mCreators.end())
 	{
 		return it->second();
 	}
-	CCLOG("EntityFactory: Unknown entity type '%s', returning empty Node.", type.c_str());
+	CCLOG("EntityFactory: Unknown entity type '%s', returning empty Node.", aType.c_str());
 	return Node::create();
 }
 
-Node* EntityFactory::createEntityFromConfig(const ValueMap& config)
+Node* EntityFactory::createEntityFromConfig(const ValueMap& aConfig)
 {
 	Node* entity = Node::create();
+	std::string entityType = "Node";
 
-	if (config.count("components"))
+	if (aConfig.count("type")) {
+		entityType = aConfig.at("type").asString();
+		if (mCreators.find(entityType) != mCreators.end()) {
+			entity = createEntity(entityType);
+		}
+	}
+
+	if (aConfig.count("components"))
 	{
-		const auto& components = config.at("components").asValueVector();
-		for (const auto& compVal : components)
+		const auto& componentsVector = aConfig.at("components").asValueVector();
+		for (const auto& compVal : componentsVector)
 		{
 			ValueMap compConfig = compVal.asValueMap();
-			std::string type = compConfig["type"].asString();
+			std::string compType = compConfig["type"].asString();
 
-			if (type == "SpriteComponent") {
+			if (compType == "SpriteComponent") {
 				auto sprite = Sprite::create();
 				if (compConfig.count("sprite_frame")) sprite->setSpriteFrame(compConfig["sprite_frame"].asString());
 				entity->addChild(sprite);
 			}
-			else if (type == "MovementComponent") {
-				auto move = MovementComponent::create();
+			else if (compType == "PhysicsBodyComponent") {
+				bool isDynamic = compConfig.count("is_dynamic") ? compConfig["is_dynamic"].asBool() : true;
+				auto phys = PhysicsBodyComponent::create(isDynamic);
+				if (compConfig.count("category_bitmask")) phys->setCategoryBitmask(compConfig["category_bitmask"].asInt());
+				if (compConfig.count("contact_test_bitmask")) phys->setContactTestBitmask(compConfig["contact_test_bitmask"].asInt());
+				entity->addComponent(phys);
+			}
+			else if (compType == "PhysicsMovementComponent") {
+				auto move = PhysicsMovementComponent::create();
 				entity->addComponent(move);
 			}
-			else if (type == "InputComponent") {
+			else if (compType == "InputComponent") {
 				auto input = InputComponent::create();
 				entity->addComponent(input);
 			}
 		}
 	}
+
+	if (entity) {
+		EntityCreatedEventData data(entity, entityType);
+		EB->publish(EventType::ENTITY_CREATED, &data);
+	}
+
 	return entity;
 }
 

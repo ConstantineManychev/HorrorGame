@@ -38,6 +38,7 @@ namespace GameSpace {
 			ROTATION,
 			ANCH_X,
 			ANCH_Y,
+			CONTENT_SIZE,
 
 			COLOR
 		};

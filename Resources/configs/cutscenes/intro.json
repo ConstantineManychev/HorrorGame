@@ -4,20 +4,23 @@
 		{
 			"target_node": "logo_sprite",
 			"action": "fade_in",
-			"duration": 2.5
+			"duration": 2.5,
+			"wait_for_finish": true
 		},
 		{
 			"action": "wait",
-			"duration": 2.5
+			"duration": 2.5,
+			"wait_for_finish": true
 		},
 		{
 			"target_node": "logo_sprite",
 			"action": "fade_out",
-			"duration": 2.5
+			"duration": 2.5,
+			"wait_for_finish": true
 		},
 		{
 			"action": "change_view",
-			"view_id": "main_menu"
+			"view_id": "main_menu_view"
 		}
 	]
 }

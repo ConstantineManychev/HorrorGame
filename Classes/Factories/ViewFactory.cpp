@@ -10,6 +10,8 @@
 #include "Helpers/JsonHelper.h"
 #include "EntityFactory.h"
 
+#include "Managers/CutsceneManager.h" 
+
 USING_NS_CC;
 
 namespace GameSpace {
@@ -23,7 +25,8 @@ namespace GameSpace {
 		{"layer", Params::LAYER}, {"opacity", Params::OPACITY},
 		{"pos_x", Params::POS_X}, {"pos_y", Params::POS_Y},{"anch_x", Params::ANCH_X}, {"anch_y", Params::ANCH_Y},
 		{"scale_x", Params::SCALE_X}, {"scale_y", Params::SCALE_Y}, {"rotation", Params::ROTATION}, {"is_visible", Params::IS_VISIBLE},
-		{"color", Params::COLOR}
+		{"color", Params::COLOR},
+		{"content_size", Params::CONTENT_SIZE}
 	};
 
 	static const cocos2d::ValueMap MapNull;
@@ -109,6 +112,18 @@ namespace GameSpace {
 					{
 						fillNodeParamFromValue(result, paramName, it->second, vmActions, aParentNode);
 					}
+				}
+
+				if (valMap.find("on_enter_cutscene") != valMap.end())
+				{
+					std::string cutscenePath = valMap.at("on_enter_cutscene").asString();
+					result->runAction(Sequence::create(
+						DelayTime::create(0.1f),
+						CallFunc::create([cutscenePath]() {
+						CSM->playCutscene(cutscenePath);
+					}),
+						nullptr
+						));
 				}
 
 				auto itChildren = valMap.find("children");
@@ -277,6 +292,11 @@ namespace GameSpace {
 				if (btn) btn->loadTextureDisabled(aValue.asString());
 				break;
 			}
+			case Params::CONTENT_SIZE:
+			{
+				aNode->setContentSize(JsonHelper::toSize(aValue));
+				break;
+			}
 			case Params::COLOR:
 				aNode->setColor(JsonHelper::toColor3B(aValue));
 				break;
@@ -427,6 +447,18 @@ namespace GameSpace {
 							}
 						});
 					}
+				}
+				else if (actionName == "play_cutscene")
+				{
+					std::string path = (actionMap.find("path") != actionMap.end()) ? actionMap.at("path").asString() : "";
+
+					result = cocos2d::CallFunc::create([path]()
+					{
+						if (!GD->isEditorMode())
+						{
+							CSM->playCutscene(path);
+						}
+					});
 				}
 			}
 		}

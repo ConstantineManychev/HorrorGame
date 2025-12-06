@@ -55,10 +55,11 @@ namespace GameSpace {
 
 					if (settingsMap.count("preload_atlases"))
 					{
+						mAtlasesToLoad.clear();
 						const auto& atlases = settingsMap.at("preload_atlases").asValueVector();
 						for (const auto& atlas : atlases)
 						{
-							SpriteFrameCache::getInstance()->addSpriteFramesWithFile(atlas.asString());
+							mAtlasesToLoad.push_back(atlas.asString());
 						}
 					}
 
@@ -108,6 +109,15 @@ namespace GameSpace {
 				}
 			}
 		}
+	}
+
+	void DataManager::preloadResources()
+	{
+		for (const auto& atlas : mAtlasesToLoad)
+		{
+			SpriteFrameCache::getInstance()->addSpriteFramesWithFile(atlas);
+		}
+		mAtlasesToLoad.clear();
 	}
 
 	void DataManager::parseViewConfigs()

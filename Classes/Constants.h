@@ -20,9 +20,24 @@ namespace Constants {
 		static const std::string TITLE = "title";
 	}
 
+	namespace Views {
+		static const std::string TITLE = "title_view";
+		static const std::string MAIN_MENU = "main_menu_view";
+		static const std::string PAUSE_MENU = "pause_menu_view";
+		static const std::string HUD = "game_hud_view";
+	}
+
 	namespace Contexts {
 		static const std::string GAME = "Game";
 		static const std::string EDITOR = "Editor";
+		static const std::string UI = "UI";
+	}
+
+	namespace Sounds {
+		static const std::string MENU_THEME = "res/sounds/music/menu_theme.mp3";
+		static const std::string GAME_THEME = "res/sounds/music/game_theme.mp3";
+		static const std::string PAUSE_THEME = "res/sounds/music/pause_theme.mp3";
+		static const std::string BUTTON_CLICK = "res/sounds/sfx/click.mp3";
 	}
 
 	namespace Actions {
