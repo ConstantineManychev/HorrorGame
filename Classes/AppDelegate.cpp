@@ -1,140 +1,141 @@
 #include "AppDelegate.h"
-
-#include "Managers/DataManager.h"
-#include "Managers/GameDirector.h"
-#include "Managers/InputManager.h"
-#include "Managers/ViewManager.h"
-#include "Managers/ScenesManager.h"
-#include "Managers/EventBus.h"
-#include "Managers/GameSession.h"
-#include "Managers/AudioManager.h"
 #include "Basics/ServiceLocator.h"
-#include "Managers/CutsceneManager.h"
-
-#include "Types/BasicDataTypes.h"
 #include "Constants.h"
 
+#include "Managers/ConfigLoader.h"
+#include "Managers/DataManager.h"
+#include "Managers/GameDirector.h"
+#include "Managers/ScenesManager.h"
+#include "Managers/InputManager.h"
+#include "Managers/ViewManager.h"
+#include "Managers/EventBus.h"
+#include "Managers/AudioManager.h"
+#include "Managers/CutsceneManager.h"
+#include "Managers/GameSession.h"
+#include "Factories/ViewFactory.h"
+#include "Factories/EntityFactory.h"
 #include "Systems/CameraSystem.h"
+#include "Systems/LightingSystem.h"
 
-#if USE_AUDIO_ENGINE
-#include "audio/include/AudioEngine.h"
-using namespace cocos2d::experimental;
-#endif
+#include "Scenes/MainGameScene.h"
+#include "Scenes/EditorScene.h"
 
 USING_NS_CC;
 _USEC;
 
-AppDelegate::AppDelegate()
-{
-}
+AppDelegate::AppDelegate() {}
 
 AppDelegate::~AppDelegate()
 {
-	SL->unregisterService<ScenesManager>();
-	SL->unregisterService<ViewManager>();
-	SL->unregisterService<InputManager>();
-	SL->unregisterService<GameDirector>();
-	SL->unregisterService<DataManager>();
-	SL->unregisterService<EventBus>();
-	SL->unregisterService<GameSession>();
-	SL->unregisterService<AudioManager>();
+	auto lightSys = SL->getService<LightingSystem>();
+	if (lightSys) lightSys->release();
+	SL->unregisterService<LightingSystem>();
 
+	delete SL->getService<CameraSystem>();
 	SL->unregisterService<CameraSystem>();
 
+	delete SL->getService<CutsceneManager>();
 	SL->unregisterService<CutsceneManager>();
 
-	ServiceLocator::destroyInstance();
+	delete SL->getService<GameDirector>();
+	SL->unregisterService<GameDirector>();
 
-#if USE_AUDIO_ENGINE
-	AudioEngine::end();
-#endif
+	delete SL->getService<AudioManager>();
+	SL->unregisterService<AudioManager>();
+
+	delete SL->getService<GameSession>();
+	SL->unregisterService<GameSession>();
+
+	delete SL->getService<InputManager>();
+	SL->unregisterService<InputManager>();
+
+	delete SL->getService<ViewManager>();
+	SL->unregisterService<ViewManager>();
+
+	delete SL->getService<ScenesManager>();
+	SL->unregisterService<ScenesManager>();
+
+	delete SL->getService<ViewFactory>();
+	SL->unregisterService<ViewFactory>();
+
+	delete SL->getService<EntityFactory>();
+	SL->unregisterService<EntityFactory>();
+
+	delete SL->getService<ConfigLoader>();
+	SL->unregisterService<ConfigLoader>();
+
+	delete SL->getService<DataManager>();
+	SL->unregisterService<DataManager>();
+
+	delete SL->getService<EventBus>();
+	SL->unregisterService<EventBus>();
+
+	ServiceLocator::destroyInstance();
 }
 
 void AppDelegate::initGLContextAttrs()
 {
 	GLContextAttrs glContextAttrs = { 8, 8, 8, 8, 24, 8, 0 };
-
 	GLView::setGLContextAttrs(glContextAttrs);
 }
 
-static int register_all_packages()
-{
-	return 0;
-}
-
-
-void AppDelegate::onInit()
-{
-	DM->loadMainInfo(Constants::Configs::MAIN_CONFIG);
-}
-
 bool AppDelegate::applicationDidFinishLaunching() {
+	auto director = Director::getInstance();
+	auto glview = director->getOpenGLView();
 
-	auto eventBus = EventBus::getInstance();
-	SL->registerService(eventBus);
 
-	auto dataManager = DataManager::getInstance();
-	SL->registerService(dataManager);
+	SL->registerService(new EventBus());
+	SL->registerService(new DataManager());
+	SL->registerService(new ConfigLoader());
 
-	auto scenesManager = ScenesManager::getInstance();
-	SL->registerService(scenesManager);
+	SL->registerService(new EntityFactory());
+	SL->registerService(new ViewFactory());
 
-	auto viewManager = ViewManager::getInstance();
-	SL->registerService(viewManager);
+	SL->registerService(new ScenesManager());
+	SL->registerService(new ViewManager());
+	SL->registerService(new InputManager());
+	SL->registerService(new GameSession());
+	SL->registerService(new AudioManager());
 
-	auto inputManager = InputManager::getInstance();
-	SL->registerService(inputManager);
+	SL->registerService(new CameraSystem());
+	SL->registerService(new LightingSystem());
+	SL->registerService(new CutsceneManager());
 
-	auto gameSession = GameSession::getInstance();
-	SL->registerService(gameSession);
+	SL->registerService(new GameDirector());
 
-	auto audioManager = AudioManager::getInstance();
-	SL->registerService(audioManager);
-
-	auto gameDirector = GameDirector::getInstance();
-	SL->registerService(gameDirector);
-
-	auto cameraSystem = CameraSystem::getInstance();
-	SL->registerService(cameraSystem);
-
-	auto cutsceneManager = CutsceneManager::getInstance();
-	SL->registerService(cutsceneManager);
-
-	onInit();
+	CL->loadMainConfig(Constants::Configs::MAIN_CONFIG);
+	CL->loadViewConfigs("configs/views/views_list.json");
 
 	auto& mainInfo = DM->getMainInfo();
 
-	auto director = Director::getInstance();
-	auto glview = director->getOpenGLView();
 	if (!glview) {
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_MAC) || (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX)
-
-		if (mainInfo.isFullScreen)
-		{
-			glview = GLViewImpl::createWithFullScreen("ABC_Adventures");
-		}
-		else
-		{
-			glview = GLViewImpl::createWithRect("ABC_Adventures", cocos2d::Rect(0, 0, mainInfo.screenWidth, mainInfo.screenHeight));
-		}
-#else
-		glview = GLViewImpl::create("ABC_Adventures");
-#endif
+		if (mainInfo.isFullScreen) glview = GLViewImpl::createWithFullScreen("ABC_Adventures");
+		else glview = GLViewImpl::createWithRect("ABC_Adventures", Rect(0, 0, mainInfo.screenWidth, mainInfo.screenHeight));
 		director->setOpenGLView(glview);
 	}
 
+	auto listener = EventListenerCustom::create("glview_window_resized", [=](EventCustom* e) {
+		auto view = Director::getInstance()->getOpenGLView();
+		Size newSize = view->getFrameSize();
+		if (newSize.height > 0) {
+			float designH = 600.0f;
+			float designW = designH * (newSize.width / newSize.height);
+			view->setDesignResolutionSize(designW, designH, ResolutionPolicy::FIXED_HEIGHT);
+			if (DM) DM->updateScreenSize(Size(designW, designH));
+		}
+	});
+	director->getEventDispatcher()->addEventListenerWithFixedPriority(listener, 1);
+
 	glview->setDesignResolutionSize(mainInfo.screenWidth, mainInfo.screenHeight, ResolutionPolicy::FIXED_HEIGHT);
+	DM->calcScale();
 
 	DM->preloadResources();
 
-	DM->calcScale();
-
-	const auto& glviewFrameSize = glview->getFrameSize();
-
-	register_all_packages();
+	SM->registerSceneFactory(Constants::Scenes::TITLE, []() { return MainGameScene::create(); });
+	SM->registerSceneFactory(Constants::Scenes::GAME, []() { return MainGameScene::create(); });
+	SM->registerSceneFactory(Constants::Scenes::EDITOR, []() { return EditorScene::create(); });
 
 	IM->createContext(Constants::Contexts::GAME);
-	IM->createContext(Constants::Contexts::EDITOR);
 
 #if IS_EDITOR_MODE
 	GD->startEditor();
@@ -145,18 +146,5 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	return true;
 }
 
-void AppDelegate::applicationDidEnterBackground() {
-	Director::getInstance()->stopAnimation();
-
-#if USE_AUDIO_ENGINE
-	AudioEngine::pauseAll();
-#endif
-}
-
-void AppDelegate::applicationWillEnterForeground() {
-	Director::getInstance()->startAnimation();
-
-#if USE_AUDIO_ENGINE
-	AudioEngine::resumeAll();
-#endif
-}
+void AppDelegate::applicationDidEnterBackground() { Director::getInstance()->stopAnimation(); }
+void AppDelegate::applicationWillEnterForeground() { Director::getInstance()->startAnimation(); }

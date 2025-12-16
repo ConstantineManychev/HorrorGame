@@ -3,12 +3,10 @@
 
 #include "cocos2d.h"
 #include "CommonDefines.h"
-#include "Components/PhysicsMovementComponent.h"
-#include "Components/PhysicsBodyComponent.h"
 
 _CSTART
 
-class GameEntity : public cocos2d::Sprite
+class GameEntity : public cocos2d::Node
 {
 public:
 	static GameEntity* create();

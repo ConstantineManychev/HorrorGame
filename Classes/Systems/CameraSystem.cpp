@@ -3,12 +3,6 @@
 USING_NS_CC;
 _CSTART
 
-CameraSystem* CameraSystem::getInstance()
-{
-	static CameraSystem instance;
-	return &instance;
-}
-
 CameraSystem::CameraSystem()
 	: mCamera(nullptr), mTarget(nullptr), mWorldBounds(Rect::ZERO)
 	, mFocusPos(Vec2::ZERO), mCurrentMode(CameraMode::FOLLOW_TARGET)

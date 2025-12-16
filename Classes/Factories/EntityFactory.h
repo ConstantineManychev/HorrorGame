@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "CommonDefines.h"
+#include "Basics/ServiceLocator.h"
 #include <functional>
 #include <map>
 #include <string>
@@ -11,8 +12,8 @@ _CSTART
 
 class EntityFactory
 {
+	friend class AppDelegate;
 public:
-	static EntityFactory* getInstance();
 
 	using EntityCreator = std::function<cocos2d::Node*()>;
 
@@ -27,7 +28,7 @@ private:
 	std::map<std::string, EntityCreator> mCreators;
 };
 
-#define EF EntityFactory::getInstance()
+#define EF SL->getService<GameSpace::EntityFactory>()
 
 _CEND
 

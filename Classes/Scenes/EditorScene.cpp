@@ -231,8 +231,12 @@ void EditorScene::setupEditorUI()
 	backButton->setTitleText("Play Game");
 	backButton->setTitleFontSize(UIConfig::FONT_SIZE_BUTTON);
 	backButton->setPosition(Vec2(visibleSize.width - 160, btnY));
-	backButton->addTouchEventListener([&](Ref* sender, ui::Widget::TouchEventType type) {
-		if (type == ui::Widget::TouchEventType::ENDED) SM->runGameScene();
+	backButton->addTouchEventListener([&](Ref* aSendeer, ui::Widget::TouchEventType aType) {
+		auto node = dynamic_cast<Node*>(aSendeer);
+		if (aType == ui::Widget::TouchEventType::ENDED && node)
+		{
+			SM->openScene(node->getName());
+		}
 	});
 	toolbar->addChild(backButton);
 

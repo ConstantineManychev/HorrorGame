@@ -4,12 +4,6 @@
 USING_NS_CC;
 _CSTART
 
-EventBus* EventBus::getInstance()
-{
-	static EventBus instance;
-	return &instance;
-}
-
 size_t EventBus::subscribeInternal(EventType type, EventCallback callback)
 {
 	size_t id = ++mNextListenerId;

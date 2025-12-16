@@ -19,9 +19,9 @@ struct CutsceneStep
 class CutsceneManager
 {
 	friend class ServiceLocator;
+	friend class AppDelegate;
 
 public:
-	static CutsceneManager* getInstance();
 
 	void playCutscene(const std::string& aConfigPath, std::function<void()> onComplete = nullptr);
 

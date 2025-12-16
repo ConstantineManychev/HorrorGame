@@ -17,12 +17,6 @@ namespace GameSpace {
 	{
 	}
 
-	GameSession* GameSession::getInstance()
-	{
-		static GameSession instance;
-		return &instance;
-	}
-
 	void GameSession::startNewSession()
 	{
 		loadDefaultConfig();

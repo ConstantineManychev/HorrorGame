@@ -24,6 +24,10 @@ bool Player::init()
 {
 	if (!GameEntity::init()) return false;
 
+	auto sprite = SpriteComponent::create();
+	sprite->setSpriteFrame("player_idle.png");
+	this->addComponent(sprite);
+
 	if (!this->getComponent("PhysicsBodyComponent"))
 	{
 		auto bodyComp = PhysicsBodyComponent::create(true);

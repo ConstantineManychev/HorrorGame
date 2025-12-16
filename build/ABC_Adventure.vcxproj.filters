@@ -94,6 +94,18 @@
     <ClCompile Include="..\Classes\Managers\CutsceneManager.cpp">
       <Filter>Source Files\Classes\managers</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\Components\SpriteComponent.cpp">
+      <Filter>Source Files\Classes\components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Components\LightComponent.cpp">
+      <Filter>Source Files\Classes\components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Systems\LightingSystem.cpp">
+      <Filter>Source Files\Classes\systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Managers\ConfigLoader.cpp">
+      <Filter>Source Files\Classes\managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\AppDelegate.h">
@@ -223,6 +235,18 @@
       <Filter>Source Files\Classes\basics</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\Managers\CutsceneManager.h">
+      <Filter>Source Files\Classes\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Components\SpriteComponent.h">
+      <Filter>Source Files\Classes\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Components\LightComponent.h">
+      <Filter>Source Files\Classes\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Systems\LightingSystem.h">
+      <Filter>Source Files\Classes\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Managers\ConfigLoader.h">
       <Filter>Source Files\Classes\managers</Filter>
     </ClInclude>
   </ItemGroup>

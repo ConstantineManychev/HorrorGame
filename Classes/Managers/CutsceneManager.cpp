@@ -9,12 +9,6 @@
 USING_NS_CC;
 _CSTART
 
-CutsceneManager* CutsceneManager::getInstance()
-{
-	static CutsceneManager instance;
-	return &instance;
-}
-
 CutsceneManager::CutsceneManager()
 	: mIsPlaying(false)
 {
@@ -48,7 +42,7 @@ void CutsceneManager::stopCutscene()
 	if (auto player = GD->getCurrentPlayer())
 	{
 		CAM_SYS->setTarget(player);
-		// player->setInputEnabled(true);
+		//player->setInputEnabled(true);
 	}
 }
 
@@ -77,7 +71,7 @@ void CutsceneManager::parseCutsceneConfig(const std::string& aConfigPath)
 				{
 					ValueMap stepMap = stepVal.asValueMap();
 					CutsceneStep step;
-					if (stepMap.count("action")) // "action" is the type key in your json
+					if (stepMap.count("action"))
 					{
 						step.type = stepMap.at("action").asString();
 						step.params = stepMap;
@@ -263,9 +257,11 @@ cocos2d::Node* CutsceneManager::findNodeInScene(const std::string& name)
 
 cocos2d::Node* CutsceneManager::findNodeRecursive(cocos2d::Node* root, const std::string& name)
 {
+	if (!root) return nullptr;
 	if (root->getName() == name) return root;
 
-	for (auto child : root->getChildren())
+	auto& children = root->getChildren();
+	for (const auto& child : children)
 	{
 		Node* res = findNodeRecursive(child, name);
 		if (res) return res;

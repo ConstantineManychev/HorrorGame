@@ -20,9 +20,9 @@ enum class SoundType {
 class AudioManager
 {
 	friend class ServiceLocator;
+	friend class AppDelegate;
 
 public:
-	static AudioManager* getInstance();
 
 	void init();
 

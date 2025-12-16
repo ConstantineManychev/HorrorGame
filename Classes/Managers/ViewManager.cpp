@@ -25,25 +25,9 @@ ViewManager::~ViewManager()
 	mViewsActions.clear();
 }
 
-ViewManager* ViewManager::getInstance()
-{
-	static ViewManager instance;
-	return &instance;
-}
-
 Node* ViewManager::createViewByID(const std::string& aID)
 {
-	Node* result = nullptr;
-	const ValueMap& viewInfo = DM->getViewInfoByID(aID);
-
-	result = ViewFactory::createNodeFromValue(Value(viewInfo));
-
-	if (result)
-	{
-		result->setScale(DM->getScaleY());
-	}
-
-	return result;
+	return VF->createView(aID);;
 }
 
 void ViewManager::changeView(const std::string& aViewID)

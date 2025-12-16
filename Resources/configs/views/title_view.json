@@ -23,7 +23,7 @@
 	},
 	"children" : 
 	{
-		"title_logo" : 
+		"logo_sprite" : 
 		{
 			"type" : "Sprite",
 			"id" : "logo_sprite",

@@ -8,17 +8,12 @@
 #include "Components/InputComponent.h"
 #include "Components/PhysicsBodyComponent.h"
 #include "Components/PhysicsMovementComponent.h"
+#include "Components/SpriteComponent.h"
 #include "Managers/EventBus.h"
 #include "Managers/EventData.h"
 
 USING_NS_CC;
 _CSTART
-
-EntityFactory* EntityFactory::getInstance()
-{
-	static EntityFactory instance;
-	return &instance;
-}
 
 EntityFactory::EntityFactory()
 {
@@ -50,14 +45,11 @@ Node* EntityFactory::createEntity(const std::string& aType)
 
 Node* EntityFactory::createEntityFromConfig(const ValueMap& aConfig)
 {
-	Node* entity = Node::create();
+	GameEntity* entity = GameEntity::create();
 	std::string entityType = "Node";
 
 	if (aConfig.count("type")) {
 		entityType = aConfig.at("type").asString();
-		if (mCreators.find(entityType) != mCreators.end()) {
-			entity = createEntity(entityType);
-		}
 	}
 
 	if (aConfig.count("components"))
@@ -69,9 +61,9 @@ Node* EntityFactory::createEntityFromConfig(const ValueMap& aConfig)
 			std::string compType = compConfig["type"].asString();
 
 			if (compType == "SpriteComponent") {
-				auto sprite = Sprite::create();
-				if (compConfig.count("sprite_frame")) sprite->setSpriteFrame(compConfig["sprite_frame"].asString());
-				entity->addChild(sprite);
+				auto spriteComp = SpriteComponent::create();
+				spriteComp->configure(compConfig);
+				entity->addComponent(spriteComp);
 			}
 			else if (compType == "PhysicsBodyComponent") {
 				bool isDynamic = compConfig.count("is_dynamic") ? compConfig["is_dynamic"].asBool() : true;

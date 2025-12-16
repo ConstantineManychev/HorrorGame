@@ -33,7 +33,6 @@ class EventBus
 	friend class AppDelegate;
 
 public:
-	static EventBus* getInstance();
 
 	template <typename T>
 	size_t subscribe(EventType aType, std::function<void(const T*)> aCallback)

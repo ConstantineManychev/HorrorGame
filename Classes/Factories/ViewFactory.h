@@ -2,61 +2,37 @@
 #define __VIEW_FACTORY_H__
 
 #include "cocos2d.h"
+#include "ui/CocosGUI.h"
 #include "CommonDefines.h"
-#include <unordered_set>
+#include "Basics/ServiceLocator.h"
+#include <functional>
 #include <unordered_map>
 
-namespace GameSpace {
+_CSTART
 
-	class ViewFactory
-	{
-	public:
-		enum class Params
-		{
-			NONE = 0,
-			CHILDREN,
-			PARAMS,
-			ACTIONS,
-			PREFAB,
+class ViewFactory
+{
+	friend class AppDelegate;
+public:
 
-			ID,
-			RES,
-			SPRITE_FRAME,
-			RES_NORMAL,
-			RES_PRESSED,
-			RES_DISABLE,
+	cocos2d::Node* createView(const std::string& aViewID);
+	cocos2d::Node* createNodeFromValue(const cocos2d::ValueMap& aValueMap);
 
-			LAYER,
-			OPACITY,
+private:
+	ViewFactory();
 
-			IS_VISIBLE,
+	using PropertyHandler = std::function<void(cocos2d::Node*, const cocos2d::Value&)>;
 
-			POS_X,
-			POS_Y,
-			SCALE_X,
-			SCALE_Y,
-			ROTATION,
-			ANCH_X,
-			ANCH_Y,
-			CONTENT_SIZE,
+	std::unordered_map<std::string, PropertyHandler> mPropertyHandlers;
 
-			COLOR
-		};
+	void initPropertyHandlers();
+	void applyProperties(cocos2d::Node* node, const cocos2d::ValueMap& params);
 
-		static cocos2d::Node* createNodeFromValue(const cocos2d::Value& aValue, cocos2d::Node* aParentNode = nullptr);
+	cocos2d::FiniteTimeAction* createActionFromValue(const cocos2d::ValueMap& aValueMap);
+};
 
-		static void parseActions(const cocos2d::Value& aValue, cocos2d::Node* aNode, std::unordered_map<cocos2d::Node*, std::unordered_map<std::string, cocos2d::Vector<cocos2d::FiniteTimeAction*>>>& outActionsMap);
+#define VF SL->getService<GameSpace::ViewFactory>()
 
-	private:
-		static void fillNodeParamFromValue(cocos2d::Node* aNode, const std::string& aParamID, const cocos2d::Value& aValue, std::unordered_map<cocos2d::Node*, std::unordered_map<std::string, cocos2d::Vector<cocos2d::FiniteTimeAction*>>>& outActionsMap, cocos2d::Node* aParentNode);
-		static cocos2d::FiniteTimeAction* createActionFromValue(const cocos2d::Value& aValue, cocos2d::Node* aNode);
-
-		static const std::unordered_set<std::string> cExcludeParams;
-		static const std::unordered_map<std::string, Params> cParamTypeMap;
-
-		static bool isAllConditionsMeetRequirements(const cocos2d::ValueMap& aMap, cocos2d::Node* aNode);
-	};
-
-}
+_CEND
 
 #endif

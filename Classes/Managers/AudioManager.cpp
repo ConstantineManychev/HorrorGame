@@ -9,12 +9,6 @@ using AudioEngine = cocos2d::AudioEngine;
 
 _CSTART
 
-AudioManager* AudioManager::getInstance()
-{
-	static AudioManager instance;
-	return &instance;
-}
-
 AudioManager::AudioManager()
 	: mCurrentMusicID(-1)
 	, mPauseMenuMusicID(-1)

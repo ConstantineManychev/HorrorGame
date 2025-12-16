@@ -21,7 +21,10 @@ GameEntity* GameEntity::create()
 
 bool GameEntity::init()
 {
-	if (!Sprite::init()) return false;
+	if (!Node::init()) return false;
+
+	this->setCascadeOpacityEnabled(true);
+	this->setCascadeColorEnabled(true);
 
 	return true;
 }

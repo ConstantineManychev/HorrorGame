@@ -4,6 +4,7 @@
 #include "Managers/GameDirector.h"
 #include "Basics/BaseLocation.h"
 #include "Systems/CameraSystem.h"
+#include "Systems/LightingSystem.h"
 #include "Managers/EventBus.h"
 #include "Managers/EventData.h"
 #include "Constants.h"
@@ -24,6 +25,15 @@ bool MainGameScene::init()
 		}
 	});
 
+	Size mapSize = Size(2134, 2134);
+	//LIGHT_SYS->initLighting(mapSize);
+
+	//LIGHT_SYS->setAmbientColor(Color3B::WHITE);
+
+	//this->addChild(LIGHT_SYS->getDarknessLayer(), 100);
+
+	this->scheduleUpdate();
+
 	return true;
 }
 
@@ -43,9 +53,9 @@ void MainGameScene::setupCameraForPlayer(Node* aPlayer)
 		if (size.width > 0)
 			worldBounds = Rect(0, 0, size.width, size.height);
 	}
-	else if (GD->getCurrentLocation())
+	else if (VM->getCurrentView())
 	{
-		Size size = GD->getCurrentLocation()->getContentSize();
+		Size size = VM->getCurrentView()->getContentSize();
 		if (size.width > 0)
 			worldBounds = Rect(0, 0, size.width, size.height);
 	}
@@ -58,6 +68,7 @@ void MainGameScene::setupCameraForPlayer(Node* aPlayer)
 void MainGameScene::update(float aDelta)
 {
 	CAM_SYS->update(aDelta);
+	LIGHT_SYS->update(aDelta);
 }
 
 void MainGameScene::onExit()

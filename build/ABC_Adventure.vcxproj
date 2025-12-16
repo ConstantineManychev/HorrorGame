@@ -831,8 +831,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="..\Classes\Components\EditorMetadataComponent.h" />
     <ClInclude Include="..\Classes\Components\GameComponent.h" />
     <ClInclude Include="..\Classes\Components\InputComponent.h" />
+    <ClInclude Include="..\Classes\Components\LightComponent.h" />
     <ClInclude Include="..\Classes\Components\PhysicsBodyComponent.h" />
     <ClInclude Include="..\Classes\Components\PhysicsMovementComponent.h" />
+    <ClInclude Include="..\Classes\Components\SpriteComponent.h" />
     <ClInclude Include="..\Classes\Constants.h" />
     <ClInclude Include="..\Classes\Factories\EntityFactory.h" />
     <ClInclude Include="..\Classes\Factories\ViewFactory.h" />
@@ -841,6 +843,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="..\Classes\Logics\GestureRecognizer.h" />
     <ClInclude Include="..\Classes\Logics\LocationLogic.h" />
     <ClInclude Include="..\Classes\Managers\AudioManager.h" />
+    <ClInclude Include="..\Classes\Managers\ConfigLoader.h" />
     <ClInclude Include="..\Classes\Managers\CutsceneManager.h" />
     <ClInclude Include="..\Classes\Managers\DataManager.h" />
     <ClInclude Include="..\Classes\Managers\EventBus.h" />
@@ -853,6 +856,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="..\Classes\Scenes\EditorScene.h" />
     <ClInclude Include="..\Classes\Scenes\MainGameScene.h" />
     <ClInclude Include="..\Classes\Systems\CameraSystem.h" />
+    <ClInclude Include="..\Classes\Systems\LightingSystem.h" />
     <ClInclude Include="..\Classes\Types\BasicDataTypes.h" />
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\AppDelegate.h" />
     <ClInclude Include="E:\My Cocos2dx projects\ABC_Adventure\proj.win32\main.h" />
@@ -865,8 +869,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="..\Classes\Basics\Player.cpp" />
     <ClCompile Include="..\Classes\Basics\ServiceLocator.cpp" />
     <ClCompile Include="..\Classes\Components\InputComponent.cpp" />
+    <ClCompile Include="..\Classes\Components\LightComponent.cpp" />
     <ClCompile Include="..\Classes\Components\PhysicsBodyComponent.cpp" />
     <ClCompile Include="..\Classes\Components\PhysicsMovementComponent.cpp" />
+    <ClCompile Include="..\Classes\Components\SpriteComponent.cpp" />
     <ClCompile Include="..\Classes\Factories\EntityFactory.cpp" />
     <ClCompile Include="..\Classes\Factories\ViewFactory.cpp" />
     <ClCompile Include="..\Classes\Helpers\NodeHelper.cpp" />
@@ -874,6 +880,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="..\Classes\Logics\GestureRecognizer.cpp" />
     <ClCompile Include="..\Classes\Logics\LocationLogic.cpp" />
     <ClCompile Include="..\Classes\Managers\AudioManager.cpp" />
+    <ClCompile Include="..\Classes\Managers\ConfigLoader.cpp" />
     <ClCompile Include="..\Classes\Managers\CutsceneManager.cpp" />
     <ClCompile Include="..\Classes\Managers\DataManager.cpp" />
     <ClCompile Include="..\Classes\Managers\EventBus.cpp" />
@@ -885,6 +892,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="..\Classes\Scenes\EditorScene.cpp" />
     <ClCompile Include="..\Classes\Scenes\MainGameScene.cpp" />
     <ClCompile Include="..\Classes\Systems\CameraSystem.cpp" />
+    <ClCompile Include="..\Classes\Systems\LightingSystem.cpp" />
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\Classes\AppDelegate.cpp" />
     <ClCompile Include="E:\My Cocos2dx projects\ABC_Adventure\proj.win32\main.cpp" />
     <ResourceCompile Include="E:\My Cocos2dx projects\ABC_Adventure\proj.win32\game.rc" />

@@ -15,7 +15,8 @@ namespace GameSpace {
 		friend class AppDelegate;
 
 	public:
-		static ViewManager* getInstance();
+
+		cocos2d::Node* getCurrentView() const { return mCurrentView; }
 
 		// Lifecycle
 		cocos2d::Node* createViewByID(const std::string& aID);
@@ -31,6 +32,9 @@ namespace GameSpace {
 	private:
 		ViewManager();
 		~ViewManager();
+
+		std::string mCurrentViewID;
+		cocos2d::Node* mCurrentView;
 
 		std::unordered_map<std::string, cocos2d::Node*> mViews;
 		std::unordered_map<cocos2d::Node*, std::unordered_map<std::string, cocos2d::Vector<cocos2d::FiniteTimeAction*>>> mViewsActions;

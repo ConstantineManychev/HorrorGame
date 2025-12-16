@@ -17,9 +17,9 @@ enum class CameraMode {
 class CameraSystem
 {
 	friend class ServiceLocator;
+	friend class AppDelegate;
 
 public:
-	static CameraSystem* getInstance();
 
 	void init(cocos2d::Camera* camera, const cocos2d::Rect& worldBounds);
 	void reset();

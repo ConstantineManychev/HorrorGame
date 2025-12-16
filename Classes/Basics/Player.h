@@ -3,6 +3,9 @@
 
 #include "GameEntity.h"
 #include "Components/InputComponent.h"
+#include "Components/PhysicsBodyComponent.h"
+#include "Components/PhysicsMovementComponent.h"
+#include "Components/SpriteComponent.h"
 
 _CSTART
 

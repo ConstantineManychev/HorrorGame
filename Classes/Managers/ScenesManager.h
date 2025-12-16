@@ -1,43 +1,37 @@
 #ifndef __SCENES_MANAGER_H__
 #define __SCENES_MANAGER_H__
 
-#include "CommonDefines.h"
+#include "cocos2d.h"
+#include "Basics/ServiceLocator.h"
 #include "Basics/BaseScene.h"
-#include "Basics/ServiceLocator.h" // Include
+#include <map>
+#include <string>
+#include <functional>
 
 _CSTART
 
 class ScenesManager
 {
-    friend class ServiceLocator;
-    friend class AppDelegate;
+	friend class AppDelegate;
+public:
+
+	using SceneCreator = std::function<BaseScene*()>;
+
+	void registerSceneFactory(const std::string& sceneId, SceneCreator creator);
+	void openScene(const std::string& aSceneID);
+
+	BaseScene* getCurrentScene();
 
 private:
-
 	ScenesManager();
 
 	std::map<std::string, BaseScene*> mScenes;
-
-	std::string mCurrentSceneID;
+	std::map<std::string, SceneCreator> mFactories;
 	BaseScene* mCurrentScene;
-
-public:
-
-	static ScenesManager* getInstance();
-
-	void registerScene(const std::string& aSceneID, BaseScene* aScene);
-	void openScene(const std::string& aSceneID);
-
-	void runEditorScene();
-	void runGameScene();
-
-	BaseScene* getCurrentScene();
-	std::string& getCurrentSceneID();
-
 };
 
-#define SM SL->getService<ScenesManager>()
+#define SM SL->getService<GameSpace::ScenesManager>()
 
 _CEND
 
-#endif // __SCENES_MANAGER_H__
+#endif

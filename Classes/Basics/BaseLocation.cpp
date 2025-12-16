@@ -30,7 +30,7 @@ void BaseLocation::onOpen()
     if (GD->isEditorMode()) return; // Disable logic in editor
     
 	Parent::onOpen();
-	GD->setLocation(this);
+	//GD->setLocation(this);
 }
 
 void BaseLocation::setupGlobalTouchListener()

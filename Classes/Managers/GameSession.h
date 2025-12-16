@@ -3,13 +3,14 @@
 
 #include "cocos2d.h"
 #include "CommonDefines.h"
+#include "Basics/ServiceLocator.h"
 
 namespace GameSpace {
 
 	class GameSession
 	{
+		friend class AppDelegate;
 	public:
-		static GameSession* getInstance();
 
 		void startNewSession();
 		void saveSession(const std::string& aFilePath);
@@ -41,7 +42,7 @@ namespace GameSpace {
 		cocos2d::ValueMap mSessionData;
 	};
 
-#define GS GameSpace::GameSession::getInstance()
+#define GS SL->getService<GameSpace::GameSession>()
 
 }
 

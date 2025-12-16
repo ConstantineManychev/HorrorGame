@@ -1,232 +1,116 @@
 #include "InputManager.h"
-#include "EventBus.h"
-#include "Managers/EventData.h"
 #include "Constants.h"
 
 USING_NS_CC;
 _CSTART
 
-InputManager* InputManager::getInstance()
+InputManager::InputManager() : mActiveContext(nullptr), mActionCallback(nullptr) {}
+
+void InputManager::createContext(const std::string& contextName)
 {
-	static InputManager instance;
-	return &instance;
-}
-
-InputManager::InputManager()
-{
-	createContext(Constants::Contexts::GAME);
-	createContext(Constants::Contexts::EDITOR);
-
-	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_A, GameAction::MoveLeft);
-	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_LEFT_ARROW, GameAction::MoveLeft);
-	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_D, GameAction::MoveRight);
-	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_RIGHT_ARROW, GameAction::MoveRight);
-	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_W, GameAction::MoveUp);
-	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_UP_ARROW, GameAction::MoveUp);
-	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_S, GameAction::MoveDown);
-	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_DOWN_ARROW, GameAction::MoveDown);
-	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_SPACE, GameAction::Jump);
-	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_E, GameAction::Use);
-	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_ESCAPE, GameAction::Pause);
-	bindKeyToContext(Constants::Contexts::GAME, EventKeyboard::KeyCode::KEY_P, GameAction::Pause);
-
-	switchContext(Constants::Contexts::GAME);
-}
-
-InputManager::~InputManager()
-{
-}
-
-void InputManager::init(Node* aInputNode)
-{
-	if (!aInputNode) return;
-
-	setupKeyboardListeners(aInputNode);
-	setupMouseListeners(aInputNode);
-}
-
-void InputManager::createContext(const std::string& aContextName)
-{
-	if (mContexts.find(aContextName) == mContexts.end())
+	if (mContexts.find(contextName) == mContexts.end())
 	{
 		InputContext context;
-		context.name = aContextName;
-		mContexts[aContextName] = context;
+		context.name = contextName;
+		mContexts[contextName] = context;
 	}
 }
 
-void InputManager::switchContext(const std::string& aContextName)
+void InputManager::bindKeyToContext(const std::string& contextName, EventKeyboard::KeyCode key, GameAction action)
 {
-	auto it = mContexts.find(aContextName);
-	if (it != mContexts.end())
+	if (mContexts.find(contextName) != mContexts.end())
 	{
-		mActiveContext = &it->second;
+		mContexts[contextName].keyBindings[key] = action;
 	}
 }
 
-void InputManager::bindKeyToContext(const std::string& aContextName, EventKeyboard::KeyCode aKeyCode, GameAction aAction)
+void InputManager::setActiveContext(const std::string& contextName)
 {
-	auto it = mContexts.find(aContextName);
-	if (it != mContexts.end())
+	if (mContexts.find(contextName) != mContexts.end())
 	{
-		it->second.keyBindings[aKeyCode] = aAction;
+		mActiveContext = &mContexts[contextName];
 	}
 }
 
-void InputManager::rebindKey(const std::string& aContextName, EventKeyboard::KeyCode aNewKey, GameAction aAction)
+void InputManager::setActionCallback(const std::function<void(GameAction, bool)>& callback)
 {
-	auto it = mContexts.find(aContextName);
-	if (it != mContexts.end())
+	mActionCallback = callback;
+}
+
+void InputManager::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
+{
+	if (mActiveContext && mActionCallback)
 	{
-		auto& bindings = it->second.keyBindings;
-		for (auto bIt = bindings.begin(); bIt != bindings.end(); )
-		{
-			if (bIt->second == aAction)
-			{
-				bIt = bindings.erase(bIt);
-			}
-			else
-			{
-				++bIt;
-			}
-		}
-		bindings[aNewKey] = aAction;
-	}
-}
-
-bool InputManager::isControllerConnected() const
-{
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-	return cocos2d::Controller::getAllController().size() > 0;
-#else
-	return true;
-#endif
-}
-
-void InputManager::setupKeyboardListeners(Node* aNode)
-{
-	auto listener = EventListenerKeyboard::create();
-	listener->onKeyPressed = CC_CALLBACK_2(InputManager::onKeyPressed, this);
-	listener->onKeyReleased = CC_CALLBACK_2(InputManager::onKeyReleased, this);
-
-	aNode->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, aNode);
-}
-
-void InputManager::setupMouseListeners(Node* aNode)
-{
-}
-
-void InputManager::onKeyPressed(EventKeyboard::KeyCode aKeyCode, Event* aEvent)
-{
-	GameAction action = mapKeyToAction(aKeyCode);
-	if (action != GameAction::None)
-	{
-		triggerAction(action, true);
-		triggerAxis(action, 1.0f);
-	}
-}
-
-void InputManager::onKeyReleased(EventKeyboard::KeyCode aKeyCode, Event* aEvent)
-{
-	GameAction action = mapKeyToAction(aKeyCode);
-	if (action != GameAction::None)
-	{
-		triggerAction(action, false);
-		triggerAxis(action, 0.0f);
-	}
-}
-
-GameAction InputManager::mapKeyToAction(EventKeyboard::KeyCode aKeyCode)
-{
-	if (mActiveContext)
-	{
-		auto it = mActiveContext->keyBindings.find(aKeyCode);
+		auto it = mActiveContext->keyBindings.find(keyCode);
 		if (it != mActiveContext->keyBindings.end())
 		{
-			return it->second;
+			mActionCallback(it->second, true);
 		}
 	}
-	return GameAction::None;
 }
 
-void InputManager::triggerAction(GameAction aAction, bool aIsPressed)
+void InputManager::onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event)
 {
-	mActionStates[aAction] = aIsPressed;
-
-	InputActionEventData data((int)aAction, aIsPressed);
-	EB->publish(EventType::INPUT_ACTION_TRIGGERED, &data);
-
-	for (auto& pair : mActionListeners)
+	if (mActiveContext && mActionCallback)
 	{
-		for (auto& info : pair.second)
+		auto it = mActiveContext->keyBindings.find(keyCode);
+		if (it != mActiveContext->keyBindings.end())
 		{
-			if (info.action == aAction)
-			{
-				info.callback(aAction, aIsPressed);
+			mActionCallback(it->second, false);
+		}
+	}
+}
+
+void InputManager::onMouseMove(EventMouse* event)
+{
+}
+
+void InputManager::loadBindings(const ValueMap& bindingsMap)
+{
+	createContext(Constants::Contexts::GAME);
+
+	std::map<std::string, GameAction> strToAction = {
+		{"MoveLeft", GameAction::MoveLeft},
+		{"MoveRight", GameAction::MoveRight},
+		{"MoveUp", GameAction::MoveUp},
+		{"MoveDown", GameAction::MoveDown},
+		{"Use", GameAction::Use},
+		{"Jump", GameAction::Jump}
+	};
+
+	for (auto& pair : bindingsMap) {
+		std::string actionStr = pair.first;
+		if (strToAction.count(actionStr)) {
+			GameAction action = strToAction[actionStr];
+			if (pair.second.getType() == Value::Type::VECTOR) {
+				for (const auto& keyVal : pair.second.asValueVector()) {
+					bindKeyToContext(Constants::Contexts::GAME, convertStringToKeyCode(keyVal.asString()), action);
+				}
+			}
+			else if (pair.second.getType() == Value::Type::STRING) {
+				bindKeyToContext(Constants::Contexts::GAME, convertStringToKeyCode(pair.second.asString()), action);
 			}
 		}
 	}
 }
 
-void InputManager::triggerAxis(GameAction aAction, float aValue)
+EventKeyboard::KeyCode InputManager::convertStringToKeyCode(const std::string& aID)
 {
-	mAxisStates[aAction] = aValue;
-
-	InputAxisEventData data((int)aAction, aValue);
-	EB->publish(EventType::INPUT_AXIS_TRIGGERED, &data);
-
-	for (auto& pair : mAxisListeners)
-	{
-		for (auto& info : pair.second)
-		{
-			if (info.action == aAction)
-			{
-				info.callback(aAction, aValue);
-			}
-		}
-	}
-}
-
-void InputManager::addActionListener(GameAction aAction, const std::string& aListenerID, ActionCallback aCallback)
-{
-	ActionListenerInfo info;
-	info.action = aAction;
-	info.callback = aCallback;
-	mActionListeners[aListenerID].push_back(info);
-}
-
-void InputManager::addAxisListener(GameAction aAction, const std::string& aListenerID, AxisCallback aCallback)
-{
-	AxisListenerInfo info;
-	info.action = aAction;
-	info.callback = aCallback;
-	mAxisListeners[aListenerID].push_back(info);
-}
-
-void InputManager::removeListener(const std::string& aListenerID)
-{
-	mActionListeners.erase(aListenerID);
-	mAxisListeners.erase(aListenerID);
-}
-
-bool InputManager::isActionPressed(GameAction aAction) const
-{
-	auto it = mActionStates.find(aAction);
-	if (it != mActionStates.end())
-	{
-		return it->second;
-	}
-	return false;
-}
-
-float InputManager::getActionStrength(GameAction aAction) const
-{
-	auto it = mAxisStates.find(aAction);
-	if (it != mAxisStates.end())
-	{
-		return it->second;
-	}
-	return 0.0f;
+	if (aID == "KEY_A" || aID == "A") return EventKeyboard::KeyCode::KEY_A;
+	if (aID == "KEY_D" || aID == "D") return EventKeyboard::KeyCode::KEY_D;
+	if (aID == "KEY_S" || aID == "S") return EventKeyboard::KeyCode::KEY_S;
+	if (aID == "KEY_W" || aID == "W") return EventKeyboard::KeyCode::KEY_W;
+	if (aID == "KEY_E" || aID == "E") return EventKeyboard::KeyCode::KEY_E;
+	if (aID == "KEY_Q" || aID == "Q") return EventKeyboard::KeyCode::KEY_Q;
+	if (aID == "KEY_SPACE" || aID == "SPACE") return EventKeyboard::KeyCode::KEY_SPACE;
+	if (aID == "KEY_SHIFT" || aID == "SHIFT") return EventKeyboard::KeyCode::KEY_SHIFT;
+	if (aID == "KEY_CTRL" || aID == "CTRL") return EventKeyboard::KeyCode::KEY_CTRL;
+	if (aID == "KEY_GRAVE" || aID == "`") return EventKeyboard::KeyCode::KEY_GRAVE;
+	if (aID == "KEY_LEFT_ARROW" || aID == "LEFT") return EventKeyboard::KeyCode::KEY_LEFT_ARROW;
+	if (aID == "KEY_RIGHT_ARROW" || aID == "RIGHT") return EventKeyboard::KeyCode::KEY_RIGHT_ARROW;
+	if (aID == "KEY_UP_ARROW" || aID == "UP") return EventKeyboard::KeyCode::KEY_UP_ARROW;
+	if (aID == "KEY_DOWN_ARROW" || aID == "DOWN") return EventKeyboard::KeyCode::KEY_DOWN_ARROW;
+	return EventKeyboard::KeyCode::KEY_NONE;
 }
 
 _CEND

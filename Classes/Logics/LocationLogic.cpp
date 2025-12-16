@@ -19,13 +19,13 @@ LocationLogic::LocationLogic()
 
 LocationLogic::~LocationLogic()
 {
-	GD->setLocation(nullptr);
-	GD->setPlayer(nullptr);
+	//GD->setLocation(nullptr);
+	//GD->setPlayer(nullptr);
 }
 
 void LocationLogic::onOpen()
 {
-	GD->setPlayer(mPlayer);
+	//GD->setPlayer(mPlayer);
 }
 
 void LocationLogic::onButtonTouchEvent(Ref* aSender, Touch* aTouch, ui::Widget::TouchEventType aEventType)
@@ -195,7 +195,7 @@ void LocationLogic::createLetter(char aLetter, const Vec2& aPoint)
 			sprite->setColor(Color3B::MAGENTA);
 		}
 
-		auto loc = GD->getCurrentLocation();
+		auto loc = VM->getCurrentView();
 		if (loc)
 		{
 			loc->addChild(sprite);

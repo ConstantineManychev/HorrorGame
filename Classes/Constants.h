@@ -15,7 +15,7 @@ namespace Constants {
 	}
 
 	namespace Scenes {
-		static const std::string MAIN = "main";
+		static const std::string GAME = "game";
 		static const std::string EDITOR = "editor";
 		static const std::string TITLE = "title";
 	}
@@ -25,6 +25,7 @@ namespace Constants {
 		static const std::string MAIN_MENU = "main_menu_view";
 		static const std::string PAUSE_MENU = "pause_menu_view";
 		static const std::string HUD = "game_hud_view";
+		static const std::string STAGE_A = "stage_A";
 	}
 
 	namespace Contexts {

@@ -21,6 +21,7 @@ public:
 	
 	virtual void update(float delta) override;
 
+	CREATE_FUNC(EditorScene);
 private:
 	// --- Constants & Configuration ---
 	struct UIConfig
@@ -68,7 +69,6 @@ private:
     
 	cocos2d::Vec2 mTouchOffset;
 
-	CREATE_FUNC(EditorScene);
 };
 
 _CEND
