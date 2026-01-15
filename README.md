@@ -67,8 +67,8 @@ This project uses **Git Submodules** to manage the Cocos2d-x engine dependency.
 
 1.  **Clone the repository with submodules:**
     ```bash
-    git clone --recursive https://github.com/ConstantineManychev/ABC_Adventures.git
-    cd ABC_Adventures
+    git clone --recursive https://github.com/ConstantineManychev/HorrorGame.git
+    cd HorrorGame
     ```
     *(If you already cloned without `--recursive`, run `git submodule update --init --recursive`)*
 
