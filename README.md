@@ -50,7 +50,7 @@ Classes/
 ├── Systems/         # Update loops for specific domains (Lighting, Camera)
 └── Types/           # Common type definitions and Enums
 Resources/
-└── configs/         # JSON configuration files (Data-Driven core)
+└── configs/         # JSON configuration files (Data-Driven core)``
 
 ---
 
