@@ -109,8 +109,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	auto& mainInfo = DM->getMainInfo();
 
 	if (!glview) {
-		if (mainInfo.isFullScreen) glview = GLViewImpl::createWithFullScreen("ABC_Adventures");
-		else glview = GLViewImpl::createWithRect("ABC_Adventures", Rect(0, 0, mainInfo.screenWidth, mainInfo.screenHeight));
+		if (mainInfo.isFullScreen) glview = GLViewImpl::createWithFullScreen("Horror Game");
+		else glview = GLViewImpl::createWithRect("Horror Game", Rect(0, 0, mainInfo.screenWidth, mainInfo.screenHeight));
 		director->setOpenGLView(glview);
 	}
 
