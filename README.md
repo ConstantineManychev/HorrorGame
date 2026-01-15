@@ -52,6 +52,8 @@ Classes/
 Resources/
 └── configs/         # JSON configuration files (Data-Driven core)
 
+---
+
 ## 🚀 Build Instructions
 
 This project uses **Git Submodules** to manage the Cocos2d-x engine dependency.
