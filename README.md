@@ -51,3 +51,36 @@ Classes/
 └── Types/           # Common type definitions and Enums
 Resources/
 └── configs/         # JSON configuration files (Data-Driven core)
+
+## 🚀 Build Instructions
+
+This project uses **Git Submodules** to manage the Cocos2d-x engine dependency.
+
+### Prerequisites
+* CMake 3.10+
+* C/C++ Compiler (MSVC, GCC, or Clang)
+* Python 2.7+ (required for Cocos dependency setup)
+
+### Setup & Build
+
+1.  **Clone the repository with submodules:**
+    ```bash
+    git clone --recursive [https://github.com/your-username/ABC_Adventures.git](https://github.com/your-username/ABC_Adventures.git)
+    cd ABC_Adventures
+    ```
+    *(If you already cloned without `--recursive`, run `git submodule update --init --recursive`)*
+
+2.  **Download Engine Dependencies:**
+    Cocos2d-x requires external binaries (curl, openssl, etc.) to be downloaded once.
+    ```bash
+    cd cocos2d
+    python download-deps.py -r yes
+    cd ..
+    ```
+
+3.  **Build with CMake:**
+    ```bash
+    mkdir build && cd build
+    cmake ..
+    cmake --build .
+    ```
