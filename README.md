@@ -81,6 +81,6 @@ This project uses **Git Submodules** to manage the Cocos2d-x engine dependency.
 3.  **Build with CMake:**
     ```bash
     mkdir build; cd build
-    cmake ..
+    cmake .. -A Win32 -DCMAKE_CXX_FLAGS="/Zm1000" -DCMAKE_C_FLAGS="/Zm1000"
     cmake --build .
     ```
