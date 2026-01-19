@@ -1,15 +1,15 @@
 #ifndef __ITEM_H__
 #define __ITEM_H__
 
-#include "BaseBeing.h"
+#include "GameEntity.h"
 
 #include "CommonDefines.h"
 
 _CSTART
 
-class Item : public BaseBeing
+class Item : public GameEntity
 {
-	BaseBeing* Parent;
+	GameEntity* Parent;
 public:
 
 	static Item* create();

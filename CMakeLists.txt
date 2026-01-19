@@ -36,6 +36,7 @@ if(XCODE)
 endif()
 
 if(NOT DEFINED BUILD_ENGINE_DONE) # to test Horror_Game into root project
+    set(USE_PHYSICS3D OFF)
     set(COCOS2DX_ROOT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cocos2d)
     set(CMAKE_MODULE_PATH ${COCOS2DX_ROOT_PATH}/cmake/Modules/)
 
