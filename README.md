@@ -75,14 +75,12 @@ This project uses **Git Submodules** to manage the Cocos2d-x engine dependency.
 2.  **Download Engine Dependencies:**
     Cocos2d-x requires external binaries (curl, openssl, etc.) to be downloaded once.
     ```bash
-    cd cocos2d
-    python download-deps.py -r yes
-    cd ..
+    git clone --depth 1 -b metal-support-22 https://github.com/cocos2d/cocos2d-x-3rd-party-libs-bin.git cocos2d/external
     ```
 
 3.  **Build with CMake:**
     ```bash
-    mkdir build && cd build
-    cmake ..
+    mkdir build; cd build
+    cmake .. -A Win32 -DCMAKE_CXX_FLAGS="/Zm1000" -DCMAKE_C_FLAGS="/Zm1000"
     cmake --build .
     ```
