@@ -1,0 +1,20 @@
+{
+	"format": "horror-app",
+	"version": 2,
+	"title": "Horror Game",
+	"start_scene": "title",
+	"window_size": [1024, 720],
+	"fullscreen": false,
+	"design_height": 720,
+	"preload_atlases": ["res/main_menu/main_menu.plist"],
+	"input": {
+		"move_left": ["KEY_A", "KEY_LEFT_ARROW"],
+		"move_right": ["KEY_D", "KEY_RIGHT_ARROW"],
+		"move_up": ["KEY_W", "KEY_UP_ARROW"],
+		"move_down": ["KEY_S", "KEY_DOWN_ARROW"],
+		"jump": ["KEY_SPACE"],
+		"use": ["KEY_E"],
+		"run": ["KEY_SHIFT"],
+		"pause": ["KEY_ESCAPE"]
+	}
+}

@@ -1,2 +1,8 @@
 Debug/
 build/
+run.bat
+.vs/
+.vscode/
+.idea/
+*.user
+imgui.ini

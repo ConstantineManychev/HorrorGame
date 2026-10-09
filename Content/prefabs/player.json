@@ -1,0 +1,41 @@
+{
+	"format": "horror-prefab",
+	"version": 2,
+	"root": {
+		"uid": 1,
+		"name": "Player",
+		"type": "Group",
+		"props": {"z": 10, "y_sort": true},
+		"components": [
+			{
+				"type": "CharacterBody",
+				"props": {"size": [140, 260], "offset": [0, 130]}
+			},
+			{
+				"type": "PlayerController",
+				"props": {
+					"run_speed": 900,
+					"acceleration": 6000,
+					"jump_speed": 1700,
+					"gravity": 4200,
+					"walk_speed": 700,
+					"walk_acceleration": 5000
+				}
+			}
+		],
+		"children": [
+			{
+				"uid": 2,
+				"name": "Body",
+				"type": "ColorRect",
+				"props": {"size": [140, 260], "anchor": [0.5, 0], "color": [60, 30, 40]}
+			},
+			{
+				"uid": 3,
+				"name": "Eye",
+				"type": "ColorRect",
+				"props": {"position": [30, 200], "size": [30, 30], "color": [240, 230, 200]}
+			}
+		]
+	}
+}

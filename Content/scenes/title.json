@@ -1,0 +1,55 @@
+{
+	"format": "horror-scene",
+	"version": 2,
+	"id": "title",
+	"kind": "screen",
+	"next_uid": 2,
+	"settings": {
+		"world_size": [3840, 2160],
+		"view_height": 2160,
+		"background": [0, 0, 0],
+		"control_mode": "none",
+		"camera_dead_zone": [0.15, 0.2],
+		"camera_damping": 6,
+		"music": "",
+		"on_start": [
+			{"do": "play_timeline", "timeline": "intro"}
+		]
+	},
+	"objects": [
+		{
+			"uid": 1,
+			"name": "logo_sprite",
+			"type": "Sprite",
+			"props": {"position": [1920, 1512], "z": 1, "opacity": 0, "texture": "res/Title.png"}
+		}
+	],
+	"timelines": [
+		{
+			"id": "intro",
+			"duration": 7.5,
+			"tracks": [
+				{
+					"kind": "property",
+					"target": 1,
+					"property": "opacity",
+					"keys": [
+						{"t": 0, "v": 0},
+						{"t": 2.5, "v": 255},
+						{"t": 5, "v": 255},
+						{"t": 7.5, "v": 0}
+					]
+				},
+				{
+					"kind": "events",
+					"events": [
+						{
+							"t": 7.5,
+							"action": {"do": "change_scene", "scene": "main_menu"}
+						}
+					]
+				}
+			]
+		}
+	]
+}
