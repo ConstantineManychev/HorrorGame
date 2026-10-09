@@ -1,0 +1,207 @@
+{
+	"format": "horror-scene",
+	"version": 2,
+	"id": "stage_a",
+	"kind": "location",
+	"next_uid": 12,
+	"settings": {
+		"world_size": [3840, 2160],
+		"view_height": 1600,
+		"background": [0, 0, 0],
+		"control_mode": "top_down",
+		"camera_dead_zone": [0.15, 0.2],
+		"camera_damping": 6,
+		"music": "",
+		"on_start": [
+			{"do": "play_timeline", "timeline": "intro"}
+		]
+	},
+	"objects": [
+		{
+			"uid": 1,
+			"name": "back",
+			"type": "Sprite",
+			"props": {"position": [1920, 1080], "z": 1, "texture": "res/gameplay/MM_Background.png"}
+		},
+		{
+			"uid": 2,
+			"name": "ground",
+			"type": "Sprite",
+			"props": {"position": [1920, 864], "z": 2, "texture": "res/main_menu/MM_ground.png"}
+		},
+		{
+			"uid": 3,
+			"name": "PlayerStart",
+			"type": "SpawnPoint",
+			"props": {"prefab": "prefabs/player.json", "position": [1900, 200]}
+		},
+		{
+			"uid": 4,
+			"name": "Enemy_Test",
+			"type": "Sprite",
+			"props": {
+				"position": [2688, 900],
+				"z": 3,
+				"scale": [0.6, 0.6],
+				"frame": "MM_A_Letter.png",
+				"y_sort": true
+			},
+			"components": [
+				{
+					"type": "PathFollower",
+					"props": {"path": 6, "duration": 6, "mode": "ping_pong", "ease": "sineInOut"}
+				}
+			]
+		},
+		{
+			"uid": 5,
+			"name": "SkyWall",
+			"type": "Collider",
+			"props": {"position": [1920, 1960], "size": [3840, 400]}
+		},
+		{
+			"uid": 6,
+			"name": "EnemyPath",
+			"type": "Path",
+			"props": {
+				"kind": "catmull_rom",
+				"points": [
+					[2600, 500],
+					[3000, 900],
+					[3300, 700],
+					[3550, 1200]
+				],
+				"closed": false
+			}
+		},
+		{
+			"uid": 7,
+			"name": "ToSideScroll",
+			"type": "Trigger",
+			"props": {
+				"position": [3700, 1000],
+				"size": [280, 2000],
+				"once": false,
+				"on_enter": [
+					{"do": "set_control_mode", "mode": "side_scroll"},
+					{"do": "play_timeline", "timeline": "scare"}
+				]
+			}
+		},
+		{
+			"uid": 8,
+			"name": "ToTopDown",
+			"type": "Trigger",
+			"props": {
+				"position": [140, 1000],
+				"size": [280, 2000],
+				"once": false,
+				"on_enter": [
+					{"do": "set_control_mode", "mode": "top_down"}
+				]
+			}
+		},
+		{
+			"uid": 9,
+			"name": "CameraPath",
+			"type": "Path",
+			"props": {
+				"kind": "catmull_rom",
+				"points": [
+					[2900, 1400],
+					[2200, 1100],
+					[1900, 700]
+				],
+				"closed": false
+			}
+		},
+		{
+			"uid": 10,
+			"name": "Ledge",
+			"type": "Collider",
+			"props": {"position": [3100, 600], "size": [600, 40], "one_way": true}
+		},
+		{
+			"uid": 11,
+			"name": "Title",
+			"type": "Label",
+			"props": {
+				"position": [1920, 1500],
+				"z": 20,
+				"text": "Stage A",
+				"font_size": 160,
+				"opacity": 0,
+				"color": [255, 240, 220]
+			}
+		}
+	],
+	"timelines": [
+		{
+			"id": "intro",
+			"duration": 4,
+			"tracks": [
+				{
+					"kind": "path",
+					"target": "@camera",
+					"path": 9,
+					"start": 0,
+					"duration": 3.5,
+					"ease": "cubicInOut"
+				},
+				{
+					"kind": "property",
+					"target": "@camera",
+					"property": "zoom",
+					"keys": [
+						{"t": 0, "v": 1.3},
+						{"t": 3.5, "v": 1, "ease": "sineInOut"}
+					]
+				},
+				{
+					"kind": "property",
+					"target": 11,
+					"property": "opacity",
+					"keys": [
+						{"t": 0, "v": 0},
+						{"t": 1, "v": 255, "ease": "sineOut"},
+						{"t": 2.5, "v": 255},
+						{"t": 3.5, "v": 0, "ease": "sineIn"}
+					]
+				},
+				{
+					"kind": "property",
+					"target": 11,
+					"property": "scale",
+					"keys": [
+						{"t": 0, "v": [0.8, 0.8]},
+						{"t": 3.5, "v": [1.2, 1.2], "ease": "sineOut"}
+					]
+				}
+			]
+		},
+		{
+			"id": "scare",
+			"duration": 1.2,
+			"tracks": [
+				{
+					"kind": "property",
+					"target": "@camera",
+					"property": "shake",
+					"keys": [
+						{"t": 0, "v": 40},
+						{"t": 1.2, "v": 0, "ease": "quadOut"}
+					]
+				},
+				{
+					"kind": "property",
+					"target": 1,
+					"property": "color",
+					"keys": [
+						{"t": 0, "v": [255, 80, 80]},
+						{"t": 1.2, "v": [255, 255, 255], "ease": "sineOut"}
+					]
+				}
+			]
+		}
+	]
+}

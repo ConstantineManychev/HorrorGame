@@ -1,175 +1,163 @@
-#/****************************************************************************
-# Copyright (c) 2013-2014 cocos2d-x.org
-# Copyright (c) 2015-2017 Chukong Technologies Inc.
-#
-# http://www.cocos2d-x.org
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
+cmake_minimum_required(VERSION 3.22...4.1)
 
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-# ****************************************************************************/
-
-cmake_minimum_required(VERSION 3.6)
-
-set(APP_NAME Horror_Game)
+set(APP_NAME HorrorGame)
+set(HG_EDITOR_NAME HorrorGameEditor)
+set(HG_BUNDLE_ID "com.constantinemanychev.horrorgame")
 
 project(${APP_NAME})
 
+option(HG_CORE_ONLY "Build only the engine independent core library, tools and tests" OFF)
+
+if(HG_CORE_ONLY)
+  set(CMAKE_CXX_STANDARD 20)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  include(cmake/HorrorGameCore.cmake)
+  return()
+endif()
+
 if(XCODE)
-    if(NOT DEFINED CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET)
-        SET (CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET 8.0)
-    endif()
+  set(CMAKE_XCODE_GENERATE_TOP_LEVEL_PROJECT_ONLY TRUE)
 endif()
 
-if(NOT DEFINED BUILD_ENGINE_DONE) # to test Horror_Game into root project
-    set(USE_PHYSICS3D OFF)
-    set(COCOS2DX_ROOT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cocos2d)
-    set(CMAKE_MODULE_PATH ${COCOS2DX_ROOT_PATH}/cmake/Modules/)
+set(_is_axmol_embed FALSE)
+set(_AX_USE_PREBUILT FALSE)
 
-    include(CocosBuildSet)
-    add_subdirectory(${COCOS2DX_ROOT_PATH}/cocos ${ENGINE_BINARY_PATH}/cocos/core)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
+
+include(AXGameEngineOptions)
+include(AXGameEngineSetup)
+
+include(cmake/HorrorGameCore.cmake)
+
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.25)
+  set_target_properties(${_AX_CORE_LIB} PROPERTIES SYSTEM TRUE)
+  if(TARGET ImGui)
+    set_target_properties(ImGui PROPERTIES SYSTEM TRUE)
+  endif()
 endif()
 
-# record sources, headers, resources...
-set(GAME_SOURCE)
-set(GAME_HEADER)
-
-set(GAME_RES_FOLDER
-    "${CMAKE_CURRENT_SOURCE_DIR}/Resources"
-    )
-if(APPLE OR WINDOWS)
-    cocos_mark_multi_resources(common_res_files RES_TO "Resources" FOLDERS ${GAME_RES_FOLDER})
-endif()
-
-# add cross-platforms source files and header files 
-file(GLOB_RECURSE GAME_SOURCE
-        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Basics/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Managers/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Types/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Scenes/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Helpers/*.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Scenes/EditorScene.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Helpers/ViewFactory.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Managers/GameSession.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Managers/InputManager.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Components/InputComponent.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Components/MovementComponent.cpp"
-     )
-file(GLOB_RECURSE GAME_HEADER
-        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/*.h"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Basics/*.h"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Managers/*.h"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Types/*.h"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Scenes/*.h"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Classes/Helpers/*.h"
-
-     )
-
-if(ANDROID)
-    # change APP_NAME to the share library name for Android, it's value depend on AndroidManifest.xml
-    set(APP_NAME Horror_Game)
-    list(APPEND GAME_SOURCE
-         proj.android/app/jni/hellocpp/main.cpp
-         )
-elseif(LINUX)
-    list(APPEND GAME_SOURCE
-         proj.linux/main.cpp
-         )
-elseif(WINDOWS)
-    list(APPEND GAME_HEADER
-         proj.win32/main.h
-         proj.win32/resource.h
-         )
-    list(APPEND GAME_SOURCE
-         proj.win32/main.cpp
-         proj.win32/game.rc
-         ${common_res_files}
-         )
-elseif(APPLE)
-    if(IOS)
-        list(APPEND GAME_HEADER
-             proj.ios_mac/ios/AppController.h
-             proj.ios_mac/ios/RootViewController.h
-             )
-        set(APP_UI_RES
-            proj.ios_mac/ios/LaunchScreen.storyboard
-            proj.ios_mac/ios/LaunchScreenBackground.png
-            proj.ios_mac/ios/Images.xcassets
-            )
-        list(APPEND GAME_SOURCE
-             proj.ios_mac/ios/main.m
-             proj.ios_mac/ios/AppController.mm
-             proj.ios_mac/ios/RootViewController.mm
-             proj.ios_mac/ios/Prefix.pch
-             ${APP_UI_RES}
-             )
-    elseif(MACOSX)
-        set(APP_UI_RES
-            proj.ios_mac/mac/Icon.icns
-            proj.ios_mac/mac/Info.plist
-            )
-        list(APPEND GAME_SOURCE
-             proj.ios_mac/mac/main.cpp
-             proj.ios_mac/mac/Prefix.pch
-             ${APP_UI_RES}
-             )
-    endif()
-    list(APPEND GAME_SOURCE ${common_res_files})
-endif()
-
-# mark app complie info and libs info
-set(all_code_files
-    ${GAME_HEADER}
-    ${GAME_SOURCE}
-    )
-if(NOT ANDROID)
-    add_executable(${APP_NAME} ${all_code_files})
-else()
-    add_library(${APP_NAME} SHARED ${all_code_files})
-    add_subdirectory(${COCOS2DX_ROOT_PATH}/cocos/platform/android ${ENGINE_BINARY_PATH}/cocos/platform)
-    target_link_libraries(${APP_NAME} -Wl,--whole-archive cpp_android_spec -Wl,--no-whole-archive)
-endif()
-
-target_link_libraries(${APP_NAME} cocos2d)
-target_include_directories(${APP_NAME}
-        PRIVATE Classes
-        PRIVATE ${COCOS2DX_ROOT_PATH}/cocos/audio/include/
+file(GLOB_RECURSE HG_RUNTIME_FILES CONFIGURE_DEPENDS
+  Source/Runtime/*.h
+  Source/Runtime/*.cpp
 )
 
-# mark app resources
-setup_cocos_app_config(${APP_NAME})
+add_library(hg_runtime STATIC ${HG_RUNTIME_FILES})
+target_link_libraries(hg_runtime PUBLIC hg_core ${_AX_CORE_LIB})
+target_include_directories(hg_runtime PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Source")
+set_target_properties(hg_runtime PROPERTIES FOLDER "HorrorGame")
+hg_configure_warnings(hg_runtime)
+
+set(content_folder "${CMAKE_CURRENT_SOURCE_DIR}/Content")
+
 if(APPLE)
-    set_target_properties(${APP_NAME} PROPERTIES RESOURCE "${APP_UI_RES}")
-
-    if(MACOSX)
-        set_xcode_property(${APP_NAME} INFOPLIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/mac/Info.plist")
-    elseif(IOS)
-        set_xcode_property(${APP_NAME} INFOPLIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/ios/Info.plist")
-        set_xcode_property(${APP_NAME} ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon")
-    endif()
-
-    # For code-signing, set the DEVELOPMENT_TEAM:
-    #set_xcode_property(${APP_NAME} DEVELOPMENT_TEAM "GRLXXXX2K9")
+  ax_mark_multi_resources(common_content_files RES_TO "Resources" FOLDERS ${content_folder})
 elseif(WINDOWS)
-    cocos_copy_target_dll(${APP_NAME})
+  ax_mark_multi_resources(common_content_files RES_TO "Content" FOLDERS ${content_folder})
 endif()
 
-if(LINUX OR WINDOWS)
-    cocos_get_resource_path(APP_RES_DIR ${APP_NAME})
-    cocos_copy_target_res(${APP_NAME} LINK_TO ${APP_RES_DIR} FOLDERS ${GAME_RES_FOLDER})
+set(HG_PLATFORM_HEADERS)
+set(HG_PLATFORM_SOURCES)
+
+if(ANDROID)
+  list(APPEND HG_PLATFORM_SOURCES proj.android/app/jni/main.cpp)
+elseif(LINUX)
+  list(APPEND HG_PLATFORM_SOURCES proj.linux/main.cpp ${common_content_files})
+elseif(WINDOWS)
+  list(APPEND HG_PLATFORM_HEADERS proj.win32/main.h proj.win32/resource.h)
+  list(APPEND HG_PLATFORM_SOURCES proj.win32/main.cpp proj.win32/game.rc ${common_content_files})
+elseif(APPLE)
+  if(IOS)
+    list(APPEND HG_PLATFORM_HEADERS
+      proj.ios_mac/ios/GameAppController.h
+      proj.ios_mac/ios/GameViewController.h
+      proj.ios_mac/ios/GameSceneDelegate.h
+    )
+    set(APP_UI_RES
+      proj.ios_mac/ios/targets/ios/LaunchScreenBackground.png
+      proj.ios_mac/ios/targets/ios/LaunchScreen.storyboard
+      proj.ios_mac/ios/targets/ios/Images.xcassets
+    )
+    list(APPEND HG_PLATFORM_SOURCES
+      proj.ios_mac/ios/main.mm
+      proj.ios_mac/ios/GameAppController.mm
+      proj.ios_mac/ios/GameViewController.mm
+      proj.ios_mac/ios/GameSceneDelegate.mm
+      proj.ios_mac/ios/Prefix.pch
+      ${APP_UI_RES}
+    )
+  elseif(MACOSX)
+    set(APP_UI_RES proj.ios_mac/mac/Icon.icns)
+    list(APPEND HG_PLATFORM_SOURCES
+      proj.ios_mac/mac/main.cpp
+      proj.ios_mac/mac/Prefix.pch
+      ${APP_UI_RES}
+    )
+  endif()
+  list(APPEND HG_PLATFORM_SOURCES ${common_content_files})
+endif()
+
+file(GLOB HG_APP_FILES CONFIGURE_DEPENDS Source/App/*.h Source/App/*.cpp)
+
+function(hg_add_application target)
+  cmake_parse_arguments(opt "" "BUNDLE_ID" "FILES" ${ARGN})
+
+  set(APP_NAME ${target})
+  set(target_files ${HG_APP_FILES} ${opt_FILES} ${HG_PLATFORM_HEADERS} ${HG_PLATFORM_SOURCES})
+
+  if(NOT ANDROID)
+    add_executable(${target} ${target_files})
+  else()
+    add_library(${target} SHARED ${target_files})
+    if(NOT BUILD_SHARED_LIBS)
+      target_link_libraries(${target} -Wl,--whole-archive cpp_android_spec -Wl,--no-whole-archive)
+    endif()
+    config_android_shared_libs("dev.axmol.lib" "${CMAKE_CURRENT_SOURCE_DIR}/proj.android/app/src")
+  endif()
+
+  target_link_libraries(${target} hg_runtime)
+  target_include_directories(${target} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Source/App" "${CMAKE_CURRENT_SOURCE_DIR}/Source")
+  set_target_properties(${target} PROPERTIES FOLDER "HorrorGame")
+  hg_configure_warnings(${target})
+
+  ax_setup_app_config(${target})
+
+  if((NOT APPLE) AND (NOT WINRT))
+    ax_get_resource_path(APP_RES_DIR ${target})
+    ax_sync_target_res(${target} LINK_TO ${APP_RES_DIR} FOLDERS ${content_folder} SYM_LINK 1)
+    if(WINDOWS AND (NOT (CMAKE_GENERATOR MATCHES "Ninja")))
+      set_property(TARGET ${target} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${content_folder}")
+    endif()
+  endif()
+
+  ax_setup_app_props(${target})
+
+  if(APPLE)
+    set_target_properties(${target} PROPERTIES RESOURCE "${APP_UI_RES}")
+    set_xcode_property(${target} INSTALL_PATH "\$(LOCAL_APPS_DIR)")
+    set_xcode_property(${target} PRODUCT_BUNDLE_IDENTIFIER "${opt_BUNDLE_ID}")
+    if(MACOSX)
+      set_target_properties(${target} PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/mac/Info.plist")
+    elseif(IOS)
+      set_target_properties(${target} PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/ios/targets/ios/Info.plist")
+      set_xcode_property(${target} ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon")
+      set_xcode_property(${target} TARGETED_DEVICE_FAMILY "1,2")
+    endif()
+  elseif(WINDOWS)
+    ax_sync_target_dlls(${target})
+  endif()
+endfunction()
+
+file(GLOB_RECURSE HG_GAME_FILES CONFIGURE_DEPENDS Source/Game/*.h Source/Game/*.cpp)
+hg_add_application(${APP_NAME} FILES ${HG_GAME_FILES} BUNDLE_ID ${HG_BUNDLE_ID})
+
+if(NOT DEFINED BUILD_ENGINE_DONE AND WINDOWS)
+  set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${APP_NAME})
+endif()
+
+option(HG_BUILD_EDITOR "Build the level editor on desktop platforms" ON)
+
+if(HG_BUILD_EDITOR AND AX_ENABLE_EXT_IMGUI AND (LINUX OR MACOSX OR (WINDOWS AND NOT WINRT)))
+  file(GLOB_RECURSE HG_EDITOR_FILES CONFIGURE_DEPENDS Source/Editor/*.h Source/Editor/*.cpp)
+  hg_add_application(${HG_EDITOR_NAME} FILES ${HG_EDITOR_FILES} BUNDLE_ID "${HG_BUNDLE_ID}.editor")
+  target_compile_definitions(${HG_EDITOR_NAME} PRIVATE HG_CONTENT_SOURCE_DIR="${content_folder}")
 endif()

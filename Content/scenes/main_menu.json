@@ -1,0 +1,58 @@
+{
+	"format": "horror-scene",
+	"version": 2,
+	"id": "main_menu",
+	"kind": "screen",
+	"next_uid": 6,
+	"settings": {
+		"world_size": [3840, 2160],
+		"view_height": 2160,
+		"background": [0, 0, 0],
+		"control_mode": "none",
+		"camera_dead_zone": [0.15, 0.2],
+		"camera_damping": 6,
+		"music": "",
+		"on_start": []
+	},
+	"objects": [
+		{
+			"uid": 1,
+			"name": "back",
+			"type": "Sprite",
+			"props": {"position": [1920, 1080], "z": 1, "texture": "res/main_menu/MM_Background.png"}
+		},
+		{
+			"uid": 2,
+			"name": "ground",
+			"type": "Sprite",
+			"props": {"position": [1920, 864], "z": 2, "texture": "res/main_menu/MM_ground.png"}
+		},
+		{
+			"uid": 3,
+			"name": "B_Letter",
+			"type": "Sprite",
+			"props": {"position": [768, 1512], "z": 3, "opacity": 255, "frame": "MM_B_Letter.png"}
+		},
+		{
+			"uid": 4,
+			"name": "C_Letter",
+			"type": "Sprite",
+			"props": {"position": [1920, 1512], "z": 3, "opacity": 255, "frame": "MM_C_Letter.png"}
+		},
+		{
+			"uid": 5,
+			"name": "btnStart",
+			"type": "Button",
+			"props": {
+				"position": [3072, 1512],
+				"z": 5,
+				"normal": "res/main_menu/MM_A_Letter.png",
+				"pressed": "res/main_menu/MM_B_Letter.png",
+				"on_click": [
+					{"do": "change_scene", "scene": "stage_a"}
+				]
+			}
+		}
+	],
+	"timelines": []
+}
