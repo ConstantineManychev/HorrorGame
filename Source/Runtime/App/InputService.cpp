@@ -1,6 +1,7 @@
 #include "Runtime/App/InputService.h"
 
 #include <algorithm>
+#include <cctype>
 #include <array>
 #include <utility>
 

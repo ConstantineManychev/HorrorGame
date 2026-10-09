@@ -1,7 +1,8 @@
 #include "Launch.h"
 
+#include "Editor/EditorScene.h"
 #include "Runtime/App/AppContext.h"
-#include "Runtime/Scenes/PlayScene.h"
+#include "Runtime/App/Log.h"
 
 namespace hg
 {
@@ -21,8 +22,7 @@ namespace hg
 
     void launchApplication(AppContext& aContext)
     {
-        auto* scene = PlayScene::create(aContext);
-        scene->loadScene(aContext.config().startScene);
-        ax::Director::getInstance()->runWithScene(scene);
+        Log::info("Editor writes content to " + aContext.content().writableRoot());
+        ax::Director::getInstance()->runWithScene(EditorScene::create(aContext));
     }
 }
