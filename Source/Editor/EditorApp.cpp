@@ -127,10 +127,11 @@ namespace hg
         drawMainMenu(*this);
         const ImGuiID dockspace = ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
         mDockspaceId = dockspace;
-        if (!mLayoutInitialized)
+        if (!mLayoutInitialized || mLayoutResetRequested)
         {
+            buildDefaultLayout(dockspace, mLayoutResetRequested);
             mLayoutInitialized = true;
-            buildDefaultLayout(dockspace);
+            mLayoutResetRequested = false;
             mFocusTimelinePending = true;
         }
 
@@ -808,6 +809,11 @@ namespace hg
         return mDockspaceId;
     }
 
+    void EditorApp::resetLayout()
+    {
+        mLayoutResetRequested = true;
+    }
+
     void EditorApp::centerViewportOn(const Vec2& aWorld)
     {
         if (mViewport.rectMax.x <= mViewport.rectMin.x)
@@ -1327,10 +1333,10 @@ namespace hg
     void EditorApp::pruneSelection()
     {
         const SceneDocument* doc = document();
-        mSelection.erase(std::remove_if(mSelection.begin(), mSelection.end(), [doc](ObjectId aUid)
+        std::erase_if(mSelection, [doc](ObjectId aUid)
         {
             return !doc || !doc->findObject(aUid);
-        }), mSelection.end());
+        });
     }
 
     void EditorApp::loadAtlasFrames()

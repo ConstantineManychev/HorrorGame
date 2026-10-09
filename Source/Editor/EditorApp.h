@@ -174,6 +174,7 @@ namespace hg
         void frameAllWhenReady();
         void onViewportReady();
         unsigned int dockspaceId() const;
+        void resetLayout();
         void centerViewportOn(const Vec2& aWorld);
         Vec2 viewportCenterWorld() const;
         Vec2 imguiToWorld(const ImVec2& aPoint) const;
@@ -247,6 +248,7 @@ namespace hg
         std::vector<std::string> mPrefabFiles;
         std::vector<std::string> mAtlasFrames;
         bool mLayoutInitialized = false;
+        bool mLayoutResetRequested = false;
         bool mFramePending = true;
         bool mFocusTimelinePending = false;
         unsigned int mDockspaceId = 0;

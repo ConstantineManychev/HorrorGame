@@ -34,16 +34,16 @@ namespace hg
         gNewSceneRequested = true;
     }
 
-    void buildDefaultLayout(ImGuiID aDockspace)
+    void buildDefaultLayout(ImGuiID aDockspace, bool aReplaceExisting)
     {
         ImGuiDockNode* existing = ImGui::DockBuilderGetNode(aDockspace);
-        if (existing && !existing->IsLeafNode())
+        if (!aReplaceExisting && existing && !existing->IsLeafNode())
         {
             return;
         }
         const ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImGui::DockBuilderRemoveNode(aDockspace);
-        ImGui::DockBuilderAddNode(aDockspace, ImGuiDockNodeFlags_DockSpace | ImGuiDockNodeFlags_PassthruCentralNode);
+        ImGui::DockBuilderAddNode(aDockspace, static_cast<ImGuiDockNodeFlags>(ImGuiDockNodeFlags_DockSpace) | ImGuiDockNodeFlags_PassthruCentralNode);
         ImGui::DockBuilderSetNodeSize(aDockspace, viewport->WorkSize);
 
         ImGuiID center = aDockspace;
@@ -207,6 +207,11 @@ namespace hg
             if (ImGui::MenuItem("Frame Selection", "F", false, !aApp.selection().empty()))
             {
                 aApp.frameObjects(aApp.selection());
+            }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Reset Layout"))
+            {
+                aApp.resetLayout();
             }
             ImGui::EndMenu();
         }

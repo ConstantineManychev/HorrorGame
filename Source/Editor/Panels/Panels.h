@@ -17,7 +17,7 @@ namespace hg
         inline constexpr const char* kConsole = "Console";
     }
 
-    void buildDefaultLayout(ImGuiID aDockspace);
+    void buildDefaultLayout(ImGuiID aDockspace, bool aReplaceExisting);
     void drawMainMenu(EditorApp& aApp);
     void drawScenesPanel(EditorApp& aApp);
     void drawHierarchyPanel(EditorApp& aApp);

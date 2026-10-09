@@ -6,6 +6,7 @@
 #include "axmol.h"
 
 #include <algorithm>
+#include <functional>
 #include <set>
 
 namespace hg
@@ -45,10 +46,7 @@ namespace hg
     }
 
     ContentStore::ContentStore()
-        : mPrefabs([this](const std::string& aPath)
-        {
-            return readText(aPath);
-        })
+        : mPrefabs(std::bind_front(&ContentStore::readText, this))
     {
     }
 
